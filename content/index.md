@@ -13,7 +13,7 @@ the documents in the [RunicMMOEngine Drive folder](https://drive.google.com/driv
 
 - [[RunicGame — Complete MMORPG Vision]]: how the game works. The Vision states the rules.
 - [[RunicEngine — Technical Architecture]]: how the Engine, the Platform and the Game build them; it links to the Vision for the rules.
-- [[RunicGame — Ideias]]: the ideas inbox, one note per idea ID, kept whole as history.
+- [[RunicGame — Ideias]]: the ideas inbox, one note per idea ID, kept whole as history. [[Ideias overview]] shows every idea in full on one page.
 - [[RunicGame — Lore]] and [[RunicGame — Quest Design]]: in the RunicGame repository.
 - Archive: the original appendices, unchanged: [[RunicGame — Appendix Nodes, Economy and Exploration|Nodes, Economy and Exploration]], [[RunicGame — Appendix Content Pipeline and Art Direction|Content Pipeline and Art Direction]], [[RunicGame — Appendix Ping Resolution|Ping Resolution]], [[RunicEngine — Appendix Security|Security]], [[RunicEngine — Appendix Database Layout|Database Layout]].
 

@@ -21,6 +21,7 @@ content/                                      ← the Obsidian vault (open this 
 │   └── …
 ├── Ideias/                                   RunicGame — Ideias, kept whole as history
 │   ├── RunicGame — Ideias.md                 its introduction and every entry in order
+│   ├── Ideias overview.md                    every idea embedded in full, in the same order
 │   ├── NAV-01 Naval Raid.md                  one note per idea ID, text unchanged; the ID is its alias
 │   └── Archived and Discarded ideas.md
 ├── Archive/                                  the original appendices, unchanged, even after they are merged
@@ -38,7 +39,7 @@ tools/                                        the split script, the move tool an
 | :--- | ---: |
 | `Vision/` | 22 |
 | `Architecture/` | 28 |
-| `Ideias/` | 101 |
+| `Ideias/` | 102 |
 | `Archive/` | 5 |
 | `Lore/`, `Quest Design/` | 1 each |
 
@@ -67,7 +68,7 @@ A note can show another note inside it, in a box with its own scrollbar, on the 
 | `![[Combat#Conditions, build-up and Tolerance]]` | one section, up to the next heading of the same level |
 | `![[Combat#^naval-rule]]` | one paragraph, marked with ` ^naval-rule` at its end |
 
-The Ideias list embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
+`Ideias overview` embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
 `runicdocs-embeds` snippet in Obsidian: turn it on once in **Settings › Appearance › CSS snippets**.
 
 ## Moving text

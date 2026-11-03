@@ -29,8 +29,8 @@ from playwright.sync_api import sync_playwright
 
 PUBLIC = Path(sys.argv[1]).resolve()
 BASE = "/" + sys.argv[2].strip("/")
-PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias"]
-EMBED_PAGE = "/Ideias/RunicGame-—-Ideias"  # the Ideias list embeds every idea
+PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias", "/Ideias/Ideias-overview"]
+EMBED_PAGE = "/Ideias/Ideias-overview"  # embeds every idea
 
 # The graph plugin loads d3 from a CDN as window.d3. Wrap d3.forceSimulation to record the node ids
 # of each graph it lays out, so the check can see which nodes the local and the full graph hold.
