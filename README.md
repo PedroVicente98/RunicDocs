@@ -122,7 +122,7 @@ settings. If the site moves, change `baseUrl` in `quartz.config.yaml`.
 ### Quartz fixes for a subpath site
 
 The site lives under `/RunicDocs/`, not at the domain root. Quartz 5.0.0's graph, explorer, search and stacked-pages
-plugins looked for their data and built their links at the root, so the graph came up empty. Three changes fix it
+plugins looked for their data and built their links at the root, so the graph came up empty. Four changes fix it
 until a Quartz release includes the fixes:
 
 - `quartz-patches/body-basepath.patch` backports a change from Quartz's main branch: each page's `<body>` gets
@@ -132,6 +132,10 @@ until a Quartz release includes the fixes:
   subdirectory deployments"). The graph uses its 4 April 2026 commit, which also removes the base path when it works out
   the current page from the address ("strip base path for non-root domains"). Without that fix the local graph showed a
   single unknown dot and linked to `/RunicDocs/RunicDocs/`.
+- `quartz-patches/decode-graph-slug.mjs` runs after the plugins are installed. The graph plugin read the page from the
+  address without decoding it, so a page with a non-ASCII character in its name (the "—" in "RunicGame — Ideias")
+  got a one-dot local graph. The script applies the later fix from `@quartz-community/utils` (`decodeURI`) to the
+  built plugin, and fails the build if the plugin has changed so the fix no longer applies.
 - `quartz.config.yaml` turns **stacked-pages off**. That plugin also works out the current page from the address and has
   no fix yet, so its tabs opened `/RunicDocs/RunicDocs/...`. Turn it back on when a newer commit removes the base path.
 

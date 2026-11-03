@@ -20,5 +20,7 @@ cp -r content .quartz/content
 cp quartz.config.yaml .quartz/quartz.config.yaml
 cp quartz-styles/custom.scss .quartz/quartz/styles/custom.scss
 
+node quartz-patches/decode-graph-slug.mjs .quartz/.quartz/plugins/graph/dist
+
 cd .quartz
 npx quartz build --serve

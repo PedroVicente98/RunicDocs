@@ -22,5 +22,7 @@ Copy-Item -Recurse "content" ".quartz\content"
 Copy-Item "quartz.config.yaml" ".quartz\quartz.config.yaml" -Force
 Copy-Item "quartz-styles\custom.scss" ".quartz\quartz\styles\custom.scss" -Force
 
+node quartz-patches/decode-graph-slug.mjs .quartz\.quartz\plugins\graph\dist
+
 Set-Location .quartz
 npx quartz build --serve

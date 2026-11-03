@@ -67,6 +67,11 @@ jobs:
         working-directory: .quartz
         run: npx quartz plugin restore
 
+      # The graph plugin reads the page from the address without decoding it, so pages with a "—" in their
+      # name got a one-dot local graph. This applies utils' later fix (decodeURI) to the built plugin.
+      - name: Patch the graph plugin for non-ASCII page names
+        run: node quartz-patches/decode-graph-slug.mjs .quartz/.quartz/plugins/graph/dist
+
       - name: Build site
         working-directory: .quartz
         run: npx quartz build
