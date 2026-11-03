@@ -1,0 +1,14 @@
+# Quartz checkout used by scripts/preview.* and CI
+.quartz/
+node_modules/
+public/
+
+# Obsidian per-device state (the shared settings in content/.obsidian stay tracked)
+content/.obsidian/workspace.json
+content/.obsidian/workspace-mobile.json
+content/.obsidian/cache
+content/.trash/
+
+.DS_Store
+Thumbs.db
+__pycache__/

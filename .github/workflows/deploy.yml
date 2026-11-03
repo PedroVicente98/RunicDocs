@@ -1,0 +1,71 @@
+name: Deploy RunicDocs to GitHub Pages
+
+# Builds the vault in content/ with Quartz and publishes it to GitHub Pages.
+# One-time setup: repository Settings > Pages > Source: GitHub Actions.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  QUARTZ_VERSION: v5.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch Quartz ${{ env.QUARTZ_VERSION }}
+        run: git clone --depth 1 --branch "$QUARTZ_VERSION" https://github.com/jackyzha0/quartz.git .quartz
+
+      - name: Add RunicDocs content and configuration
+        run: |
+          rm -rf .quartz/content
+          cp -r content .quartz/content
+          cp quartz.config.yaml .quartz/quartz.config.yaml
+
+      - name: Install Quartz
+        working-directory: .quartz
+        run: npm ci
+
+      - name: Restore Quartz plugins
+        working-directory: .quartz
+        run: npx quartz plugin restore
+
+      - name: Build site
+        working-directory: .quartz
+        run: npx quartz build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .quartz/public
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

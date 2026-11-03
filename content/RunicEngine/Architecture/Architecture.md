@@ -1,0 +1,112 @@
+---
+title: "RunicEngine — Technical Architecture v4"
+tags:
+  - "runicengine"
+  - "architecture"
+source: "RunicEngine — Technical Architecture v4"
+source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
+created: "2026-10-14"
+modified: "2026-10-30"
+aliases:
+  - "Technical Architecture v4"
+---
+
+Oct 14, 2026 · Pedro
+
+## Contents
+
+- [[About this document (Architecture)|About this document]]
+- [[Architecture overview|Architecture overview]]
+  - [[Architecture overview#Layered view|Layered view]]
+  - [[Architecture overview#Ownership map|Ownership map]]
+- [[Principles and performance targets|Principles and performance targets]]
+  - [[Principles and performance targets#Non-negotiable principles|Non-negotiable principles]]
+  - [[Principles and performance targets#Targets|Targets]]
+  - [[Principles and performance targets#Planning budgets|Planning budgets]]
+- [[Repositories build targets and processes|Repositories, build targets and processes]]
+- [[Modules work packages and the implementation contract|Modules, work packages and the implementation contract (Engine, Platform, Game)]]
+- [[Application and LayerStack|Application and LayerStack (Engine)]]
+  - [[Application and LayerStack#Entry point|Entry point]]
+  - [[Application and LayerStack#Loop policies|Loop policies]]
+  - [[Application and LayerStack#Stacks per executable|Stacks per executable]]
+  - [[Application and LayerStack#Transitions|Transitions]]
+  - [[Application and LayerStack#Implementation rules|Implementation rules]]
+- [[Godot integration|Godot integration (Engine)]]
+- [[Simulation core clock and threads|Simulation core: clock and threads (Engine)]]
+  - [[Simulation core clock and threads#Multi-rate fixed-step scheduler|Multi-rate fixed-step scheduler]]
+  - [[Simulation core clock and threads#Threading model (decided)|Threading model (decided)]]
+- [[Simulation core Flecs and Jolt|Simulation core: Flecs and Jolt (Engine)]]
+  - [[Simulation core Flecs and Jolt#Flecs rules|Flecs rules]]
+  - [[Simulation core Flecs and Jolt#Jolt rules|Jolt rules]]
+- [[World space coordinates cells and activation|World space: coordinates, cells and activation (Engine)]]
+  - [[World space coordinates cells and activation#64-bit coordinates (decided)|64-bit coordinates (decided)]]
+  - [[World space coordinates cells and activation#Which values are 64-bit (decided)|Which values are 64-bit (decided)]]
+  - [[World space coordinates cells and activation#Spatial hierarchy|Spatial hierarchy]]
+  - [[World space coordinates cells and activation#Sparse 3D cells and exact queries|Sparse 3D cells and exact queries]]
+  - [[World space coordinates cells and activation#Activation volumes|Activation volumes]]
+  - [[World space coordinates cells and activation#Volumes for caves and rules|Volumes for caves and rules]]
+  - [[World space coordinates cells and activation#Sparse and expandable world|Sparse and expandable world]]
+  - [[World space coordinates cells and activation#Worlds, instances and transitions|Worlds, instances and transitions]]
+  - [[World space coordinates cells and activation#Runtime loading and ownership|Runtime loading and ownership]]
+- [[Water system|Water system (Engine)]]
+- [[Environment wind currents tides waves and weather|Environment: wind, currents, tides, waves and weather (Engine)]]
+  - [[Environment wind currents tides waves and weather#Ownership|Ownership]]
+  - [[Environment wind currents tides waves and weather#Environment clock|Environment clock]]
+  - [[Environment wind currents tides waves and weather#Wind|Wind]]
+  - [[Environment wind currents tides waves and weather#Currents over time|Currents over time]]
+  - [[Environment wind currents tides waves and weather#Tides|Tides]]
+  - [[Environment wind currents tides waves and weather#Waves|Waves]]
+  - [[Environment wind currents tides waves and weather#Weather|Weather]]
+  - [[Environment wind currents tides waves and weather#Routines, events and world routines|Routines, events and world routines]]
+  - [[Environment wind currents tides waves and weather#Determinism, replication and handoff|Determinism, replication and handoff]]
+  - [[Environment wind currents tides waves and weather#API|API]]
+  - [[Environment wind currents tides waves and weather#Performance|Performance]]
+  - [[Environment wind currents tides waves and weather#Acceptance tests|Acceptance tests]]
+- [[Engine gameplay APIs|Engine gameplay APIs (Engine)]]
+- [[AI architecture|AI architecture (Engine, Game)]]
+- [[RunicGame systems|RunicGame systems (Game)]]
+- [[Sailing swimming and naval play|Sailing, swimming and naval play (Game)]]
+- [[Networking stack sessions and responsiveness|Networking: stack, sessions and responsiveness]]
+  - [[Networking stack sessions and responsiveness#Stack (decided)|Stack (decided)]]
+  - [[Networking stack sessions and responsiveness#Sessions|Sessions]]
+  - [[Networking stack sessions and responsiveness#Client prediction and reconciliation (decided)|Client prediction and reconciliation (decided)]]
+  - [[Networking stack sessions and responsiveness#Input queue (decided)|Input queue (decided)]]
+- [[Networking replication interest and handoff|Networking: replication, interest and handoff (Engine)]]
+  - [[Networking replication interest and handoff#Replication|Replication]]
+  - [[Networking replication interest and handoff#Priority and bandwidth budget|Priority and bandwidth budget]]
+  - [[Networking replication interest and handoff#Interest and visibility tiers (decided)|Interest and visibility tiers (decided)]]
+  - [[Networking replication interest and handoff#Simulations, handoff and ghosts|Simulations, handoff and ghosts]]
+- [[Platform and operations|Platform and operations]]
+  - [[Platform and operations#Services|Services]]
+  - [[Platform and operations#Simulation placement|Simulation placement]]
+  - [[Platform and operations#Instances and geography|Instances and geography]]
+  - [[Platform and operations#Launch phases|Launch phases]]
+  - [[Platform and operations#Monitoring one panel (decided)|Monitoring: one panel (decided)]]
+  - [[Platform and operations#Local development|Local development]]
+- [[Client runtime Game on Engine|Client runtime (Game on Engine)]]
+- [[Render data extraction and world UI|Render data, extraction and world UI (Engine, Game)]]
+- [[Audio|Audio (Engine, Game)]]
+  - [[Audio#Ownership|Ownership]]
+  - [[Audio#Semantic sound-effect events (Engine routing, Game definitions)|Semantic sound-effect events (Engine routing, Game definitions)]]
+  - [[Audio#Music contexts (Game defines, Engine resolves)|Music contexts (Game defines, Engine resolves)]]
+  - [[Audio#Soundtrack presets, albums and radio state (Engine)|Soundtrack presets, albums and radio state (Engine)]]
+  - [[Audio#Player settings and local files (Game screens, Engine profiles)|Player settings and local files (Game screens, Engine profiles)]]
+  - [[Audio#Security and authority rules|Security and authority rules]]
+  - [[Audio#Failure behavior|Failure behavior]]
+  - [[Audio#Developer tooling (Engine)|Developer tooling (Engine)]]
+  - [[Audio#Acceptance tests|Acceptance tests]]
+- [[Tools|Tools (Engine)]]
+  - [[Tools#RunicEditor|RunicEditor]]
+  - [[Tools#Cooker|Cooker]]
+  - [[Tools#Debug drawing|Debug drawing]]
+  - [[Tools#Testing at scale|Testing at scale]]
+  - [[Tools#Metrics every process exports|Metrics every process exports]]
+- [[Debug drawing|Debug drawing (Engine)]]
+- [[World authoring and cooking|World authoring and cooking (Engine, Game)]]
+- [[Vertical-slice roadmap|Vertical-slice roadmap]]
+- [[Decisions log|Decisions log]]
+
+---
+
+↑ [[index|RunicDocs]]  
+Source: [RunicEngine — Technical Architecture v4](https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit) · exported 2026-11-03
