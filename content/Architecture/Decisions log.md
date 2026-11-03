@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-03"
 ---
 
 | Area | Decision |
@@ -16,7 +16,7 @@ modified: "2026-10-30"
 | Authority | The C++ simulation is authoritative; Go services own durable and distributed state |
 | Scale | 5,000 players per world; 100 vs 100 must feel perfect; 500 in one region supported |
 | Coordinates | 64-bit double positions with a real Y axis and a 1 cm minimum unit; Jolt double precision; camera-relative rendering; network positions quantized relative to the cell |
-| World | One main world in continuous coordinates (surface, floating islands, underground spaces); separate persistent maps such as the Game’s sky world are their own WorldId; about 600 km² per map to start, land and sea included; expandable live; continent-scale capable |
+| World | One main world in continuous coordinates (surface, floating islands, underground spaces); separate persistent maps such as the Game’s sky world are their own WorldId; 51.2 × 51.2 km per map to start (about 2,621 km², about 600 km² of it land); expandable live; continent-scale capable |
 | Clock | 60 Hz master; 30/20/10 Hz domains; combat and physics at 30 Hz |
 | Threading | Every simulation is multi-threaded with fixed phases and barriers |
 | Placement | One region per pod by default; quiet neighbors may share a pod or a process; grow by in-place resize or move by handoff; the World Coordinator places by load, memory and inter-simulation traffic over Agones and co-locates high-traffic pairs up to a per-node cap; busy areas get their own simulation through authority partitions |

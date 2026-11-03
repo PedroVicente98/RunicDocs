@@ -5,10 +5,10 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-03"
 ---
 
-Exploring happens on foot, mounted, with a glider, with a wing, in vehicles and by ship. Flight exists only on the neutral continent and the Sky Island; elsewhere you can only glide, and over the ocean only with the wind current.
+Exploring happens on foot, mounted, with a glider, with a wing, in vehicles and by ship. Flight exists only in the flight zones: special regions of the neutral continent (for now one, the region of the floating islands) and the Sky Island; elsewhere you can only glide, and over the ocean only with the wind current.
 
 * **Glider (ArcheAge style):** only glides. It is the first way to glide and uses the wind currents of the regions with that gimmick. Gliders are crafted at a table from a design.  
 * **Wing:** equipment, equipped and not summoned. It glides like the glider and flies in the flight zones.  
@@ -20,5 +20,5 @@ Exploring happens on foot, mounted, with a glider, with a wing, in vehicles and 
 * **Trade packs** don't let you fly or glide, only walk slowly. They need vehicles or specialized mounts; a mount carries one pack.  
 * **Ships of several sizes** are essential for trade packs, housing islands and naval raids. Ships are built from designs on a construction platform.  
 * **Context kit:** mounted, with a glider or with a wing, the character uses only the context skills (see the Weapon Class System).  
-* **Between maps:** the island staircase of the neutral continent leads to the Sky Island; caves and rivers go down to the Underground, in the same map; other maps use portals.  
+* **Between maps:** how players reach the Sky Island is *being defined*; caves and rivers go down to the Underground, in the same map; other maps use portals.  
 * **Every discrete action** (interactions, starting and stopping a sprint, using an item) has a minimum cooldown of 0.25 s, to prevent spam in a highly interactive world.
