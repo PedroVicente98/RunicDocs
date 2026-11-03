@@ -2,8 +2,9 @@
 """
 Check the RunicDocs vault: every wikilink resolves to a note or an attachment,
 every #anchor matches a heading in its target note, every frontmatter block
-parses as YAML, and no two notes share a file name (ignoring case and folder),
-so short links like [[Combat]] always point to one note.
+parses as YAML, no two notes share a file name (ignoring case and folder), so
+short links like [[Combat]] always point to one note, and the vault's folders
+exist (Lore/ and Quest Design/ are never removed, even when empty).
 
     python3 tools/check_vault.py [content_dir]
 
@@ -24,6 +25,7 @@ except ImportError:  # the YAML check is skipped without PyYAML
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent / "content")
 LINK_RE = re.compile(r"(!?)\[\[([^\]]+?)\]\]")
+REQUIRED_FOLDERS = ["Vision", "Architecture", "Ideias", "Archive", "Lore", "Quest Design"]
 
 
 def slug(text: str) -> str:
@@ -56,6 +58,7 @@ def main() -> int:
     for key in notes:
         lower[key.split("/")[-1].lower()].append(key)
     dupes = [(name, ", ".join(keys)) for name, keys in lower.items() if len(keys) > 1]
+    missing = [(f, "folder missing") for f in REQUIRED_FOLDERS if not (ROOT / f).is_dir()]
     for key, path in notes.items():
         text = path.read_text(encoding="utf-8")
         if text.startswith("---\n"):
@@ -102,11 +105,12 @@ def main() -> int:
                         bad_anchor.append((key, inner))
     print(f"{len(notes)} notes, {total} links checked")
     for title, items in (("Broken links", broken), ("Anchors with no matching heading", bad_anchor),
-                         ("Frontmatter that does not parse", bad_yaml), ("Note names used more than once", dupes)):
+                         ("Frontmatter that does not parse", bad_yaml), ("Note names used more than once", dupes),
+                         ("Required folders missing", missing)):
         print(f"{title}: {len(items)}")
         for k, v in items[:40]:
             print(f"  {k}  ->  {v}")
-    return 1 if (broken or bad_anchor or bad_yaml or dupes) else 0
+    return 1 if (broken or bad_anchor or bad_yaml or dupes or missing) else 0
 
 
 if __name__ == "__main__":

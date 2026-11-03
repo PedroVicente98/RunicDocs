@@ -1,100 +1,109 @@
 # RunicDocs
 
-The RunicGame and RunicEngine design documentation as an Obsidian vault, published as a website with
-[Quartz](https://quartz.jzhao.xyz) (folder explorer, backlinks and the note graph).
+The RunicGame and RunicEngine design documentation, kept as Markdown: an Obsidian vault published as a website with
+[Quartz](https://quartz.jzhao.xyz) at [pedrovicente98.github.io/RunicDocs](https://pedrovicente98.github.io/RunicDocs/).
 
-It was compiled on 2026-11-03 from the documents in the
-[RunicMMOEngine Drive folder](https://drive.google.com/drive/folders/1hSflbWXn8Y2Ox-3QPFpXjrVkMo5warhv).
-Every note ends with a link to the Google Doc and section it came from.
+The vault started on 2026-11-03 as an export of the documents in the
+[RunicMMOEngine Drive folder](https://drive.google.com/drive/folders/1hSflbWXn8Y2Ox-3QPFpXjrVkMo5warhv). From then on the
+documents are edited and merged here, in Markdown, not in Google Docs.
 
-## What is inside
-
-| Area | Notes | From |
-| :--- | ---: | :--- |
-| `RunicGame/Vision` | 28 | RunicGame — Complete MMORPG Vision |
-| `RunicGame/Ideias` | 99 | RunicGame — Ideias: one note per idea ID, plus the archived and discarded table |
-| `RunicGame/Lore` | 1 | A note pointing to the RunicGame repository, where the Lore lives |
-| `RunicGame/Quest Design` | 1 | A note pointing to the RunicGame repository, where the Quest Design lives |
-| `RunicGame/Appendices` | 43 | Nodes, Economy and Exploration · Content Pipeline and Art Direction · Ping Resolution |
-| `RunicEngine/Architecture` | 147 | RunicEngine — Technical Architecture v4 |
-| `RunicEngine/Roadmap` | 53 | The vertical-slice roadmap table, one note per slice |
-| `RunicEngine/Packages` | 249 | The work-package tables, one note per package, grouped by repository and module |
-| `RunicEngine/Appendices` | 58 | Security · Database Layout |
-
-680 notes and about 6,700 links. Nothing was rewritten: the text is the documents' own, checked word by word against
-the exports.
-
-**Appendices** stay here until their content is merged into the Vision or the Architecture. On 2026-11-03 most of it
-wasn't yet: Security, Ping Resolution, Database Layout and Content Pipeline were 89–98% absent from both documents,
-and Nodes, Economy and Exploration about half. After a merge, delete the appendix folder (or rebuild without it).
+## Layout
 
 ```
-content/                          ← the Obsidian vault (open this folder in Obsidian)
-├── index.md                      home page (the only index.md)
-├── RunicGame/
-│   ├── Vision/
-│   │   ├── Vision.md             the document's main note: intro and contents, in document order
-│   │   ├── Combat.md             one note per section
-│   │   └── Recorded decisions and next steps/   a long section becomes a folder with a main note of the same name
-│   ├── Ideias/                   Ideias.md, NAV-01 Naval Raid.md, LAND-01 Land Ownership.md, …
-│   ├── Lore/Lore.md              → RunicGame repository
-│   ├── Quest Design/Quest Design.md   → RunicGame repository
-│   └── Appendices/
-├── RunicEngine/
-│   ├── Architecture/             Architecture.md and its sections
-│   ├── Roadmap/                  Roadmap.md, Slice 00 Build skeleton.md … Slice 44 Expansion.md
-│   ├── Packages/                 Packages.md, Engine/CMB Combat/CMB Combat.md, Engine/CMB Combat/CMB-3.md, …
-│   └── Appendices/
-└── attachments/                  the diagrams embedded in the documents
-quartz.config.yaml                site configuration (Quartz 5)
-.github/workflows/deploy.yml      builds and publishes the site on every push to main
-scripts/preview.sh|.ps1           build and serve the site on your machine
-tools/                            the converter that built the vault, and a vault checker
+content/                                      ← the Obsidian vault (open this folder in Obsidian)
+├── index.md                                  home page (the only index.md; Quartz needs it)
+├── Vision/                                   RunicGame — Complete MMORPG Vision: the rules
+│   ├── RunicGame — Complete MMORPG Vision.md the document's note: introduction and sections in order
+│   ├── Combat.md                             one note per H2
+│   └── …
+├── Architecture/                             RunicEngine — Technical Architecture: how they are built
+│   ├── RunicEngine — Technical Architecture.md
+│   └── …
+├── Ideias/                                   RunicGame — Ideias, kept whole as history
+│   ├── RunicGame — Ideias.md                 its introduction and every entry in order
+│   ├── NAV-01 Naval Raid.md                  one note per idea ID, text unchanged; the ID is its alias
+│   └── Archived and Discarded ideas.md
+├── Archive/                                  the original appendices, unchanged, even after they are merged
+├── Lore/                                     one note linking to the RunicGame repository — never delete this folder
+├── Quest Design/                             one note linking to the RunicGame repository — never delete this folder
+└── attachments/                              images
+quartz.config.yaml                            site configuration (Quartz 5)
+.github/workflows/deploy.yml                  builds and publishes the site on every push to main
+scripts/preview.sh|.ps1                       build and serve the site on your machine
+tools/                                        the split script, the move tool and the vault checker
 ```
 
-## Names and links
+| Folder | Notes |
+| :--- | ---: |
+| `Vision/` | 22 |
+| `Architecture/` | 28 |
+| `Ideias/` | 99 |
+| `Archive/` | 5 |
+| `Lore/`, `Quest Design/` | 1 each |
 
-- **Every file name is unique** in the vault, ignoring case and folder, so links are short: `[[Combat]]`,
-  `[[PCS-1]]`, `[[Weapon Class System#Loadouts|loadout]]`. Obsidian is set to write new links the same way, and
-  Quartz resolves them by name.
-- **Main notes** have their folder's name (`Vision/Vision.md`), the convention of Obsidian's Folder Notes plugin.
-- **Sections** use their heading as the file name, without numbers. When two headings are the same, each gets its
-  parent in parentheses: `Ownership (Water system)`, `Open (Security)`, `About this document (Vision)`.
-- **Order.** File explorers sort alphabetically. The document's order is in each main note's contents list and in the
-  previous/next links at the bottom of every section.
+## Rules
 
-## How the notes connect
+- **H1 = folder, H2 = note, H3 = section inside the note.** Headings keep the text and level they had in the documents.
+  A document's own note (named after the document) holds its introduction and lists its sections in order.
+- **H2s are unique in the whole vault**, so every note name is unique and links are short: `[[Combat]]`,
+  `[[Weapon Class System#Loadouts|loadout]]`. A file name is the H2 without the characters Obsidian rejects (in
+  practice `:`); the note's title keeps them.
+- **Each fact lives in one place.** The Vision states the rule; the Architecture says how to implement it and links to
+  the Vision.
+- **Ideias stay whole**, as history: archived and decided entries are never removed. Each idea's ID is its alias.
+- **The original appendices stay intact in `Archive/`**, also after they are merged. Merged notes get no "differences"
+  or "conflicts" sections.
+- **English throughout.** Titles carry no version ("RunicEngine — Technical Architecture").
+- **Links.** "Section › Subsection" references, "(see X)" references, idea IDs and document names are wikilinks.
 
-- **Hierarchy.** Every note links up to its parent (the main note of its folder, or the home page) and to the previous
-  and next section.
-- **Idea IDs** (`NAV-01`, `QUEST-02`…) link to the idea's note wherever they appear. Each idea note links to the Vision
-  section named in its *Game vision* field and is tagged with its status (`status/open`, `status/partial`,
-  `status/being-designed`, `status/in-game-vision`, `status/discarded`).
-- **Package IDs** (`PCS-1`, `SIM-6`, `GSVC-11`…) link to the package's note. A package note links to the packages it
-  needs, so the notes form the dependency graph, and to the slice that first needs it.
-- **Slices** ("slice 44", the roadmap table, the *Slice* columns) link to the slice notes, which list their packages.
-- **Documents and terms.** Document names, the documents' Google Docs links and about 65 key terms (Disciplines, Labor,
-  Market Isle, Flecs, Jolt, GameNetworkingSockets, defender grace…) link to where they are defined, once per note.
-  Mentions of the Lore and the Quest Design link to their notes here, which point on to the RunicGame repository.
-- **Tags.** `vision`, `ideias`, `appendix`, `architecture`, `idea`, `package`, `slice`, `redirect`, and `repo/engine`,
-  `repo/platform`, `repo/game` for the Architecture sections, packages and slices that name an owner.
+## Moving text
+
+Text that only changes place is moved with a script, never retyped:
+
+```
+python3 tools/move_section.py SOURCE "HEADING" TARGET [--copy] [--level N] [--after "HEADING" | --before "HEADING"] [--create] [--dry-run]
+```
+
+It cuts the section (its heading and everything up to the next heading of the same or a higher level) and pastes it
+into the target note, changing nothing but the heading levels when `--level` asks for it. Use `--copy` when the source
+is in `Archive/`, which stays intact. Run `--dry-run` first to see the change. `python3 tools/move_section.py -h` has
+the full list of options.
+
+After any change, run the checker:
+
+```
+python3 tools/check_vault.py
+```
+
+It reports broken links, anchors that no longer match a heading, frontmatter that does not parse, note names used more
+than once, and missing required folders.
+
+The dates the site shows come from each note's `created` and `modified` frontmatter; update `modified` when you change a
+note.
+
+## How the vault was made
+
+`tools/drive-to-vault/build_vault.py` split each document by its headings into the notes above. The only wording
+changes it made are listed in its `H2_RENAMES` and `TEXT_EDITS` (each must match an exact number of times):
+
+- "About this document" became "About the Vision" and "About the Architecture", the only H2 used twice.
+- The Architecture's title lost "v4", and so did the Vision's one mention of it.
+- In the Vision, the Portuguese names of the Disciplines were dropped or translated (Song, Elementalism, Shadow, Hunt),
+  and "ex.:" became "e.g.". In the Architecture, "ex.:" became "e.g." and GSH-6 names the loadouts in English.
+- The Vision's two diagrams, images with Portuguese text, were redrawn in English as Mermaid.
+- Two pieces of text that Google Docs had turned into equations were repaired (the relay cost in Ping Resolution and an
+  SQL line in Database Layout).
+
+The Ideias were left word for word, including the old Portuguese names they record. Every word of every document was
+checked against the exports. The script is kept to document how the vault was made; running it again would overwrite
+`content/` from the exports, so don't run it now that the vault is edited directly.
 
 ## Publish with GitHub Pages
 
-1. Push this repository to GitHub.
-2. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Every push to `main` runs `.github/workflows/deploy.yml`: it downloads Quartz 5.0.0, copies `content/` and
-   `quartz.config.yaml` into it, builds, and publishes. The site is at
-   [pedrovicente98.github.io/RunicDocs](https://pedrovicente98.github.io/RunicDocs/).
-
-The first build takes about 15 minutes because Quartz installs its plugins; the workflow caches them, so later builds
-are much faster.
-
-The site is public even if the repository is private (on plans that allow Pages for private repositories). Each note's
-footer links to its Google Doc, and the Lore and Quest Design notes link to the RunicGame repository; people without
-access to those can't open the links.
-
-If the site lives at another address, change `baseUrl` in `quartz.config.yaml`.
+Every push to `main` runs `.github/workflows/deploy.yml`: it downloads Quartz 5.0.0, copies `content/` and
+`quartz.config.yaml` into it, builds, and publishes. The first build took about 15 minutes; the workflow caches
+Quartz's plugins, so later builds are faster. GitHub Pages is set to **Source: GitHub Actions** in the repository
+settings. If the site moves, change `baseUrl` in `quartz.config.yaml`.
 
 ## Preview on your machine
 
@@ -105,47 +114,4 @@ Needs Node 22 or newer and git.
 .\scripts\preview.ps1         # Windows PowerShell
 ```
 
-The first run downloads Quartz into `.quartz/` (ignored by git). Then open http://localhost:8080. Re-run after editing
-notes.
-
-## Editing
-
-Open `content/` as a vault in Obsidian and edit as usual. After moving or renaming notes, run the checker:
-
-```
-python3 tools/check_vault.py
-```
-
-It reports broken links, anchors that no longer match a heading, frontmatter that does not parse, and note names used
-more than once.
-
-The dates the site shows come from each note's `created` and `modified` frontmatter: the Google Doc's dates for the
-converted notes, the build date for the generated ones. Update `modified` when you change a note.
-
-## Rebuilding from the Drive documents
-
-While the Google Docs are still the source of truth, the vault can be regenerated from fresh exports. This rebuilds
-`content/` from scratch (keeping `content/.obsidian`), so don't use it once you start editing the vault directly.
-
-1. Export each document with **File → Download → Markdown (.md)** into one folder, with these names:
-   `RunicGame_Complete_MMORPG_Vision.md`, `RunicGame_Ideias.md`, `RunicEngine_Technical_Architecture_v4.md`,
-   `RunicGame_Appendix_Nodes_Economy_and_Exploration.md`, `RunicGame_Appendix_Content_Pipeline_and_Art_Direction.md`,
-   `RunicGame_Appendix_Ping_Resolution.md`, `RunicEngine_Appendix_Security.md`,
-   `RunicEngine_Appendix_Database_Layout.md`, and optionally `RunicEngine_Layered_Architecture.png`.
-2. Run `python3 tools/drive-to-vault/build_vault.py <export folder> content`, then `python3 tools/check_vault.py`.
-
-The script's header explains what it produces. Its `DOCS` list says which documents are included (remove an appendix
-there once it is merged), and its `TERMS` list holds the curated term links; add a term there to link it across the
-vault. `tools/drive-to-vault/docsjson2md.py` converts a Google Docs API JSON export (`documents.get`) to Markdown, for
-documents whose Markdown export isn't available.
-
-## Notes on the conversion
-
-- **Code samples.** Google's Markdown export writes the Architecture's code as plain paragraphs. The converter rebuilt
-  them as fenced blocks with a language (C++, GDScript, Go, YAML, JSON, XML, CMake or plain text).
-- **Formulas.** The three formulas in the Architecture are kept as LaTeX (`$$…$$`); every other dollar sign is escaped.
-- **Equation glitches in the Google Docs.** Google Docs turned two pieces of text into equation objects, which export
-  badly. The vault has them repaired; the Docs still need the fix:
-  - *Ping Resolution*, relay routing cost: "US\$0.025 per hour per accelerator plus US\$0.007 to 0.105 per GB… US\$0.035
-    per GB, 1,000 concurrent players add about US\$3.50 per hour".
-  - *Database Layout*, the Go example: `ledger_op=$1 WHERE grant_id=$1`.
+The first run downloads Quartz into `.quartz/` (ignored by git). Then open http://localhost:8080.

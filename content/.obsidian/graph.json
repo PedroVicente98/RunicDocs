@@ -8,52 +8,45 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": "path:\"RunicGame/Vision\"",
+      "query": "path:\"Vision\"",
       "color": {
         "a": 1,
         "rgb": 14722342
       }
     },
     {
-      "query": "path:\"RunicGame/Ideias\"",
-      "color": {
-        "a": 1,
-        "rgb": 15105570
-      }
-    },
-    {
-      "query": "path:\"RunicGame/Appendices\"",
-      "color": {
-        "a": 1,
-        "rgb": 12597547
-      }
-    },
-    {
-      "query": "path:\"RunicEngine/Architecture\"",
+      "query": "path:\"Architecture\"",
       "color": {
         "a": 1,
         "rgb": 3447003
       }
     },
     {
-      "query": "path:\"RunicEngine/Packages\"",
+      "query": "path:\"Ideias\"",
+      "color": {
+        "a": 1,
+        "rgb": 15105570
+      }
+    },
+    {
+      "query": "path:\"Archive\"",
       "color": {
         "a": 1,
         "rgb": 8359053
       }
     },
     {
-      "query": "path:\"RunicEngine/Roadmap\"",
+      "query": "path:\"Lore\"",
       "color": {
         "a": 1,
-        "rgb": 3066993
+        "rgb": 10181046
       }
     },
     {
-      "query": "path:\"RunicEngine/Appendices\"",
+      "query": "path:\"Quest Design\"",
       "color": {
         "a": 1,
-        "rgb": 48340
+        "rgb": 1752220
       }
     }
   ],

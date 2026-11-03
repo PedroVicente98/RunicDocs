@@ -1,40 +1,35 @@
 #!/usr/bin/env python3
 """
-Build the RunicDocs Obsidian vault (Quartz-ready) from Markdown exports of the
-RunicMMOEngine Google Drive documents.
+Split the RunicGame and RunicEngine Drive documents into the RunicDocs vault.
 
-    python3 build_vault.py <source_dir> <content_dir>
+    python3 build_vault.py <export_dir> <content_dir>
 
-<source_dir> holds one Markdown export per document (Google Docs:
-File > Download > Markdown), named as in DOCS below. Images may stay embedded
-as data URIs; they are extracted to <content_dir>/attachments.
+<export_dir> holds each Google Doc exported as text/markdown (File > Download >
+Markdown), named as in DOCS below. <content_dir> is rebuilt from scratch; its
+.obsidian folder is kept.
 
-<content_dir> is rebuilt from scratch (its .obsidian folder is kept).
+The text is moved, not rewritten: every section is cut out of its document by
+its heading and written into a note. The only text changes are listed in
+H2_RENAMES and TEXT_EDITS (each with the number of matches it must have), the
+Markdown cleanup in normalize() and the links added by inject_links().
 
-What it produces
-- One folder per document, split along the document's own outline. The
-  document's main note has the folder's name (Vision/Vision.md), every
-  top-level section becomes a note, and very long sections become a folder
-  with a main note of the same name that lists their subsections.
-- Every file name in the vault is unique (only the home page is index.md), so
-  links are short ([[Combat]]). A title used twice gets its parent in
-  parentheses: "Ownership (Water system)".
-- Documents that live in another repository (Lore, Quest Design) keep their
-  folder with a single note that links there.
-- RunicGame — Ideias becomes one note per idea ID, with status tags and a link
-  to the Vision section that holds it.
-- The Architecture's work-package tables become one note per package (with
-  links to the packages it needs and the slice that first needs it), and the
-  vertical-slice roadmap becomes one note per slice.
-- Cross-links everywhere: idea IDs, package IDs, slice numbers, document
-  names, Google Docs URLs of the folder's documents and a curated list of game
-  and engine terms all become wikilinks.
+Vault layout
+- Vision/, Architecture/: H1 = folder, H2 = note, H3 and below stay inside the
+  note with their original level. Each folder has a note named after the
+  document with its introduction and its sections in order.
+- Ideias/: one note per idea ID with the text unchanged (the ID is the note's
+  alias), the archived and discarded table, and the document's own note.
+- Archive/: the original appendices, one note each, text unchanged.
+- Lore/, Quest Design/: one note linking to the RunicGame repository.
+Every note name is unique in the vault, so [[Combat]] always finds one note.
+
+Links added: "Section › Subsection" references, "(see X)" references to a
+heading, idea IDs, document names and Google Docs links of these documents.
 """
 from __future__ import annotations
 
 import base64
 import json
-from collections import Counter
 import re
 import shutil
 import sys
@@ -42,181 +37,138 @@ from collections import OrderedDict, defaultdict
 from pathlib import Path
 
 SNAPSHOT = "2026-11-03"
-SPLIT_CHARS = 14000  # sections longer than this (with subsections) become folders
-MAX_DEPTH = 3
-
 DRIVE_FOLDER = "https://drive.google.com/drive/folders/1hSflbWXn8Y2Ox-3QPFpXjrVkMo5warhv"
-RUNICGAME_REPO = "https://github.com/PedroVicente98/RunicGame"
-RUNICWORLD_URL = RUNICGAME_REPO + "/tree/main/docs/RunicWorld"
+RUNICGAME_DOCS = "https://github.com/PedroVicente98/RunicGame/tree/main/docs/RunicWorld"
+REQUIRED_FOLDERS = ["Vision", "Architecture", "Ideias", "Archive", "Lore", "Quest Design"]
 
 DOCS = [
-    dict(key="vision", file="RunicGame_Complete_MMORPG_Vision.md",
-         title="RunicGame — Complete MMORPG Vision", short="Vision",
-         folder="RunicGame/Vision", drive="1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk",
-         created="2026-10-13", modified="2026-10-30", tags=["runicgame", "vision"]),
-    # Lore and Quest Design live in the RunicGame repository (docs/RunicWorld); here they keep
-    # their folder with one note that points there.
-    dict(key="lore", file=None, title="RunicGame — Lore", short="Lore",
-         folder="RunicGame/Lore", drive="1WfyE78jlRm-So9YndQvtplTwua3p8bWY26uIqMAwjYE",
-         created="2026-10-27", modified="2026-10-30", tags=["runicgame", "lore"], kind="redirect"),
-    dict(key="quests", file=None, title="RunicGame — Quest Design",
-         short="Quest Design", folder="RunicGame/Quest Design",
-         drive="11UTu2AtZl00OAmg6sMzjS8xcUDvXXoU9PAlhPsbOwJk",
-         created="2026-10-27", modified="2026-10-30", tags=["runicgame", "quest-design"], kind="redirect"),
-    dict(key="ideias", file="RunicGame_Ideias.md", title="RunicGame — Ideias", short="Ideias",
-         folder="RunicGame/Ideias", drive="17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow",
-         created="2026-10-17", modified="2026-11-03", tags=["runicgame", "ideias"], kind="ideas"),
-    dict(key="nodes", file="RunicGame_Appendix_Nodes_Economy_and_Exploration.md",
-         title="RunicGame — Appendix: Nodes, Economy and Exploration",
-         short="Nodes, Economy and Exploration",
-         folder="RunicGame/Appendices/Nodes Economy and Exploration",
-         drive="1HW3MV5eSJhU-cTdsMnc-3lC6XhBCCcP07pZzexqmjCA",
-         created="2026-10-19", modified="2026-10-30", tags=["runicgame", "appendix"]),
-    dict(key="pipeline", file="RunicGame_Appendix_Content_Pipeline_and_Art_Direction.md",
-         title="RunicGame — Appendix: Content Pipeline and Art Direction",
-         short="Content Pipeline and Art Direction",
-         folder="RunicGame/Appendices/Content Pipeline and Art Direction",
-         drive="1SQ4d0oVU_sqVEO6JtGF4nym9JUYtIM7-3-52tHIbcYQ",
-         created="2026-10-26", modified="2026-10-30", tags=["runicgame", "appendix"]),
-    dict(key="ping", file="RunicGame_Appendix_Ping_Resolution.md",
-         title="RunicGame — Appendix: Ping Resolution", short="Ping Resolution",
-         folder="RunicGame/Appendices/Ping Resolution",
-         drive="1iYe10T523upQnBfv91Pk3dL1FC6TuyF7hmdGg6ZG5Ys",
-         created="2026-10-21", modified="2026-10-21", tags=["runicgame", "appendix"]),
-    dict(key="arch", file="RunicEngine_Technical_Architecture_v4.md",
-         title="RunicEngine — Technical Architecture v4", short="Technical Architecture v4",
-         folder="RunicEngine/Architecture", drive="1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA",
-         created="2026-10-14", modified="2026-10-30", tags=["runicengine", "architecture"]),
-    dict(key="security", file="RunicEngine_Appendix_Security.md",
-         title="RunicEngine — Appendix: Security", short="Security",
-         folder="RunicEngine/Appendices/Security", drive="1W9S-5tPLsfXRzNXKb9vazkhnFiolq1QhV1C1i_o2PbQ",
-         created="2026-10-22", modified="2026-10-22", tags=["runicengine", "appendix"]),
-    dict(key="db", file="RunicEngine_Appendix_Database_Layout.md",
-         title="RunicEngine — Appendix: Database Layout", short="Database Layout",
-         folder="RunicEngine/Appendices/Database Layout",
-         drive="1ex3n2TbxelB7QQnSZYIyQJxl0-Wj1WjmkRuolwk8tY8",
-         created="2026-10-26", modified="2026-10-30", tags=["runicengine", "appendix"]),
+    dict(key="vision", kind="split", file="RunicGame_Complete_MMORPG_Vision.md",
+         title="RunicGame — Complete MMORPG Vision", folder="Vision", tags=["vision"],
+         drive="1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk", created="2026-10-13", modified="2026-10-30"),
+    dict(key="arch", kind="split", file="RunicEngine_Technical_Architecture_v4.md",
+         title="RunicEngine — Technical Architecture", folder="Architecture", tags=["architecture"],
+         drive="1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA", created="2026-10-14", modified="2026-10-30"),
+    dict(key="ideias", kind="ideas", file="RunicGame_Ideias.md",
+         title="RunicGame — Ideias", folder="Ideias", tags=["ideias"],
+         drive="17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow", created="2026-10-17", modified="2026-11-03"),
+    dict(key="nodes", kind="archive", file="RunicGame_Appendix_Nodes_Economy_and_Exploration.md",
+         title="RunicGame — Appendix: Nodes, Economy and Exploration", folder="Archive", tags=["archive"],
+         drive="1HW3MV5eSJhU-cTdsMnc-3lC6XhBCCcP07pZzexqmjCA", created="2026-10-19", modified="2026-10-30"),
+    dict(key="pipeline", kind="archive", file="RunicGame_Appendix_Content_Pipeline_and_Art_Direction.md",
+         title="RunicGame — Appendix: Content Pipeline and Art Direction", folder="Archive", tags=["archive"],
+         drive="1SQ4d0oVU_sqVEO6JtGF4nym9JUYtIM7-3-52tHIbcYQ", created="2026-10-26", modified="2026-10-30"),
+    dict(key="ping", kind="archive", file="RunicGame_Appendix_Ping_Resolution.md",
+         title="RunicGame — Appendix: Ping Resolution", folder="Archive", tags=["archive"],
+         drive="1iYe10T523upQnBfv91Pk3dL1FC6TuyF7hmdGg6ZG5Ys", created="2026-10-21", modified="2026-10-21"),
+    dict(key="security", kind="archive", file="RunicEngine_Appendix_Security.md",
+         title="RunicEngine — Appendix: Security", folder="Archive", tags=["archive"],
+         drive="1W9S-5tPLsfXRzNXKb9vazkhnFiolq1QhV1C1i_o2PbQ", created="2026-10-22", modified="2026-10-22"),
+    dict(key="db", kind="archive", file="RunicEngine_Appendix_Database_Layout.md",
+         title="RunicEngine — Appendix: Database Layout", folder="Archive", tags=["archive"],
+         drive="1ex3n2TbxelB7QQnSZYIyQJxl0-Wj1WjmkRuolwk8tY8", created="2026-10-26", modified="2026-10-30"),
+    dict(key="lore", kind="redirect", title="RunicGame — Lore", folder="Lore", tags=["lore"],
+         drive="1WfyE78jlRm-So9YndQvtplTwua3p8bWY26uIqMAwjYE", created="2026-10-27", modified="2026-10-30"),
+    dict(key="quests", kind="redirect", title="RunicGame — Quest Design", folder="Quest Design", tags=["quest-design"],
+         drive="11UTu2AtZl00OAmg6sMzjS8xcUDvXXoU9PAlhPsbOwJk", created="2026-10-27", modified="2026-10-30"),
 ]
-DOC = {d["key"]: d for d in DOCS}
-CTX = {"nodes": "Nodes and Economy", "pipeline": "Content Pipeline"}
-for d in DOCS:
-    d["url"] = f"https://docs.google.com/document/d/{d['drive']}/edit"
-    d["hub"] = d["folder"].rsplit("/", 1)[-1]          # the document's main note: Vision/Vision.md
-    d["ctx"] = CTX.get(d["key"], d["hub"])             # short name used in "(…)" to tell clashing titles apart
-    d["hub_path"] = f"{d['folder']}/{d['hub']}"
 
-PACKAGES_FOLDER = "RunicEngine/Packages"
-ROADMAP_FOLDER = "RunicEngine/Roadmap"
-PACKAGES_HUB = f"{PACKAGES_FOLDER}/Packages"
-ROADMAP_HUB = f"{ROADMAP_FOLDER}/Roadmap"
+# H2s must be unique in the vault; these are the only renamed headings.
+H2_RENAMES = {
+    "vision": {"About this document": "About the Vision"},
+    "arch": {"About this document": "About the Architecture"},
+}
 
-# Text fixes for known glitches in the source documents.
-FIXES = {
-    # Google Docs turned "$1 WHERE grant_id=$" into an equation in this SQL line.
-    "db": [(r"ledger_op=\$1WHEREgran\{t\}_\{i\}d=\$1", "ledger_op=$1 WHERE grant_id=$1")],
-    "ping": [
-        # Two amounts in the AWS cost line are Google Docs equation objects; the
-        # API returns them empty and the Markdown export runs their words together.
-        (r"US\$?0\.025perhourperacceleratorplusUS\$?0\.007", "US$0.025 per hour per accelerator plus US$0.007"),
-        (r"US\$?0\.035perGB,1,000concurrentplayersaddaboutUS\$?3\.50", "US$0.035 per GB, 1,000 concurrent players add about US$3.50"),
-        (r"(?<![\w$])US(?=0\.007 to 0\.105)", "US$0.025 per hour per accelerator plus US$"),
-        (r"player-hour and US(?=3\.50 per hour)", "player-hour and US$0.035 per GB, 1,000 concurrent players add about US$"),
+# The only wording changes (English throughout; no "v4" in titles). (pattern, replacement, expected matches)
+TEXT_EDITS = {
+    "vision": [
+        (r"\| War \(Guerra\) \|", "| War |", 1),
+        (r"\| Defense \(Vigília\) \|", "| Defense |", 1),
+        (r"\| Vitality \(Restauração\) \|", "| Vitality |", 1),
+        (r"\| Arcane \(Arcano\) \|", "| Arcane |", 1),
+        (r"\| Occultism \(Ocultismo\) \|", "| Occultism |", 1),
+        (r"Canção(?= doesn)", "Song", 1),
+        (r"Elementalismo(?= merged)", "Elementalism", 1),
+        (r"Sombra(?=['’]s stealth)", "Shadow", 1),
+        (r"Caça(?= \(marks and traps\))", "Hunt", 1),
+        (r"\| Canção, Elementalismo and Sombra as Disciplines \|", "| Song, Elementalism and Shadow as Disciplines |", 1),
+        (r"RunicEngine — Technical Architecture v4", "RunicEngine — Technical Architecture", 1),
+        (r"\bex\.:", "e.g.", 21),
+        (r"\bEx\.:", "E.g.", 8),
+    ],
+    "arch": [
+        (r"Espada \\\+ Escudo, Lança 2H and Varinha \\\+ Foco Arcano", r"Sword \\+ Shield, Spear and Wand \\+ Focus", 1),
+        (r"\bex\.:", "e.g.", 2),
     ],
 }
 
-# Curated term links: (regex, doc key, heading path). First occurrence per note.
-TERMS = [
-    # Vision
-    (r"\bDisciplines?\b", "vision", ["Weapon Class System", "Disciplines"]),
-    (r"\bloadouts?\b", "vision", ["Weapon Class System", "Loadouts"]),
-    (r"\bnamed class(?:es)?\b", "vision", ["Weapon Class System", "Named classes"]),
-    (r"\bResolve\b", "vision", ["Combat", "Resolve: hard and light CC"]),
-    (r"\bTolerance\b", "vision", ["Combat", "Conditions, build-up and Tolerance"]),
-    (r"\bEvasion\b", "vision", ["Defense: Evasion, Guard and armor", "Evasion"]),
-    (r"\bGuard\b", "vision", ["Defense: Evasion, Guard and armor", "Guard"]),
-    (r"\bAltars?\b", "vision", ["Real exploration", "Altars, death, respawn and teleports"]),
-    (r"\bExploration XP\b", "vision", ["Real exploration", "Exploration XP"]),
-    (r"\bMarket Isle\b", "vision", ["Inventory, equipment and the Market Isle", "Market Isle (working name)"]),
-    (r"\bOutlaws?\b", "vision", ["Factions, PvP and crime", "Outlaw and Infamy"]),
-    (r"\bInfamy\b", "vision", ["Factions, PvP and crime", "Outlaw and Infamy"]),
-    (r"\bJurisdiction\b", "vision", ["Factions, PvP and crime", "Jurisdiction"]),
-    (r"\bRunes\b", "vision", ["Runes"]),
-    (r"\bpower budget\b", "vision", ["Item progression and infinite progression", "Power budget"]),
-    (r"\binfinite progression\b", "vision", ["Item progression and infinite progression", "Infinite progression"]),
-    (r"\bsubscription\b", "vision", ["Business model, launch, visuals and audio", "Subscription"]),
-    (r"\bcontext kit\b", "vision", ["Weapon Class System", "Context kit: mount, glider and wing"]),
-    # Appendix: Nodes, Economy and Exploration
-    (r"\blabor reserve\b", "nodes", ["Labor", "Labor reserve"]),
-    (r"\b[Ll]abor\b", "nodes", ["Labor"]),
-    (r"\btrade packs?\b", "nodes", ["Trade packs and routes"]),
-    (r"\b[Pp]rosperity\b", "nodes", ["Regional economy", "Prosperity and node missions"]),
-    (r"\bnode missions?\b", "nodes", ["Regional economy", "Prosperity and node missions"]),
-    (r"\b[Ss]urveying\b", "nodes", ["Maps and cartography", "Surveying"]),
-    (r"\b[Tt]riangulation\b", "nodes", ["Maps and cartography", "Triangulation (base chart on land)"]),
-    (r"\b[Ss]tamina\b", "nodes", ["Stamina and climbing", "Stamina"]),
-    (r"\bnodes?\b(?= (?:volume|ecology|type|prosperity|mission))", "nodes", ["Nodes", "What a node is"]),
-    # Technical Architecture v4
-    (r"\bFlecs\b", "arch", ["Simulation core: Flecs and Jolt (Engine)", "Flecs rules"]),
-    (r"\bJolt\b", "arch", ["Simulation core: Flecs and Jolt (Engine)", "Jolt rules"]),
-    (r"\bLayerStack\b", "arch", ["Application and LayerStack (Engine)"]),
-    (r"\bGameNetworkingSockets\b", "arch", ["Networking: stack, sessions and responsiveness", "Stack (decided)"]),
-    (r"\bRunicEditor\b", "arch", ["Tools (Engine)", "RunicEditor"]),
-    (r"\b(?:the |Runic )?Cooker\b", "arch", ["World authoring and cooking (Engine, Game)", "Cooker"]),
-    (r"\bRunicBot\b", "arch", ["Tools (Engine)", "Testing at scale"]),
-    (r"\bGodotBridge\b", "arch", ["Godot integration (Engine)", "How the Engine uses Godot"]),
-    (r"\bRenderFrame\b", "arch", ["Render data, extraction and world UI (Engine, Game)", "RenderData in Core"]),
-    (r"\bRenderData\b", "arch", ["Render data, extraction and world UI (Engine, Game)", "RenderData in Core"]),
-    (r"\bWorld Coordinator\b", "arch", ["Platform and operations", "Simulation placement"]),
-    (r"\bAgones\b", "arch", ["Platform and operations", "Simulation placement"]),
-    (r"\bGameplayFlow\b", "arch", ["Engine gameplay APIs (Engine)", "Scripted sequences (GameplayFlow) and restrictions"]),
-    (r"\bWaterSystem\b", "arch", ["Water system (Engine)", "Core model: water reports facts"]),
-    (r"\bbehavior trees?\b", "arch", ["AI architecture (Engine, Game)", "Behavior-tree runtime"]),
-    (r"\bactivation volumes?\b", "arch", ["World space: coordinates, cells and activation (Engine)", "Activation volumes"]),
-    (r"\b64-bit coordinates\b", "arch", ["World space: coordinates, cells and activation (Engine)", "64-bit coordinates (decided)"]),
-    (r"\bmulti-rate (?:fixed-step )?scheduler\b", "arch", ["Simulation core: clock and threads (Engine)", "Multi-rate fixed-step scheduler"]),
-    (r"\binterest set\b", "arch", ["Networking: replication, interest and handoff (Engine)", "Interest and visibility tiers (decided)"]),
-    (r"\bhandoff\b", "arch", ["Networking: replication, interest and handoff (Engine)", "Simulations, handoff and ghosts"]),
-    (r"\bdebug draw(?:ing)?\b", "arch", ["Debug drawing (Engine)"]),
-    # Appendix: Ping Resolution
-    (r"\b[Dd]efender grace\b", "ping", ["Part 1. Locked: ping resolution", "3. Defender grace (all defense)"]),
-    (r"\b[Cc]apped rewind\b", "ping", ["Part 1. Locked: ping resolution", "5. Capped rewind"]),
-    (r"\b[Tt]elegraph fast-forward\b", "ping", ["Part 1. Locked: ping resolution", "2. Telegraph fast-forward"]),
-    (r"\b[Rr]elay routing\b", "ping", ["Part 1. Locked: ping resolution", "10. Relay routing"]),
-    (r"\bLatency Feel Lab\b", "ping", []),
-    # Appendix: Security
-    (r"\b[Aa]nti-cheat\b", "security", ["The client"]),
-    (r"\bDDoS\b", "security", ["DDoS"]),
-    (r"\b[Ss]upply chain\b", "security", ["Supply chain and releases"]),
-    # Appendix: Database Layout
-    (r"\bPostgreSQL\b", "db", ["Physical layout (Proposal)"]),
-    # Appendix: Content Pipeline
-    (r"\bMPFB2?\b", "pipeline", ["Characters"]),
-    (r"\bQuaternius\b", "pipeline", ["Animation"]),
-    (r"\bdye masks?\b", "pipeline", ["Characters"]),
-    (r"\b[Aa]rt direction\b", "pipeline", ["Art direction"]),
-]
+# The Vision's two diagrams were images with Portuguese text; they are redrawn in English as Mermaid.
+DIAGRAMS = {
+    "resolvedor de skills · 5 fontes, 2 checagens": """```mermaid
+flowchart TB
+  subgraph sources["Rule sources (same format)"]
+    S1["Skill and tree choices"]
+    S2["Class role passive"]
+    S3["Class signature"]
+    S4["Item effect (or extracted)"]
+    S5["Mount, glider or wing"]
+  end
+  subgraph server["Execution on the server"]
+    A1["1 · Activation — checks the caster<br/>Conditions: previous skill, resources, buffs, position<br/>Changes cost, casting or variant (e.g. Grab with no cast time)"]
+    A2["2 · Timeline in ticks (30 Hz)<br/>Startup, active and recovery, scaled by the weapon's profile<br/>Shape and reach create the hit volume or the projectile"]
+    A3["3 · Hit — checks the target<br/>Target conditions: Stagger becomes Trip, Frozen is consumed<br/>Damage per component against resistances; Resolve decides the CC"]
+    A4["4 · Authoritative events<br/>Damage, effects and new states become conditions for the next skills"]
+  end
+  sources --> A1
+  sources --> A3
+  A1 --> A2 --> A3 --> A4
+```
 
-# Mentions of whole documents. Target is the document's index note.
+*Skill resolver · 5 sources, 2 checks: rules from five sources are checked at two moments, activation and hit.*""",
+    "fluxo de recursos · 4 atividades, 1 destino": """```mermaid
+flowchart TB
+  PVE["PvE — dungeons and raids<br/>raid-exclusive materials, drops and equipment"]
+  PVP["Faction PvP<br/>gold, honor, special resources and contribution theft"]
+  CRAFT["Endgame crafting<br/>raid mats + regional and special resources become<br/>weapons and armor used in raids and wars"]
+  OW["Open world and housing<br/>gathering, farms, rare mobs, gold and regional resources"]
+  TP["Trade packs<br/>carry production between regions;<br/>pay gold and special resources"]
+  PVE --> CRAFT
+  PVP --> CRAFT
+  OW --> CRAFT
+  TP --> CRAFT
+  OW -- "production becomes cargo" --> TP
+  TP -- "the cargo draws PvP" --> PVP
+```
+
+*Resource flow · 4 activities, 1 destination: PvE, PvP, the open world and trade packs converge in endgame crafting.*""",
+}
+
+# Mentions of a document by name link to its note (first mention per note).
 DOC_MENTIONS = [
     (r"RunicGame — Visão Completa do MMORPG", "vision"),
     (r"RunicGame — Complete MMORPG Vision", "vision"),
-    (r"RunicEngine — Technical Architecture v\d", "arch"),
-    (r"Technical Architecture v4", "arch"),
-    (r"Architecture v4", "arch"),
+    (r"RunicEngine — Technical Architecture(?: v\d)?", "arch"),
+    (r"(?:Technical )?Architecture v4", "arch"),
     (r"RunicGame — Ideias", "ideias"),
     (r"\bIdeias\b", "ideias"),
     (r"RunicGame — Lore", "lore"),
-    (r"RunicGame — Quest Design", "quests"),
-    (r"\bQuest Design\b", "quests"),
+    (r"(?:RunicGame — )?Quest Design", "quests"),
     (r"(?:RunicGame — )?(?:Appendix: )?Nodes, Economy and Exploration", "nodes"),
     (r"(?:RunicGame — )?(?:Appendix: )?Content Pipeline and Art Direction", "pipeline"),
     (r"(?:RunicGame — )?(?:Appendix: )?Ping Resolution", "ping"),
     (r"(?:RunicEngine — )?Appendix: Security", "security"),
     (r"(?:RunicEngine — )?(?:Appendix: )?Database Layout", "db"),
-    (r"\bthe Vision\b", "vision"),
     (r"\bthe game vision\b", "vision"),
+    (r"\bthe Vision\b", "vision"),
 ]
 
+# Text fixes for known glitches in the exports (equation objects that export badly).
+FIXES = {
+    "db": [(r"ledger_op=\$1WHEREgran\{t\}_\{i\}d=\$1", "ledger_op=$1 WHERE grant_id=$1")],
+    "ping": [
+        (r"(?<![\w$])US(?=0\.007 to 0\.105)", "US$0.025 per hour per accelerator plus US$"),
+        (r"player-hour and US(?=3\.50 per hour)", "player-hour and US$0.035 per GB, 1,000 concurrent players add about US$"),
+    ],
+}
 
 # --------------------------------------------------------------------------- helpers
 
@@ -280,6 +232,8 @@ def extract_images(md: str, key: str, out_attach: Path) -> str:
         alt, ref = m.group(1), m.group(2)
         if ref not in defs:
             return m.group(0)
+        if alt in DIAGRAMS:
+            return DIAGRAMS[alt]
         ext, data = defs[ref]
         name = f"{key}-{slugify(alt)[:50].strip('-') or ref}.{ 'png' if ext == 'png' else ext }"
         out_attach.mkdir(parents=True, exist_ok=True)
@@ -559,26 +513,44 @@ def render_subtree(node: Node, base_level: int) -> list[str]:
     return out
 
 
+
+# --------------------------------------------------------------------------- file names and links
+
+FORBIDDEN = '*"\\/<>:|?#^[]'
+
+
+def file_name(title: str) -> str:
+    """A heading as a file name: drop only the characters Obsidian or Windows reject (in practice ':')."""
+    t = "".join(" " if ch in FORBIDDEN else ch for ch in clean_heading(title))
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def wl(path: str, text: str | None = None, anchor: str | None = None, table: bool = False) -> str:
+    """Wikilink by file name (unique in the vault). `path` may be a full vault path or a name."""
+    name = path.rsplit("/", 1)[-1]
+    target = name + (f"#{anchor_text(anchor)}" if anchor else "")
+    if text is None or (text == name and not anchor):
+        return f"[[{target}]]"
+    text = text.replace("[", "(").replace("]", ")").replace("|", "/")
+    return f"[[{target}{chr(92) + '|' if table else '|'}{text}]]"
+
+
+for d in DOCS:
+    d["url"] = f"https://docs.google.com/document/d/{d['drive']}/edit"
+    d["note"] = f"{d['folder']}/{file_name(d['title'])}"
+DOC = {d["key"]: d for d in DOCS}
+
+
 # --------------------------------------------------------------------------- notes
 
 class Note:
-    def __init__(self, path: str, title: str, body: str, fm: dict, doc: dict | None = None,
-                 node: Node | None = None, self_ids: set | None = None):
-        self.path = path
-        self.title = title
-        self.body = body
-        self.fm = fm
-        self.doc = doc
-        self.node = node
-        self.self_ids = self_ids or set()
-        self.footer: list[str] = []
+    def __init__(self, path, title, body, fm, kind, doc=None, self_ids=()):
+        self.path, self.title, self.body, self.fm, self.kind, self.doc = path, title, body, fm, kind, doc
+        self.self_ids = set(self_ids)
 
     def render(self) -> str:
-        fm = OrderedDict()
-        fm["title"] = self.title
-        for k, v in self.fm.items():
-            fm[k] = v
-        # Quartz reads dates from frontmatter first; generated notes get the build date
+        fm = OrderedDict([("title", self.title)])
+        fm.update(self.fm)
         fm.setdefault("created", SNAPSHOT)
         fm.setdefault("modified", SNAPSHOT)
         out = ["---"]
@@ -591,583 +563,258 @@ class Note:
             else:
                 out.append(f"{k}: {yaml_str(str(v))}")
         out.append("---")
-        body = self.body.rstrip() + "\n"
-        if self.footer:
-            body += "\n---\n\n" + "  \n".join(self.footer) + "\n"
-        return "\n".join(out) + "\n\n" + body
+        return "\n".join(out) + "\n\n" + self.body.strip() + "\n"
 
 
 NOTES: "OrderedDict[str, Note]" = OrderedDict()
 
 
 def add_note(n: Note):
-    if n.path in NOTES:
-        raise SystemExit(f"duplicate note path {n.path}")
+    name = n.path.rsplit("/", 1)[-1].lower()
+    clash = [p for p in NOTES if p.rsplit("/", 1)[-1].lower() == name]
+    if clash:
+        raise SystemExit(f"note name used twice: {n.path} and {clash[0]}")
     NOTES[n.path] = n
 
 
-def wl(path: str, text: str | None = None, anchor: str | None = None, table: bool = False) -> str:
-    """Wikilink by file name only: every name in the vault is unique, so Obsidian and Quartz
-    ("shortest" resolution) find it wherever it lives."""
-    target = path.rsplit("/", 1)[-1] + (f"#{anchor_text(anchor)}" if anchor else "")
-    if text is None:
-        return f"[[{target}]]"
-    text = text.replace("[", "(").replace("]", ")").replace("|", "/")
-    sep = "\\|" if table else "|"
-    return f"[[{target}{sep}{text}]]"
+def doc_fm(doc: dict, tags=()) -> OrderedDict:
+    return OrderedDict(tags=list(dict.fromkeys(doc["tags"] + list(tags))), source=doc["title"],
+                       source_url=doc["url"], created=doc["created"], modified=doc["modified"])
 
 
-def doc_fm(doc: dict, extra_tags=(), section: str | None = None) -> dict:
-    return OrderedDict(
-        tags=list(dict.fromkeys(doc["tags"] + list(extra_tags))),
-        source=doc["title"],
-        source_url=doc["url"],
-        section=section,
-        created=doc["created"],
-        modified=doc["modified"],
-    )
-
-
-OWNER_RE = re.compile(r"\s*\(((?:Engine|Game|Platform)(?:, (?:Engine|Game|Platform))*)\)\s*$")
+OWNER_RE = re.compile(r"\s*\(((?:Engine|Game|Platform)(?:, (?:Engine|Game|Platform)| on (?:Engine|Game|Platform))*)\)\s*$")
 
 
 def owner_tags(title: str) -> list[str]:
     m = OWNER_RE.search(title)
     if not m:
         return []
-    return [f"repo/{x.strip().lower()}" for x in m.group(1).split(",")]
+    return [f"repo/{x.strip().lower()}" for x in re.split(r",| on ", m.group(1)) if x.strip()]
 
 
-PLANNED: list[Node] = []  # every outline node that becomes a note
+def apply_edits(md: str, key: str) -> str:
+    for pat, rep, count in TEXT_EDITS.get(key, []):
+        md, n = re.subn(pat, rep, md)
+        if n != count:
+            raise SystemExit(f"{key}: edit {pat!r} matched {n} times, expected {count}")
+    return md
 
 
-def plan_node(node: Node, depth: int, ctx: str):
-    node.base = safe_name(OWNER_RE.sub("", node.title))
-    node.ctx = ctx
-    node.is_folder = bool(node.children) and node.size() > SPLIT_CHARS and depth < MAX_DEPTH
-    PLANNED.append(node)
-    if node.is_folder:
-        for ch in node.children:
-            plan_node(ch, depth + 1, node.base)
+# --------------------------------------------------------------------------- Vision and Architecture: H1 = folder, H2 = note
+
+def render_children(node: Node, offset: int) -> list[str]:
+    """The node's own text, then every subsection with its original heading level."""
+    out = trim(node.lines)
+    for ch in node.children:
+        out += ["", f"{'#' * min(6, ch.level + offset)} {ch.title}", ""]
+        out += render_children(ch, offset)
+    return out
 
 
-def plan_doc(doc: dict, md: str):
-    """Parse a document and decide which sections become notes or folders (names come later)."""
+def build_split(doc: dict, md: str):
     root = parse_tree(md, doc)
-    doc["root"] = root
-    root.is_folder = True
-    root.base = doc["hub"]
-    root.ctx = doc["ctx"]
-    PLANNED.append(root)
+    levels, in_code = [], False
+    for l in md.split("\n"):
+        if l.startswith("```"):
+            in_code = not in_code
+        elif not in_code and re.match(r"^#{1,6} ", l):
+            levels.append(len(l) - len(l.lstrip("#")))
+    offset = min(levels[1:]) - 1  # the first heading is the document title; H2 -> level 1
+    doc["root"], doc["offset"] = root, offset
+    renames = H2_RENAMES.get(doc["key"], {})
+    root.path, root.container = doc["note"], root
     for ch in root.children:
-        plan_node(ch, 1, doc["ctx"])
+        ch.title = renames.get(ch.title, ch.title)
+        ch.path = f"{doc['folder']}/{file_name(ch.title)}"
+        for d in ch.walk():
+            d.container = ch
+    contents = []
+    for ch in root.children:
+        contents.append(f"- {wl(ch.path, ch.title)}")
+        for g in ch.children:
+            contents.append(f"  - {wl(ch.path, g.title, anchor=g.title)}")
+        tags = owner_tags(ch.title)
+        add_note(Note(ch.path, ch.title, "\n".join(render_children(ch, offset)), doc_fm(doc, tags), "section", doc))
+    body = trim(root.lines) + ["", "**Contents**", ""] + contents
+    fm = doc_fm(doc)
+    add_note(Note(root.path, doc["title"], "\n".join(body), fm, "doc", doc))
 
 
-def resolve_names(reserved: set[str]):
-    """Give every planned note a file name that is unique in the whole vault (case-insensitive).
-    A name used more than once gets its parent in parentheses: 'Ownership (Water system)'."""
-    counts = Counter(n.base.lower() for n in PLANNED)
-    taken = set(reserved)
-    for n in PLANNED:
-        name = n.base
-        if counts[name.lower()] > 1 or name.lower() in reserved:
-            name = f"{n.base} ({n.ctx})"
-        if name.lower() in taken:
-            name = f"{n.base} ({n.ctx}, {n.doc['ctx']})"
-        k = 2
-        while name.lower() in taken:
-            name = f"{n.base} ({n.ctx}) {k}"
-            k += 1
-        taken.add(name.lower())
-        n.name = name
-
-
-def assign_node(node: Node, folder: str):
-    if node.is_folder:
-        sub = folder if node.parent is None else f"{folder}/{node.name}"
-        node.path = f"{sub}/{node.name}"  # folder note: same name as its folder
-        node.container = node
-        for ch in node.children:
-            assign_node(ch, sub)
-    else:
-        node.path = f"{folder}/{node.name}"
-        for d in node.walk():
-            d.container = node
-
-
-def build_doc(doc: dict):
-    root = doc["root"]
-    assign_node(root, doc["folder"])
-    doc["hub_path"] = root.path
-    # create notes
-    for n in root.walk():
-        if n.container is not n:
+def find_heading(key: str, title: str, within: Node | None = None):
+    """Nodes of a document whose heading is `title`, or starts with it followed by ':', ',' or ' ('."""
+    want = norm_key(title)
+    base = within or DOC[key]["root"]
+    exact, prefix = [], []
+    for n in base.walk():
+        if n is base and within is None:
             continue
-        section = " › ".join(n.heading_path()) or None
-        tags = []
-        for h in n.heading_path():
-            tags += owner_tags(h)
-        if n.is_folder:
-            body = trim(n.lines)
-            contents = []
-            for ch in n.children:
-                contents.append(f"- {wl(ch.path, ch.title)}")
-                if not ch.is_folder:
-                    for g in ch.children:
-                        contents.append(f"  - {wl(ch.path, g.title, anchor=g.title)}")
-            if contents:
-                if body:
-                    body += [""]
-                body += ["## Contents", ""] + contents
-            title = doc["title"] if n.parent is None else (n.title if n.name == n.base else n.name)
-            fm = doc_fm(doc, tags, section)
-            if n.parent is None and doc["short"] != doc["hub"]:
-                fm["aliases"] = [doc["short"]]
-            add_note(Note(n.path, title, "\n".join(body), fm, doc, n))
-        else:
-            body = render_subtree(n, n.level)
-            title = n.title if n.name == n.base else n.name
-            add_note(Note(n.path, title, "\n".join(body), doc_fm(doc, tags, section), doc, n))
+        t = clean_heading(n.title)
+        k = norm_key(t)
+        if k == want:
+            exact.append(n)
+        elif t.lower().startswith(title.lower()) and t[len(title):len(title) + 2] in (": ", ", ", " (") :
+            prefix.append(n)
+    return exact or prefix
 
 
-def find_node(key: str, hpath: list[str]) -> Node | None:
+def target(node: Node):
+    """(note path, anchor) of a heading node."""
+    c = node.container
+    return (c.path, None) if c is node else (c.path, node.title)
+
+
+def resolve_path(parts: list[str], key="vision"):
+    """'Combat › Resolve: hard and light CC' -> node, walking down the outline."""
     node = DOC[key]["root"]
-    for h in hpath:
-        want = norm_key(h)
-        nxt = None
-        for ch in node.children:
-            if norm_key(ch.title) == want:
-                nxt = ch
-                break
-        if nxt is None:
-            for ch in node.children:
-                if norm_key(ch.title).startswith(want) or want.startswith(norm_key(ch.title)):
-                    nxt = ch
-                    break
-        if nxt is None:
-            # the path may skip a parent: search the whole subtree for this title
-            nxt = next((x for x in node.walk() if x is not node and norm_key(x.title) == want), None)
-        if nxt is None:
+    for p in parts:
+        found = [c for c in node.children if norm_key(c.title) == norm_key(p)] or find_heading(key, p, node)
+        if not found:
             return None
-        node = nxt
+        node = found[0]
     return node
 
 
-def node_target(node: Node) -> tuple[str, str | None]:
-    """(note path, anchor) for a node."""
-    c = node.container
-    if c is node:
-        return node.path, None
-    return c.path, node.title
-
-
-# --------------------------------------------------------------------------- ideas
+# --------------------------------------------------------------------------- Ideias: one note per ID, text unchanged
 
 ID_LINE_RE = re.compile(r"^\*\*ID:\*\*\s*([A-Z]+-\d+)\s*·\s*\*\*Status:\*\*\s*(.+?)(?:\s*·\s*\*\*Game vision:\*\*\s*(.+?))?\s*$")
 IDEAS: "OrderedDict[str, dict]" = OrderedDict()
-ARCHIVED_IDS: dict[str, dict] = {}
+ARCHIVED: "OrderedDict[str, str]" = OrderedDict()
+
+
+def status_tag(status: str) -> str:
+    s = status.lower()
+    for k, tag in (("in game vision", "in-game-vision"), ("partial", "partial"), ("being", "being-designed"),
+                   ("open", "open"), ("archived", "archived"), ("discarded", "discarded")):
+        if s.startswith(k):
+            return "status/" + tag
+    return "status/" + re.sub(r"[^a-z0-9]+", "-", s).strip("-")
 
 
 def build_ideas(doc: dict, md: str):
     lines = md.split("\n")
     heads = [(i, len(m.group(1)), m.group(2).strip()) for i, l in enumerate(lines)
              for m in [re.match(r"^(#{1,6}) (.*)$", l)] if m]
-    folder = doc["folder"]
-    title_idx = heads[0][0]
-    pre_end = heads[1][0]
-    preamble = trim(lines[title_idx + 1:pre_end])
-    groups = []
-    stack = []  # (level, idea id)
+    preamble = trim(lines[heads[0][0] + 1:heads[1][0]])
+    outline = []  # ("idea", id, depth) | ("group", title, depth, intro) | ("archived",)
+    stack = []
     archived_lines = []
     for n, (i, lvl, title) in enumerate(heads[1:], 1):
         end = heads[n + 1][0] if n + 1 < len(heads) else len(lines)
         block = lines[i + 1:end]
         first = next((l for l in block if l.strip()), "")
-        m = ID_LINE_RE.match(first)
         while stack and stack[-1][0] >= lvl:
             stack.pop()
+        depth = sum(1 for _, kind in stack if kind == "idea")  # list nesting: only ideas inside ideas
+        m = ID_LINE_RE.match(first)
         if m:
-            iid, status, vision = m.group(1), m.group(2).strip(), (m.group(3) or "").strip()
+            iid = m.group(1)
             rest = list(block)
             rest.remove(first)
-            parent = stack[-1][1] if stack else None
-            IDEAS[iid] = dict(id=iid, title=title, status=status, vision=vision, body=trim(rest),
-                              parent=parent, children=[], group=None)
-            if parent and parent in IDEAS:
-                IDEAS[parent]["children"].append(iid)
-            elif parent and parent.startswith("group:"):
-                IDEAS[iid]["group"] = parent[6:]
-            stack.append((lvl, iid))
+            IDEAS[iid] = dict(id=iid, title=title, status=m.group(2).strip(), vision=(m.group(3) or "").strip(),
+                              id_line=first, body=trim(rest),
+                              path=f"{doc['folder']}/{iid} {file_name(title)}")
+            outline.append(("idea", iid, depth))
+            kind = "idea"
         elif norm_key(title).startswith("archived"):
             archived_lines = trim(block)
-            stack.append((lvl, "archived"))
+            outline.append(("archived", title, depth))
+            kind = "archived"
         else:
-            groups.append(dict(title=title, intro=trim(block), ideas=[]))
-            stack.append((lvl, "group:" + title))
-    for g in groups:
-        g["ideas"] = [k for k, v in IDEAS.items() if v["group"] == g["title"]]
+            outline.append(("group", title, depth, trim(block)))
+            kind = "group"
+        stack.append((lvl, kind))
     for l in archived_lines:
-        m = re.match(r"^\|\s*([A-Z]+-\d+)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|", l)
+        m = re.match(r"^\|\s*([A-Z]+-\d+)\s*\|\s*([^|]*?)\s*\|", l)
         if m:
-            ARCHIVED_IDS[m.group(1)] = dict(title=m.group(2), status=m.group(3))
+            ARCHIVED[m.group(1)] = m.group(2)
+    archived_path = f"{doc['folder']}/Archived and Discarded ideas"
+    doc["archived_path"] = archived_path
+
     for iid, idea in IDEAS.items():
-        idea["path"] = f"{folder}/{iid} {safe_name(idea['title'], False)}"
-    doc["archived_path"] = f"{folder}/Archived and Discarded ideas"
-    doc["hub_path"] = f"{folder}/{doc['hub']}"
-    doc["ideas_preamble"] = preamble
-    doc["ideas_groups"] = groups
-    doc["archived_lines"] = archived_lines
-
-
-def status_tag(status: str) -> str:
-    s = status.lower()
-    for key, tag in (("in game vision", "status/in-game-vision"), ("partial", "status/partial"),
-                     ("being", "status/being-designed"), ("open", "status/open"),
-                     ("archived", "status/archived"), ("discarded", "status/discarded")):
-        if s.startswith(key):
-            return tag
-    return "status/" + slugify(s)
-
-
-def vision_links(field: str, table=False) -> str:
-    """'Combat › Resolve: hard and light CC (effect gates); PvE' -> links."""
-    parts = [p.strip() for p in field.split(";") if p.strip()]
-    out = []
-    for p in parts:
-        m = re.match(r"^(.*?)\s*(\(.*\))?$", p)
-        main, paren = m.group(1).strip(), (m.group(2) or "")
-        hp = [x.strip() for x in main.split("›")]
-        node = find_node("vision", hp)
-        if node is None and len(hp) > 1:
-            node = find_node("vision", hp[:1])
-        if node is None:
-            UNRESOLVED.append(("vision-field", field))
-            out.append(p)
-            continue
-        path, anchor = node_target(node)
-        out.append(wl(path, main, anchor, table) + (f" {paren}" if paren else ""))
-    return "; ".join(out)
-
-
-def make_idea_notes(doc: dict):
-    for iid, idea in IDEAS.items():
-        idea_line = f"**ID:** {iid} · **Status:** {idea['status']}"
-        if idea["vision"]:
-            idea_line += f" · **Game vision:** {vision_links(idea['vision'])}"
-        body = [idea_line, ""] + idea["body"]
-        fm = OrderedDict(aliases=[iid, idea["title"]],
-                         tags=["runicgame", "idea", status_tag(idea["status"])],
-                         id=iid, status=idea["status"], game_vision=idea["vision"] or None,
-                         source=doc["title"], source_url=doc["url"],
-                         created=doc["created"], modified=doc["modified"])
-        note = Note(idea["path"], f"{iid} · {idea['title']}", "\n".join(body), fm, doc, self_ids={iid})
-        if idea["parent"] and idea["parent"] in IDEAS:
-            p = IDEAS[idea["parent"]]
-            note.footer.append(f"Part of {wl(p['path'], p['id'] + ' · ' + p['title'])}")
-        if idea["children"]:
-            note.footer.append("Includes " + ", ".join(wl(IDEAS[c]["path"], c + ' · ' + IDEAS[c]["title"]) for c in idea["children"]))
-        if idea["group"]:
-            note.footer.append(f"Group: {wl(doc['hub_path'], idea['group'], anchor=idea['group'] + ' ideas')}")
-        add_note(note)
-    # archived table
-    fm = OrderedDict(tags=["runicgame", "ideias", "status/archived", "status/discarded"],
+        fm = OrderedDict(aliases=[iid], tags=["ideias", "idea", status_tag(idea["status"])], id=iid,
+                         status=idea["status"], game_vision=idea["vision"] or None, source=doc["title"],
+                         source_url=doc["url"], created=doc["created"], modified=doc["modified"])
+        body = [vision_field_links(idea["id_line"], idea["vision"]), ""] + idea["body"]
+        add_note(Note(idea["path"], f"{iid} · {idea['title']}", "\n".join(body), fm, "idea", doc, {iid}))
+    fm = OrderedDict(aliases=list(ARCHIVED), tags=["ideias", "status/archived", "status/discarded"],
                      source=doc["title"], source_url=doc["url"], created=doc["created"], modified=doc["modified"])
-    add_note(Note(doc["archived_path"], "Archived and Discarded ideas", "\n".join(doc["archived_lines"]), fm, doc,
-                  self_ids=set(ARCHIVED_IDS)))
-    # index
-    body = list(doc["ideas_preamble"]) + [""]
-    order = ["Open", "Partial", "Being designed", "In game vision"]
-    by_status = defaultdict(list)
-    for iid, idea in IDEAS.items():
-        st = next((o for o in order if idea["status"].lower().startswith(o.lower())), idea["status"])
-        by_status[st].append(idea)
-    body += ["## Ideas by status", ""]
-    body += [f"{len(IDEAS)} ideas with an ID, plus {len(ARCHIVED_IDS)} archived or discarded ones in "
-             f"{wl(doc['archived_path'], 'Archived and Discarded')}.", ""]
-    for st in order + [s for s in by_status if s not in order]:
-        if not by_status.get(st):
+    add_note(Note(archived_path, "Archived and Discarded ideas", "\n".join(archived_lines), fm, "idea", doc,
+                  set(ARCHIVED)))
+    # the document's own note: its preamble, then every entry in document order
+    body = preamble + ["", "**Contents**", ""]
+    for item in outline:
+        if item[0] == "idea":
+            idea = IDEAS[item[1]]
+            body.append(f"{'  ' * item[2]}- {wl(idea['path'], idea['id'] + ' · ' + idea['title'])}")
+        elif item[0] == "archived":
+            body.append(f"{'  ' * item[2]}- {wl(archived_path, item[1])}")
+        else:
+            body += ["", f"**{item[1]}**", ""] + item[3] + [""]
+    add_note(Note(doc["note"], doc["title"], "\n".join(body), doc_fm(doc), "doc", doc))
+
+
+def vision_field_links(id_line: str, field: str) -> str:
+    """The idea's 'Game vision:' field, each 'Section › Subsection' as a wikilink. The text stays the same."""
+    if not field:
+        return id_line
+    out = []
+    for part in [p.strip() for p in field.split(";")]:
+        m = re.match(r"^(.*?)\s*(\(.*\))?$", part)
+        main, paren = m.group(1).strip(), m.group(2) or ""
+        steps = [x.strip() for x in main.split("›")]
+        node = resolve_path(steps)
+        while node is None and len(steps) > 1:  # a step that isn't a heading: link the closest one above it
+            steps = steps[:-1]
+            node = resolve_path(steps)
+            STATS["› link to a parent heading"] += 1
+        if node is None:
+            UNRESOLVED.append(("game vision", part))
+            out.append(part)
             continue
-        body += [f"### {st} ({len(by_status[st])})", "", "| ID | Idea | Game vision |", "| :---- | :---- | :---- |"]
-        for idea in by_status[st]:
-            vis = vision_links(idea["vision"], table=True) if idea["vision"] else "—"
-            body.append(f"| {wl(idea['path'], idea['id'], table=True)} | {idea['title']} | {vis} |")
-        body.append("")
-    for g in doc["ideas_groups"]:
-        body += [f"## {g['title']} ideas", ""] + g["intro"] + [""]
-        body += [f"- {wl(IDEAS[i]['path'], i + ' · ' + IDEAS[i]['title'])}" for i in g["ideas"]] + [""]
-    fm = OrderedDict(aliases=["Ideas inbox"], tags=["runicgame", "ideias"], source=doc["title"],
-                     source_url=doc["url"], created=doc["created"], modified=doc["modified"])
-    add_note(Note(doc["hub_path"], doc["title"], "\n".join(body), fm, doc))
+        path, anchor = target(node)
+        out.append(wl(path, main, anchor) + (f" {paren}" if paren else ""))
+    return id_line.replace(field, "; ".join(out))
 
 
-# --------------------------------------------------------------------------- packages and slices
+# --------------------------------------------------------------------------- Archive, Lore and Quest Design
 
-PACKAGES: "OrderedDict[str, dict]" = OrderedDict()
-SLICES: "OrderedDict[str, dict]" = OrderedDict()
-PREFIXES: dict[str, tuple[str, str]] = {}  # prefix -> (module name, repo)
-
-
-def split_row(line: str) -> list[str]:
-    s = line.strip()
-    if s.startswith("|"):
-        s = s[1:]
-    if s.endswith("|") and not s.endswith("\\|"):
-        s = s[:-1]
-    return [c.strip() for c in re.split(r"(?<!\\)\|", s)]
+def build_archive(doc: dict, md: str):
+    lines = md.split("\n")
+    first = next(i for i, l in enumerate(lines) if l.strip())
+    if lines[first].startswith("# "):
+        lines = lines[first + 1:]
+    fm = OrderedDict(tags=["archive", "appendix"], source=doc["title"], source_url=doc["url"],
+                     created=doc["created"], modified=doc["modified"])
+    add_note(Note(doc["note"], doc["title"], "\n".join(trim(lines)), fm, "archive", doc))
 
 
-def parse_tables(doc: dict):
-    """Yield (heading node, header cells, rows) for every table in a document."""
-    for n in doc["root"].walk():
-        lines = n.lines
-        i = 0
-        while i < len(lines):
-            if lines[i].startswith("|") and i + 1 < len(lines) and re.match(r"^\|\s*:?-{3,}", lines[i + 1]):
-                header = split_row(lines[i])
-                rows = []
-                j = i + 2
-                while j < len(lines) and lines[j].startswith("|"):
-                    rows.append(split_row(lines[j]))
-                    j += 1
-                yield n, header, rows
-                i = j
-            else:
-                i += 1
+def build_redirect(doc: dict):
+    body = f"""This document lives in the **RunicGame** repository: [RunicGame › docs/RunicWorld]({RUNICGAME_DOCS})."""
+    fm = OrderedDict(tags=doc["tags"] + ["redirect"], moved_to=RUNICGAME_DOCS)
+    add_note(Note(doc["note"], doc["title"], body, fm, "redirect", doc))
 
 
-def slice_id_from_cell(cell: str):
-    s = unescape_md(cell).strip()
-    m = re.match(r"^(\d+)([a-z]?)(\+)?\.\s*(.*)$", s)
-    if not m:
-        return None
-    return m.group(1), m.group(2), bool(m.group(3)), m.group(4).strip()
+def build_home():
+    g = lambda k: DOC[k]["note"]
+    arch = [d for d in DOCS if d["kind"] == "archive"]
+    body = f"""The RunicGame and RunicEngine design documentation, kept as Markdown. It started on {SNAPSHOT} as an export of
+the documents in the [RunicMMOEngine Drive folder]({DRIVE_FOLDER}).
+
+- {wl(g('vision'), 'RunicGame — Complete MMORPG Vision')}: how the game works. The Vision states the rules.
+- {wl(g('arch'), 'RunicEngine — Technical Architecture')}: how the Engine, the Platform and the Game build them; it links to the Vision for the rules.
+- {wl(g('ideias'), 'RunicGame — Ideias')}: the ideas inbox, one note per idea ID, kept whole as history.
+- {wl(g('lore'), 'RunicGame — Lore')} and {wl(g('quests'), 'RunicGame — Quest Design')}: in the RunicGame repository.
+- Archive: the original appendices, unchanged: {", ".join(wl(d['note'], d['title'].split(': ', 1)[-1]) for d in arch)}.
+
+**How the vault is organized.** A folder is a document (its H1), a note is a section (an H2), and the headings inside a
+note are its subsections (H3 and below). Every note name is unique, so a link like `[[Combat]]` always finds the same
+note. Each document's main note lists its sections in order.
+"""
+    add_note(Note("index", "RunicDocs", body, OrderedDict(aliases=["Home"], tags=["home"]), "home"))
 
 
-def build_slices_and_packages():
-    arch = DOC["arch"]
-    # prefix legend
-    for n in arch["root"].walk():
-        for l in n.lines:
-            if l.startswith("**Prefixes.**"):
-                text = unescape_md(l.replace("**Prefixes.**", "")).strip()
-                for repo, items in re.findall(r"(Engine|Platform|Game):\s*(.*?)(?=(?:Engine|Platform|Game):|$)", text):
-                    for item in items.strip().rstrip(".").split(","):
-                        item = item.strip()
-                        if not item:
-                            continue
-                        parts = item.split(" ", 1)
-                        name = parts[1] if len(parts) > 1 else parts[0]
-                        PREFIXES[parts[0]] = (name[0].upper() + name[1:], repo)
-    # roadmap slices
-    for node, header, rows in parse_tables(arch):
-        if header and header[0] == "Slice" and "Runnable result" in header:
-            for r in rows:
-                sid = slice_id_from_cell(r[0])
-                if not sid:
-                    continue
-                num, letter, plus, name = sid
-                key = f"{num}{letter}{'+' if plus else ''}"
-                fields = OrderedDict((header[k], r[k] if k < len(r) else "") for k in range(1, len(header)))
-                SLICES[key] = dict(key=key, num=int(num), letter=letter, plus=plus, name=name, fields=fields,
-                                   path=f"{ROADMAP_FOLDER}/Slice {int(num):02d}{letter} {safe_name(name, False)}",
-                                   packages_first=[], node=node)
-            break
-    # packages (Architecture tables first, then any other doc that defines new ones)
-    for key in ["arch", "security", "db", "pipeline", "ping", "nodes", "vision"]:
-        doc = DOC[key]
-        for node, header, rows in parse_tables(doc):
-            if not header or header[0] != "ID" or len(header) < 2 or header[1] != "Package":
-                continue
-            group = node.title
-            for r in rows:
-                pid = unescape_md(r[0]).strip()
-                if not re.match(r"^[A-Z]+-\d+[a-z]?$", pid):
-                    continue
-                fields = OrderedDict((header[k], r[k] if k < len(r) else "") for k in range(1, len(header)))
-                if pid in PACKAGES:
-                    for k, v in fields.items():
-                        if k not in PACKAGES[pid]["fields"] and v:
-                            PACKAGES[pid]["fields"][k] = v
-                    PACKAGES[pid]["also"].append((doc, node))
-                    continue
-                prefix = pid.split("-")[0]
-                mod, repo = PREFIXES.get(prefix, (prefix, "Other"))
-                PACKAGES[pid] = dict(id=pid, prefix=prefix, module=mod, repo=repo, fields=fields,
-                                     group=group, doc=doc, node=node, also=[])
-    for pid, p in PACKAGES.items():
-        mod_dir = p["prefix"] if p["module"] == p["prefix"] else f"{p['prefix']} {safe_name(p['module'], False)}"
-        folder = f"{PACKAGES_FOLDER}/{p['repo']}/{mod_dir}"
-        p["folder"] = folder
-        p["module_note"] = f"{folder}/{mod_dir}"
-        p["path"] = f"{folder}/{pid}"
-        desc = unescape_md(p["fields"].get("Package", ""))
-        short = re.split(r":|\s\(|;|\.\s", desc, maxsplit=1)[0].strip()
-        if len(short) > 64:
-            short = short[:64].rsplit(" ", 1)[0] + "…"
-        p["short"] = short
-        sl = unescape_md(p["fields"].get("Slice", "")).strip()
-        p["slice"] = sl
-        sk = slice_key(sl)
-        if sk:
-            SLICES[sk]["packages_first"].append(pid)
+# --------------------------------------------------------------------------- links
 
-
-def slice_key(token: str) -> str | None:
-    t = unescape_md(token).strip().rstrip(".")
-    if t in SLICES:
-        return t
-    m = re.match(r"^(\d+)([a-z]?)(\+)?$", t)
-    if not m:
-        return None
-    for k in (f"{m.group(1)}{m.group(2)}{m.group(3) or ''}", f"{m.group(1)}{m.group(2)}", f"{m.group(1)}+"):
-        if k in SLICES:
-            return k
-    return None
-
-
-def make_package_and_slice_notes():
-    arch = DOC["arch"]
-    for pid, p in PACKAGES.items():
-        f = p["fields"]
-        lines = []
-        for k, v in f.items():
-            if not v or v in ("—", "-"):
-                v = "—"
-            if k == "Slice":
-                sk = slice_key(v)
-                v = wl(SLICES[sk]["path"], f"Slice {sk} · {SLICES[sk]['name']}") if sk else v
-            lines.append(f"**{k}:** {v}")
-            lines.append("")
-        mod_index = p["module_note"]
-        mname = p["prefix"] if p["module"] == p["prefix"] else p["prefix"] + " · " + p["module"]
-        lines.append(f"**Module:** {wl(mod_index, mname)} ({p['repo']})")
-        lines.append("")
-        dpath, danchor = node_target(p["node"])
-        lines.append(f"**Defined in:** {wl(dpath, p['doc']['short'] + ' › ' + p['group'], danchor)}")
-        for d, nd in p["also"]:
-            ap, aa = node_target(nd)
-            lines.append("")
-            lines.append(f"**Also in:** {wl(ap, d['short'] + ' › ' + nd.title, aa)}")
-        fm = OrderedDict(aliases=[pid], tags=["runicengine", "package", f"repo/{p['repo'].lower()}"],
-                         id=pid, module=f"{p['prefix']} {p['module']}", slice=p["slice"] or None,
-                         source=p["doc"]["title"], source_url=p["doc"]["url"],
-                         created=p["doc"]["created"], modified=p["doc"]["modified"])
-        add_note(Note(p["path"], f"{pid} · {p['short']}", "\n".join(lines), fm, p["doc"], self_ids={pid}))
-    # module, repo and package indexes
-    repos = OrderedDict()
-    for p in PACKAGES.values():
-        repos.setdefault(p["repo"], OrderedDict()).setdefault(p["prefix"], []).append(p)
-    wp_node = find_node("arch", ["Modules, work packages and the implementation contract (Engine, Platform, Game)", "Work packages"])
-    wp_path, wp_anchor = node_target(wp_node) if wp_node else (DOC["arch"]["root"].path, None)
-    top = [f"Every work package of the {wl(arch['root'].path, 'Technical Architecture v4')} as its own note, "
-           f"grouped by repository and module. The tables these notes come from are in "
-           f"{wl(wp_path, 'Work packages', wp_anchor)}; a package's **Needs** links form the dependency graph, "
-           f"and its **Slice** links to the {wl(ROADMAP_HUB, 'roadmap')} slice that first needs it.", ""]
-    for repo, mods in repos.items():
-        top += [f"## {repo}", ""]
-        for prefix, plist in mods.items():
-            mpath = plist[0]["module_note"]
-            mtitle = prefix if plist[0]["module"] == prefix else f"{prefix} · {plist[0]['module']}"
-            top.append(f"- {wl(mpath, mtitle)} — {', '.join(wl(x['path'], x['id']) for x in plist)}")
-            mb = [f"Module **{prefix}** ({plist[0]['module']}) in {repo}.", "",
-                  "| ID | Package | Needs | Slice |", "| :---- | :---- | :---- | :---- |"]
-            for x in plist:
-                sk = slice_key(x["slice"])
-                sl = wl(SLICES[sk]["path"], sk, table=True) if sk else (x["slice"] or "—")
-                needs = x["fields"].get("Needs", "") or "—"
-                mb.append(f"| {wl(x['path'], x['id'], table=True)} | {x['short']} | {needs} | {sl} |")
-            add_note(Note(mpath, mtitle, "\n".join(mb), OrderedDict(tags=["runicengine", "package", f"repo/{repo.lower()}"]), arch))
-        top.append("")
-    add_note(Note(PACKAGES_HUB, "Work Packages", "\n".join(top),
-                  OrderedDict(aliases=["Packages"], tags=["runicengine", "package"]), arch))
-    # slices
-    keys = list(SLICES)
-    rm_node = find_node("arch", ["Vertical-slice roadmap"])
-    rm_path, rm_anchor = node_target(rm_node) if rm_node else (arch["root"].path, None)
-    for i, k in enumerate(keys):
-        s = SLICES[k]
-        lines = []
-        for fk, fv in s["fields"].items():
-            lines += [f"**{fk}:** {fv or '—'}", ""]
-        if s["packages_first"]:
-            lines += ["**Packages first needed here:** " + ", ".join(wl(PACKAGES[p]["path"], p) for p in s["packages_first"]), ""]
-        if rm_node:
-            for para in rm_node.lines:
-                m = re.match(r"^\*\*[^*]*\(slice (\d+[a-z]?)\)[^*]*\*\*", para)
-                if m and slice_key(m.group(1)) == k:
-                    lines += [para, ""]
-        lines.append(f"**Defined in:** {wl(rm_path, 'Technical Architecture v4 › Vertical-slice roadmap', rm_anchor)}")
-        owners = [o.strip().lower() for o in unescape_md(s["fields"].get("Owner", "")).split(",") if o.strip()]
-        fm = OrderedDict(aliases=[f"Slice {k}"], tags=["runicengine", "slice"] + [f"repo/{o}" for o in owners],
-                         slice=k, source=arch["title"], source_url=arch["url"],
-                         created=arch["created"], modified=arch["modified"])
-        note = Note(s["path"], f"Slice {k} · {s['name']}", "\n".join(lines), fm, arch)
-        nav = [f"↑ {wl(ROADMAP_HUB, 'Roadmap')}"]
-        if i > 0:
-            p = SLICES[keys[i - 1]]
-            nav.append(f"← {wl(p['path'], 'Slice ' + p['key'] + ' · ' + p['name'])}")
-        if i + 1 < len(keys):
-            nx = SLICES[keys[i + 1]]
-            nav.append(f"{wl(nx['path'], 'Slice ' + nx['key'] + ' · ' + nx['name'])} →")
-        note.footer.append(" · ".join(nav))
-        add_note(note)
-    rb = [f"The vertical slices of the {wl(rm_path, 'roadmap', rm_anchor)}, one note per slice. Each slice is small, "
-          "ends in something runnable and testable, and adds one piece of the architecture.", "",
-          "| Slice | Runnable result | Owner |", "| :---- | :---- | :---- |"]
-    for k in keys:
-        s = SLICES[k]
-        rr = s["fields"].get("Runnable result", "")
-        if len(rr) > 160:
-            rr = rr[:160].rsplit(" ", 1)[0] + "…"
-        rb.append(f"| {wl(s['path'], k + '. ' + s['name'], table=True)} | {rr} | {s['fields'].get('Owner', '')} |")
-    add_note(Note(ROADMAP_HUB, "Vertical-slice roadmap", "\n".join(rb),
-                  OrderedDict(aliases=["Slices"], tags=["runicengine", "slice"],
-                              source=arch["title"], source_url=arch["url"]), arch))
-
-
-# --------------------------------------------------------------------------- navigation
-
-def add_navigation():
-    for d in DOCS:
-        if d.get("kind") in ("ideas", "redirect"):
-            continue
-        for n in d["root"].walk():
-            if n.container is not n or n.parent is None:
-                continue
-            note = NOTES[n.path]
-            sibs = [c for c in n.parent.children]
-            i = sibs.index(n)
-            label = lambda x: x.title if x.name == x.base else x.name
-            nav = [f"↑ {wl(n.parent.path, label(n.parent) if n.parent.parent else d['short'])}"]
-            if i > 0:
-                nav.append(f"← {wl(sibs[i - 1].path, label(sibs[i - 1]))}")
-            if i + 1 < len(sibs):
-                nav.append(f"{wl(sibs[i + 1].path, label(sibs[i + 1]))} →")
-            note.footer.append(" · ".join(nav))
-    # up-links for document main notes and generated notes, so every note hangs from the tree
-    up = {PACKAGES_HUB: (HOME, "RunicDocs"), ROADMAP_HUB: (HOME, "RunicDocs")}
-    for d in DOCS:
-        up[d["hub_path"]] = (HOME, "RunicDocs")
-    ideias = DOC["ideias"]
-    for idea in IDEAS.values():
-        up[idea["path"]] = (ideias["hub_path"], "Ideias")
-    up[ideias["archived_path"]] = (ideias["hub_path"], "Ideias")
-    for p in PACKAGES.values():
-        up[p["module_note"]] = (PACKAGES_HUB, "Work Packages")
-    for path, (parent, label) in up.items():
-        if path in NOTES and parent in NOTES:
-            NOTES[path].footer.insert(0, f"↑ {wl(parent, label)}")
-
-    for note in NOTES.values():
-        if note.doc and note.fm.get("source_url"):
-            sec = note.fm.get("section")
-            src = f"Source: [{note.doc['title']}]({note.doc['url']})" + (f" › {sec}" if sec else "")
-            note.footer.append(f"{src} · exported {SNAPSHOT}")
-
-
-# --------------------------------------------------------------------------- link injection
-
-HOME = "index"
 PROTECT_RE = re.compile(r"(!?\[\[[^\]]*\]\]|!?\[[^\]]*\]\([^)]*\)|`[^`]*`|https?://[^\s)>|]+|<[^>]+>)")
 UNRESOLVED: list = []
 STATS = defaultdict(int)
@@ -1181,14 +828,10 @@ def map_segments(line: str, fn):
     return "".join(parts)
 
 
-def linkify(note: Note, id_targets: dict, slice_targets: dict, term_targets: list, doc_targets: list):
-    out = []
-    in_code = False
-    used_terms = set()
+def link_note(note: Note, id_re, id_targets, doc_targets):
+    out, in_code = [], False
     used_docs = set()
-    table_header = None
-    lines = note.body.split("\n")
-    for li, line in enumerate(lines):
+    for line in note.body.split("\n"):
         if line.startswith("```"):
             in_code = not in_code
             out.append(line)
@@ -1196,192 +839,92 @@ def linkify(note: Note, id_targets: dict, slice_targets: dict, term_targets: lis
         if in_code or re.match(r"^#{1,6} ", line):
             out.append(line)
             continue
-        in_table = line.startswith("|")
-        if in_table and li + 1 < len(lines) and re.match(r"^\|\s*:?-{3,}", lines[li + 1]):
-            table_header = [h.lower() for h in split_row(line)]
-        elif not in_table:
-            table_header = None
+        tbl = line.startswith("|")
 
-        # Google Docs URLs of folder documents -> wikilinks
         def gdoc(m):
-            text, did = m.group(1), m.group(2)
             for d in DOCS:
-                if d["drive"] == did and d["hub_path"] != note.path:
-                    STATS["gdoc-url"] += 1
-                    return wl(d["hub_path"], text, table=in_table)
+                if d["drive"] == m.group(2) and d["note"] != note.path:
+                    STATS["google-doc link"] += 1
+                    return wl(d["note"], m.group(1), table=tbl)
             return m.group(0)
         line = re.sub(r"\[([^\]]+)\]\(https://docs\.google\.com/document/d/([\w-]+)[^)]*\)", gdoc, line)
+
+        def see(seg):
+            def r(m):
+                ref = m.group(2)
+                key = note.doc["key"] if note.doc and note.doc["key"] in ("vision", "arch") else "vision"
+                here = NOTES_NODE.get(note.path)
+                cands = (find_heading(key, ref, here) if here else []) or find_heading(key, ref) or \
+                    find_heading("arch" if key == "vision" else "vision", ref)
+                uniq = {target(c) for c in cands}
+                if len(uniq) != 1:
+                    UNRESOLVED.append(("see", note.path, ref))
+                    return m.group(0)
+                path, anchor = uniq.pop()
+                if path == note.path and anchor is None:
+                    return m.group(0)
+                STATS["see link"] += 1
+                return f"{m.group(1)}{wl(path, ref, anchor, tbl)})"
+            return re.sub(r"(\(see )([A-Z][\w ,'\-]*?)\)", r, seg)
+        if note.kind in ("section", "doc"):
+            line = map_segments(line, see)
+
+        def arrows(seg):
+            def r(m):
+                parts = [p.strip() for p in m.group(0).split("›")]
+                for key in ("vision", "arch"):
+                    node = resolve_path(parts, key)
+                    if node is not None and norm_key(parts[0]) in {norm_key(c.title) for c in DOC[key]["root"].children}:
+                        path, anchor = target(node)
+                        if path == note.path and anchor is None:
+                            return m.group(0)
+                        STATS["› link"] += 1
+                        return wl(path, m.group(0), anchor, tbl)
+                return m.group(0)
+            return re.sub(r"[A-Z][\w ,:'()\-]*?(?: › [A-Z][\w ,:'()\-]*?)+(?=[.;)]|\s\(|$)", r, seg)
+        line = map_segments(line, arrows)
 
         def ids(seg):
             def r(m):
                 t = m.group(0)
-                if t in note.self_ids or t not in id_targets:
+                if t in note.self_ids or id_targets[t] == note.path:
                     return t
-                STATS["id"] += 1
-                path = id_targets[t]
-                if path == note.path:
-                    return t
-                return wl(path, t, table=in_table)
-            return ID_RE.sub(r, seg)
+                STATS["idea ID link"] += 1
+                return wl(id_targets[t], t, table=tbl)
+            return id_re.sub(r, seg)
         line = map_segments(line, ids)
 
-        def slices(seg):
-            def r(m):
-                word, sp, toks = m.group(1), m.group(2), m.group(3)
-                def tok(mm):
-                    k = slice_key(mm.group(0))
-                    if not k or slice_targets[k] == note.path:
-                        return mm.group(0)
-                    STATS["slice"] += 1
-                    return wl(slice_targets[k], unescape_md(mm.group(0)), table=in_table)
-                return word + sp + re.sub(r"\d+[a-z]?(?:\\?\+)?", tok, toks)
-            return SLICE_RE.sub(r, seg)
-        line = map_segments(line, slices)
-
-        if in_table and table_header and not re.match(r"^\|\s*:?-{3,}", line):
-            cells = split_row(line)
-            changed = False
-            for ci, h in enumerate(table_header):
-                if ci >= len(cells) or "[[" in cells[ci]:
-                    continue
-                if h == "slice" and ci == 0 and slice_id_from_cell(cells[0]):
-                    sid = slice_id_from_cell(cells[0])
-                    k = slice_key(f"{sid[0]}{sid[1]}{'+' if sid[2] else ''}")
-                    if k and slice_targets[k] != note.path:
-                        cells[0] = wl(slice_targets[k], unescape_md(cells[0]), table=True)
-                        changed = True
-                elif h in ("slice", "slices"):
-                    def tok(mm):
-                        k = slice_key(mm.group(0))
-                        if not k:
-                            return mm.group(0)
-                        STATS["slice-cell"] += 1
-                        return wl(slice_targets[k], unescape_md(mm.group(0)), table=True)
-                    new = re.sub(r"(?<![\w-])\d+[a-z]?(?:\\?\+)?(?![\w-])", tok, cells[ci])
-                    if new != cells[ci]:
-                        cells[ci] = new
-                        changed = True
-            if changed:
-                line = "| " + " | ".join(cells) + " |"
-
         def docs(seg):
-            for rx, key, target in doc_targets:
-                if key in used_docs or target == note.path or (note.doc and note.doc["key"] == key):
+            for rx, key in doc_targets:
+                tgt = DOC[key]["note"]
+                if key in used_docs or tgt == note.path or (note.doc and note.doc["key"] == key):
                     continue
                 m = rx.search(seg)
                 if m:
                     used_docs.add(key)
-                    STATS["doc"] += 1
-                    return docs(seg[:m.start()]) + wl(target, m.group(0), table=in_table) + docs(seg[m.end():])
+                    STATS["document link"] += 1
+                    return docs(seg[:m.start()]) + wl(tgt, m.group(0), table=tbl) + docs(seg[m.end():])
             return seg
         line = map_segments(line, docs)
-
-        def terms(seg):
-            for rx, tpath, anchor, tkey in term_targets:
-                if tkey in used_terms:
-                    continue
-                if tpath == note.path:
-                    continue
-                m = rx.search(seg)
-                if m:
-                    used_terms.add(tkey)
-                    STATS["term"] += 1
-                    return seg[:m.start()] + wl(tpath, m.group(0), anchor, table=in_table) + terms(seg[m.end():])
-            return seg
-        line = map_segments(line, terms)
         out.append(line)
     note.body = "\n".join(out)
 
 
-ID_RE = re.compile(r"$^")
-SLICE_RE = re.compile(r"\b([Ss]lices?)(\s+)((?:\d+[a-z]?(?:\\?\+)?)(?:(?:,\s*|\s+and\s+|\s+to\s+|\s+or\s+|\s*/\s*)\d+[a-z]?(?:\\?\+)?)*)")
+NOTES_NODE: dict = {}
 
 
 def inject_links():
-    global ID_RE
-    id_targets = {}
-    for iid, idea in IDEAS.items():
-        id_targets[iid] = idea["path"]
-    for aid in ARCHIVED_IDS:
-        id_targets[aid] = DOC["ideias"]["archived_path"]
-    for pid, p in PACKAGES.items():
-        id_targets[pid] = p["path"]
-    ids_sorted = sorted(id_targets, key=len, reverse=True)
-    ID_RE = re.compile(r"(?<![\w\-/#\[|])(?:" + "|".join(re.escape(x) for x in ids_sorted) + r")(?![\w-])")
-    slice_targets = {k: s["path"] for k, s in SLICES.items()}
-    term_targets = []
-    for i, (rx, key, hp) in enumerate(TERMS):
-        node = find_node(key, hp) if hp else DOC[key]["root"]
-        if node is None:
-            UNRESOLVED.append(("term", rx, key, hp))
-            continue
-        path, anchor = node_target(node)
-        term_targets.append((re.compile(rx), path, anchor, f"t{i}"))
-    doc_targets = [(re.compile(rx), key, DOC[key]["hub_path"]) for rx, key in DOC_MENTIONS]
+    id_targets = {i: d["path"] for i, d in IDEAS.items()}
+    id_targets.update({a: DOC["ideias"]["archived_path"] for a in ARCHIVED})
+    id_re = re.compile(r"(?<![\w\-/#\[|])(?:" + "|".join(sorted(map(re.escape, id_targets), key=len, reverse=True)) + r")(?![\w-])")
+    doc_targets = [(re.compile(rx), key) for rx, key in DOC_MENTIONS]
+    for key in ("vision", "arch"):
+        for ch in DOC[key]["root"].children:
+            NOTES_NODE[ch.path] = ch
     for note in NOTES.values():
-        linkify(note, id_targets, slice_targets, term_targets, doc_targets)
-
-
-# --------------------------------------------------------------------------- hubs
-
-def write_hubs():
-    g = lambda k: DOC[k]["hub_path"]
-    home = f"""This site is the RunicGame and RunicEngine design documentation, compiled from the documents in the
-[RunicMMOEngine Drive folder]({DRIVE_FOLDER}) on {SNAPSHOT}. Every note says which document and section it comes from.
-
-## RunicGame — the game
-
-- {wl(g('vision'), 'Complete MMORPG Vision')}: how the game should work, and every recorded decision.
-- {wl(g('ideias'), 'Ideias')}: the ideas inbox, one note per idea ID with its status.
-- {wl(g('lore'), 'Lore')} and {wl(g('quests'), 'Quest Design')}: they live in the RunicGame repository, in the
-  [RunicWorld vault]({RUNICWORLD_URL}).
-- Appendices, until they are merged into the Vision: {wl(g('nodes'), 'Nodes, Economy and Exploration')},
-  {wl(g('pipeline'), 'Content Pipeline and Art Direction')}, {wl(g('ping'), 'Ping Resolution')}.
-
-## RunicEngine — the technology
-
-![[runicengine-layered-architecture.png]]
-*RunicEngine layered architecture*
-
-- {wl(g('arch'), 'Technical Architecture v4')}: how the Engine, the Platform and the Game are built.
-- {wl(ROADMAP_HUB, 'Vertical-slice roadmap')}: one note per slice, with its packages.
-- {wl(PACKAGES_HUB, 'Work Packages')}: one note per package, linked to what it needs.
-- Appendices, until they are merged into the Architecture: {wl(g('security'), 'Security')}, {wl(g('db'), 'Database Layout')}.
-
-## How to read it
-
-- **Hierarchy.** Each document is a folder whose main note has the folder's name and lists its sections in order.
-  Sections are notes, and long sections are folders of their own. Every note links up to its parent and to the
-  previous and next section.
-- **Graph.** Links carry the connections between documents: idea IDs (like NAV-01), package IDs (like PCS-1), slice
-  numbers, document names and key terms (Disciplines, Labor, Flecs, Jolt…) all link to where they are defined.
-  The graph on the right shows a note's neighbourhood; open it full-screen to see the whole map.
-- **Labels.** The documents mark items as Decided (or Decision), Proposal and Open. Numbers are examples that show the
-  shape; final values come from development and playtests.
-- **Tags.** `vision`, `architecture`, `ideias`, `appendix`, `idea` with `status/…`, `package` and `slice` with
-  `repo/engine`, `repo/platform` and `repo/game`.
-"""
-    add_note(Note(HOME, "RunicDocs", home, OrderedDict(aliases=["Home"], tags=["home"])))
-    # documents that live in another repository keep their folder with one note pointing there
-    where = {
-        "lore": "The world's story, gods, peoples, factions and the main story.",
-        "quests": "Quests, the Chronicle journal, the Codex, knowledge tags and secrets.",
-    }
-    for d in DOCS:
-        if d.get("kind") != "redirect":
+        if note.kind in ("archive", "home", "redirect"):
             continue
-        body = f"""{where[d['key']]}
-
-This document lives in the **RunicGame** repository, in the RunicWorld vault:
-**[RunicGame › docs/RunicWorld]({RUNICWORLD_URL})**
-
-Until its text moves there, the current version is the Google Doc [{d['title']}]({d['url']}).
-
-↑ {wl(HOME, 'RunicDocs')}
-"""
-        fm = OrderedDict(aliases=[d["title"]], tags=d["tags"] + ["redirect"], source=d["title"],
-                         source_url=d["url"], moved_to=RUNICWORLD_URL)
-        add_note(Note(d["hub_path"], d["hub"], body, fm))
+        link_note(note, id_re, id_targets, doc_targets)
 
 
 # --------------------------------------------------------------------------- main
@@ -1401,51 +944,29 @@ def main():
         shutil.copytree(keep, out / ".obsidian")
         shutil.rmtree(keep)
     attach = out / "attachments"
-    extra_png = src / "RunicEngine_Layered_Architecture.png"
-    if extra_png.exists():
-        attach.mkdir(parents=True, exist_ok=True)
-        shutil.copy(extra_png, attach / "runicengine-layered-architecture.png")
 
+    for kind in ("split", "archive"):
+        for d in DOCS:
+            if d["kind"] == kind:
+                md = apply_edits(normalize((src / d["file"]).read_text(encoding="utf-8"), d["key"], attach), d["key"])
+                (build_split if kind == "split" else build_archive)(d, md)
+    d = DOC["ideias"]
+    build_ideas(d, normalize((src / d["file"]).read_text(encoding="utf-8"), d["key"], attach))
     for d in DOCS:
-        if d.get("kind") == "redirect":
-            continue
-        md = normalize((src / d["file"]).read_text(encoding="utf-8"), d["key"], attach)
-        if d.get("kind") == "ideas":
-            build_ideas(d, md)
-        else:
-            plan_doc(d, md)
-    build_slices_and_packages()
-    # names that generated notes already use; section notes must not take them
-    reserved = {HOME}
-    reserved |= {i["path"].rsplit("/", 1)[-1] for i in IDEAS.values()}
-    reserved |= {DOC["ideias"]["hub"], DOC["ideias"]["archived_path"].rsplit("/", 1)[-1]}
-    reserved |= {p["id"] for p in PACKAGES.values()} | {p["module_note"].rsplit("/", 1)[-1] for p in PACKAGES.values()}
-    reserved |= {s_["path"].rsplit("/", 1)[-1] for s_ in SLICES.values()}
-    reserved |= {PACKAGES_HUB.rsplit("/", 1)[-1], ROADMAP_HUB.rsplit("/", 1)[-1]}
-    reserved |= {d["hub"] for d in DOCS if d.get("kind") in ("redirect", "ideas")}
-    resolve_names({r.lower() for r in reserved})
-    for d in DOCS:
-        if d.get("kind") not in ("ideas", "redirect"):
-            build_doc(d)
-    make_idea_notes(DOC["ideias"])
-    make_package_and_slice_notes()
-    write_hubs()
-    add_navigation()
+        if d["kind"] == "redirect":
+            build_redirect(d)
+    build_home()
     inject_links()
-
-    names = Counter(path.rsplit("/", 1)[-1].lower() for path in NOTES)
-    dupes = [n for n, c in names.items() if c > 1]
-    if dupes:
-        raise SystemExit(f"duplicate note names: {dupes}")
 
     for note in NOTES.values():
         p = out / (note.path + ".md")
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(note.render(), encoding="utf-8")
+    for folder in REQUIRED_FOLDERS:
+        (out / folder).mkdir(parents=True, exist_ok=True)
 
-    report = dict(notes=len(NOTES), ideas=len(IDEAS), archived=len(ARCHIVED_IDS), packages=len(PACKAGES),
-                  slices=len(SLICES), links=dict(STATS), unresolved=UNRESOLVED)
-    print(json.dumps(report, indent=1, ensure_ascii=False))
+    print(json.dumps(dict(notes=len(NOTES), ideas=len(IDEAS), archived_ids=len(ARCHIVED), links=dict(STATS),
+                          unresolved=UNRESOLVED), indent=1, ensure_ascii=False))
 
 
 if __name__ == "__main__":
