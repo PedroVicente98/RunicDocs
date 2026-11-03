@@ -9,7 +9,8 @@ the site:
 - no plugin remembers a page under the base path ("RunicDocs/Vision/Combat");
 - every link on the checked pages and in the search results opens a page (no 404, such as
   /RunicDocs/RunicDocs/);
-- embedded notes (![[Note]]) are filled in and shown in a scroll box.
+- embedded notes (![[Note]]) are filled in and shown in a scroll box;
+- in the sidebar, each document's own note is the first note of its folder.
 
     python3 tools/check_site.py PUBLIC_DIR BASE_PATH      e.g.  .quartz/public RunicDocs
 
@@ -31,6 +32,9 @@ PUBLIC = Path(sys.argv[1]).resolve()
 BASE = "/" + sys.argv[2].strip("/")
 PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias", "/Ideias/Ideias-overview"]
 EMBED_PAGE = "/Ideias/Ideias-overview"  # embeds every idea
+# in the sidebar, each folder's first note is the document's own note (quartz.config.yaml, explorer sortFn)
+PINNED = {"Vision": "RunicGame-—-Complete-MMORPG-Vision", "Architecture": "RunicEngine-—-Technical-Architecture",
+          "Ideias": "RunicGame-—-Ideias"}
 
 # The graph plugin loads d3 from a CDN as window.d3. Wrap d3.forceSimulation to record the node ids
 # of each graph it lays out, so the check can see which nodes the local and the full graph hold.
@@ -151,6 +155,12 @@ def main() -> int:
                 failures.append(f"{path}: the graph drew no canvas")
             if not explorer_links:
                 failures.append(f"{path}: the explorer has no links")
+            for folder, first in PINNED.items():
+                prefix = f"{BASE}/{folder}/"
+                notes = [urllib.parse.unquote(h)[len(prefix):] for h in explorer_links
+                         if urllib.parse.unquote(h).startswith(prefix) and urllib.parse.unquote(h) != prefix]
+                if notes and notes[0] != first:
+                    failures.append(f"{path}: the sidebar's first note in {folder}/ is {notes[0]!r}, expected {first!r}")
             if outside:
                 failures.append(f"{path}: links that leave the site: {outside[:5]}")
 

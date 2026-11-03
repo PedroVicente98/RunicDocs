@@ -71,6 +71,13 @@ A note can show another note inside it, in a box with its own scrollbar, on the 
 `Ideias overview` embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
 `runicdocs-embeds` snippet in Obsidian: turn it on once in **Settings › Appearance › CSS snippets**.
 
+## Site navigation
+
+- **Sidebar order:** in each folder the document's own note comes first, then its overview, then the other notes by
+  name (the explorer's `sortFn` in `quartz.config.yaml`).
+- **Home page:** `content/index.md` has `cssclasses: home-dashboard`, so its callouts show as a grid of cards, on the site
+  (`quartz-styles/custom.scss`) and in Obsidian's reading view (the same `runicdocs-embeds` snippet).
+
 ## Moving text
 
 Text that only changes place is moved with a script, never retyped:

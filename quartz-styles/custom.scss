@@ -18,3 +18,25 @@
     margin: 0.5rem 0;
   }
 }
+
+// The home page (cssclasses: home-dashboard): its callouts are cards in a grid; everything else spans the full width.
+article.home-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0 1rem;
+  align-items: start;
+
+  > * {
+    grid-column: 1 / -1;
+  }
+
+  > .callout {
+    grid-column: auto;
+    margin: 0.5rem 0;
+
+    ul {
+      margin: 0.25rem 0 0;
+      padding-left: 1.1rem;
+    }
+  }
+}

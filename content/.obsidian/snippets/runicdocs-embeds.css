@@ -13,3 +13,15 @@ body {
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
 }
+
+/* The home page (cssclasses: home-dashboard): its callouts are cards in a grid, like on the website. */
+.home-dashboard.markdown-preview-view .markdown-preview-sizer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0 1rem;
+  align-items: start;
+}
+
+.home-dashboard.markdown-preview-view .markdown-preview-sizer > div:not(:has(> .callout)) {
+  grid-column: 1 / -1;
+}
