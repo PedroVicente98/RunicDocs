@@ -1,0 +1,15 @@
+/* RunicDocs: an embedded note (![[Note]]) shows in a box with its own scrollbar,
+   like on the website. Turn it on in Settings > Appearance > CSS snippets. */
+body {
+  --embed-max-height: 28rem;
+}
+
+.markdown-embed .markdown-embed-content {
+  max-height: var(--embed-max-height);
+  overflow-y: auto;
+}
+
+.markdown-embed {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+}

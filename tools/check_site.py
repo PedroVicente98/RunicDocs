@@ -8,7 +8,8 @@ the site:
   and the full graph holds every page;
 - no plugin remembers a page under the base path ("RunicDocs/Vision/Combat");
 - every link on the checked pages and in the search results opens a page (no 404, such as
-  /RunicDocs/RunicDocs/).
+  /RunicDocs/RunicDocs/);
+- embedded notes (![[Note]]) are filled in and shown in a scroll box.
 
     python3 tools/check_site.py PUBLIC_DIR BASE_PATH      e.g.  .quartz/public RunicDocs
 
@@ -28,7 +29,8 @@ from playwright.sync_api import sync_playwright
 
 PUBLIC = Path(sys.argv[1]).resolve()
 BASE = "/" + sys.argv[2].strip("/")
-PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid"]
+PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias"]
+EMBED_PAGE = "/Ideias/RunicGame-—-Ideias"  # the Ideias list embeds every idea
 
 # The graph plugin loads d3 from a CDN as window.d3. Wrap d3.forceSimulation to record the node ids
 # of each graph it lays out, so the check can see which nodes the local and the full graph hold.
@@ -183,6 +185,22 @@ def main() -> int:
                 bad = [s for s in slugs if s == base_slug or s.startswith(base_slug + "/")]
                 if bad:
                     failures.append(f"{path}: {what} include the base path: {bad[:5]}")
+
+            # embedded notes: filled in (no "Transclude of ..." placeholder left) and in a scroll box
+            embeds = page.evaluate("""() => [...document.querySelectorAll("article .transclude")].map(e => {
+                const st = getComputedStyle(e);
+                return { filled: !e.querySelector(":scope > a.transclude-inner"), overflow: st.overflowY, maxHeight: st.maxHeight };
+            })""")
+            if embeds:
+                unfilled = sum(not e["filled"] for e in embeds)
+                unboxed = sum(e["overflow"] != "auto" or e["maxHeight"] == "none" for e in embeds)
+                print(f"{path}: embedded notes={len(embeds)}, not filled in={unfilled}, without a scroll box={unboxed}")
+                if unfilled:
+                    failures.append(f"{path}: {unfilled} embedded notes were not filled in")
+                if unboxed:
+                    failures.append(f"{path}: {unboxed} embedded notes have no scroll box (quartz-styles/custom.scss not applied?)")
+            if path == EMBED_PAGE and len(embeds) < 100:
+                failures.append(f"{path}: expected about 100 embedded ideas, found {len(embeds)}")
 
             for h in page.eval_on_selector_all("a[href]", "els => els.map(e => e.href)"):
                 if h.startswith(root):

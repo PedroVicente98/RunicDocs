@@ -57,6 +57,7 @@ jobs:
           cp -r content .quartz/content
           cp quartz.config.yaml .quartz/quartz.config.yaml
           cp quartz.lock.json .quartz/quartz.lock.json
+          cp quartz-styles/custom.scss .quartz/quartz/styles/custom.scss
 
       - name: Install Quartz
         working-directory: .quartz

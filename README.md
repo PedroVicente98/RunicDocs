@@ -28,6 +28,7 @@ content/                                      ← the Obsidian vault (open this 
 ├── Quest Design/                             one note linking to the RunicGame repository — never delete this folder
 └── attachments/                              images
 quartz.config.yaml                            site configuration (Quartz 5)
+quartz-styles/custom.scss                     site styles (the scroll box for embedded notes)
 .github/workflows/deploy.yml                  builds and publishes the site on every push to main
 scripts/preview.sh|.ps1                       build and serve the site on your machine
 tools/                                        the split script, the move tool and the vault checker
@@ -55,6 +56,19 @@ tools/                                        the split script, the move tool an
   or "conflicts" sections.
 - **English throughout.** Titles carry no version ("RunicEngine — Technical Architecture").
 - **Links.** "Section › Subsection" references, "(see X)" references, idea IDs and document names are wikilinks.
+
+## Embedding notes
+
+A note can show another note inside it, in a box with its own scrollbar, on the site and in Obsidian:
+
+| Write | Shows |
+| :--- | :--- |
+| `![[NAV-01 Naval Raid]]` | the whole note, with its title |
+| `![[Combat#Conditions]]` | one section, up to the next heading of the same level |
+| `![[Combat#^naval-rule]]` | one paragraph, marked with ` ^naval-rule` at its end |
+
+The Ideias list embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
+`runicdocs-embeds` snippet in Obsidian: turn it on once in **Settings › Appearance › CSS snippets**.
 
 ## Moving text
 
@@ -126,7 +140,8 @@ After the build, `tools/check_site.py` opens the site under `/RunicDocs/` in Chr
 - the local graph isn't drawn around the page itself with its neighbours, or the full graph doesn't hold every page;
 - a plugin remembers a page under the base path;
 - the explorer has no links or search finds nothing;
-- a link leaves the site or opens a missing page.
+- a link leaves the site or opens a missing page;
+- an embedded note isn't filled in or has no scroll box.
 
 ## Preview on your machine
 

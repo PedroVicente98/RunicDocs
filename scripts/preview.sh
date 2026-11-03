@@ -18,6 +18,7 @@ fi
 rm -rf .quartz/content
 cp -r content .quartz/content
 cp quartz.config.yaml .quartz/quartz.config.yaml
+cp quartz-styles/custom.scss .quartz/quartz/styles/custom.scss
 
 cd .quartz
 npx quartz build --serve

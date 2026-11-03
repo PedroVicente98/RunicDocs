@@ -20,6 +20,7 @@ if (-not (Test-Path ".quartz")) {
 if (Test-Path ".quartz\content") { Remove-Item -Recurse -Force ".quartz\content" }
 Copy-Item -Recurse "content" ".quartz\content"
 Copy-Item "quartz.config.yaml" ".quartz\quartz.config.yaml" -Force
+Copy-Item "quartz-styles\custom.scss" ".quartz\quartz\styles\custom.scss" -Force
 
 Set-Location .quartz
 npx quartz build --serve

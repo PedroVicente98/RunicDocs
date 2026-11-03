@@ -1,0 +1,20 @@
+@use "./base.scss";
+
+// RunicDocs. Copied over Quartz's quartz/styles/custom.scss by the deploy and the preview scripts.
+
+// An embedded note (![[Note]], ![[Note#Heading]]) shows in a box with its own scrollbar.
+.transclude {
+  max-height: 28rem;
+  overflow-y: auto;
+  margin: 0.75rem 0;
+  padding: 0.25rem 1rem 0.75rem;
+  border: 1px solid var(--lightgray);
+  border-left: 3px solid var(--secondary);
+  border-radius: 6px;
+
+  // the embedded note's title
+  > h1:first-child {
+    font-size: 1.35rem;
+    margin: 0.5rem 0;
+  }
+}
