@@ -82,6 +82,7 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[TRADE-01 Trade Packs|TRADE-01 · Trade Packs]]
 - [[INV-01 Inventory|INV-01 · Inventory]]
 - [[MARKET-01 Market Isle|MARKET-01 · Market Isle]]
+  - [[MARKET-02 Mirage Isle|MARKET-02 · Mirage Isle]]
 - [[LAUNCH-01 Launch|LAUNCH-01 · Launch]]
 - [[PROF-02 Professions and Masteries|PROF-02 · Professions and Masteries]]
 - [[JOB-01 Job Board|JOB-01 · Job Board]]
