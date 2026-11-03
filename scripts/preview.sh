@@ -10,6 +10,8 @@ cd "$ROOT"
 
 if [ ! -d .quartz ]; then
   git clone --depth 1 --branch "$QUARTZ_VERSION" https://github.com/jackyzha0/quartz.git .quartz
+  git -C .quartz apply ../quartz-patches/body-basepath.patch
+  cp quartz.lock.json .quartz/quartz.lock.json
   (cd .quartz && npm ci && npx quartz plugin restore)
 fi
 

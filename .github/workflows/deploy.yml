@@ -32,6 +32,12 @@ jobs:
       - name: Fetch Quartz ${{ env.QUARTZ_VERSION }}
         run: git clone --depth 1 --branch "$QUARTZ_VERSION" https://github.com/jackyzha0/quartz.git .quartz
 
+      # Quartz 5.0.0 doesn't tell its plugins that the site lives under /RunicDocs/, so the graph,
+      # explorer and search look for their data and links at the domain root. This applies the fix
+      # from Quartz's main branch (data-basepath on <body>); quartz.lock.json pins the plugins that read it.
+      - name: Patch Quartz for a subpath site
+        run: git -C .quartz apply ../quartz-patches/body-basepath.patch
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -43,13 +49,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .quartz/.quartz/plugins
-          key: quartz-plugins-${{ env.QUARTZ_VERSION }}-${{ hashFiles('quartz.config.yaml', '.quartz/quartz.lock.json') }}
+          key: quartz-plugins-${{ env.QUARTZ_VERSION }}-${{ hashFiles('quartz.config.yaml', 'quartz.lock.json') }}
 
       - name: Add RunicDocs content and configuration
         run: |
           rm -rf .quartz/content
           cp -r content .quartz/content
           cp quartz.config.yaml .quartz/quartz.config.yaml
+          cp quartz.lock.json .quartz/quartz.lock.json
 
       - name: Install Quartz
         working-directory: .quartz
@@ -62,6 +69,11 @@ jobs:
       - name: Build site
         working-directory: .quartz
         run: npx quartz build
+
+      - name: Check the built site
+        run: |
+          pip install --quiet playwright
+          python3 tools/check_site.py .quartz/public RunicDocs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

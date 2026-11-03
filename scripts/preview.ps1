@@ -9,6 +9,8 @@ Set-Location $Root
 
 if (-not (Test-Path ".quartz")) {
   git clone --depth 1 --branch $QuartzVersion https://github.com/jackyzha0/quartz.git .quartz
+  git -C .quartz apply ../quartz-patches/body-basepath.patch
+  Copy-Item "quartz.lock.json" ".quartz\quartz.lock.json" -Force
   Push-Location .quartz
   npm ci
   npx quartz plugin restore

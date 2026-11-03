@@ -105,6 +105,20 @@ Every push to `main` runs `.github/workflows/deploy.yml`: it downloads Quartz 5.
 Quartz's plugins, so later builds are faster. GitHub Pages is set to **Source: GitHub Actions** in the repository
 settings. If the site moves, change `baseUrl` in `quartz.config.yaml`.
 
+### Quartz fixes for a subpath site
+
+The site lives under `/RunicDocs/`, not at the domain root. Quartz 5.0.0's graph, explorer, search and stacked-pages
+plugins looked for their data and built their links at the root, so the graph came up empty. Two files fix it until a
+Quartz release includes the fixes:
+
+- `quartz-patches/body-basepath.patch` backports a change from Quartz's main branch: each page's `<body>` gets
+  `data-basepath="/RunicDocs"`.
+- `quartz.lock.json` is Quartz 5.0.0's plugin lockfile with those four plugins moved to their 22 March 2026 commits,
+  which read that attribute ("resolve links correctly on subdirectory deployments").
+
+After the build, `tools/check_site.py` opens the site under `/RunicDocs/` in Chrome and fails the deploy if the graph
+draws nothing, the explorer has no links, search finds nothing, or a link leaves the site.
+
 ## Preview on your machine
 
 Needs Node 22 or newer and git.
