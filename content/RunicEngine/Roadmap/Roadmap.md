@@ -7,6 +7,8 @@ tags:
   - "slice"
 source: "RunicEngine — Technical Architecture v4"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 The vertical slices of the [[Vertical-slice roadmap|roadmap]], one note per slice. Each slice is small, ends in something runnable and testable, and adds one piece of the architecture.

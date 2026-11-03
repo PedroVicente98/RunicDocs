@@ -4,6 +4,8 @@ aliases:
   - "Home"
 tags:
   - "home"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 This site is the RunicGame and RunicEngine design documentation, compiled from the documents in the

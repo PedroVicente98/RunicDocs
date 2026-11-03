@@ -9,6 +9,8 @@ tags:
 source: "RunicGame — Quest Design"
 source_url: "https://docs.google.com/document/d/11UTu2AtZl00OAmg6sMzjS8xcUDvXXoU9PAlhPsbOwJk/edit"
 moved_to: "https://github.com/PedroVicente98/RunicGame/tree/main/docs/RunicWorld"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 Quests, the Chronicle journal, the Codex, knowledge tags and secrets.

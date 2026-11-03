@@ -5,6 +5,8 @@ aliases:
 tags:
   - "runicengine"
   - "package"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 Every work package of the [[Architecture|Technical Architecture v4]] as its own note, grouped by repository and module. The tables these notes come from are in [[Work packages|Work packages]]; a package's **Needs** links form the dependency graph, and its **Slice** links to the [[Roadmap|roadmap]] slice that first needs it.

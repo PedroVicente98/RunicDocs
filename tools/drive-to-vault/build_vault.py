@@ -462,7 +462,10 @@ def normalize(md: str, key: str, attach: Path) -> str:
     for ln in md.split("\n"):
         if ln.startswith("```"):
             in_code = not in_code
-        elif not in_code and not re.match(r"^\$\$.*\$\$\s*$", ln):
+        elif re.match(r"^\$\$.*\$\$\s*$", ln):
+            # display math: Google exports thin and four-per-em spaces, which KaTeX can't typeset
+            ln = ln.replace("\u2009", "\\,").replace("\u2005", "\\,")
+        elif not in_code:
             ln = re.sub(r"(?<!\\)\$", r"\\$", ln)
             ln = re.sub(r"(^|\s)#(\d)", r"\1\\#\2", ln) if not ln.startswith("#") else ln
             ln = ln.replace("%%", "%​%")
@@ -575,6 +578,9 @@ class Note:
         fm["title"] = self.title
         for k, v in self.fm.items():
             fm[k] = v
+        # Quartz reads dates from frontmatter first; generated notes get the build date
+        fm.setdefault("created", SNAPSHOT)
+        fm.setdefault("modified", SNAPSHOT)
         out = ["---"]
         for k, v in fm.items():
             if v is None or v == [] or v == "":

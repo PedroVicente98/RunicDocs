@@ -29,12 +29,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch Quartz ${{ env.QUARTZ_VERSION }}
+        run: git clone --depth 1 --branch "$QUARTZ_VERSION" https://github.com/jackyzha0/quartz.git .quartz
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: .quartz/package-lock.json
 
-      - name: Fetch Quartz ${{ env.QUARTZ_VERSION }}
-        run: git clone --depth 1 --branch "$QUARTZ_VERSION" https://github.com/jackyzha0/quartz.git .quartz
+      # Installing Quartz's plugins takes most of a cold build; keep them between runs.
+      - name: Cache Quartz plugins
+        uses: actions/cache@v4
+        with:
+          path: .quartz/.quartz/plugins
+          key: quartz-plugins-${{ env.QUARTZ_VERSION }}-${{ hashFiles('quartz.config.yaml', '.quartz/quartz.lock.json') }}
 
       - name: Add RunicDocs content and configuration
         run: |

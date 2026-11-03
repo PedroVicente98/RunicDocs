@@ -4,6 +4,8 @@ tags:
   - "runicengine"
   - "package"
   - "repo/game"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 Module **GCL** (Client module) in Game.

@@ -8,7 +8,7 @@ configuration:
   enablePopovers: true
   analytics: {}
   locale: en-US
-  baseUrl: pedrovicente98.github.io/runicdocs
+  baseUrl: pedrovicente98.github.io/RunicDocs
   ignorePatterns:
     - private
     - templates

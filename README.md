@@ -84,8 +84,11 @@ tools/                            the converter that built the vault, and a vaul
 1. Push this repository to GitHub.
 2. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
 3. Every push to `main` runs `.github/workflows/deploy.yml`: it downloads Quartz 5.0.0, copies `content/` and
-   `quartz.config.yaml` into it, builds, and publishes. The site appears at
-   `https://pedrovicente98.github.io/runicdocs/`.
+   `quartz.config.yaml` into it, builds, and publishes. The site is at
+   [pedrovicente98.github.io/RunicDocs](https://pedrovicente98.github.io/RunicDocs/).
+
+The first build takes about 15 minutes because Quartz installs its plugins; the workflow caches them, so later builds
+are much faster.
 
 The site is public even if the repository is private (on plans that allow Pages for private repositories). Each note's
 footer links to its Google Doc, and the Lore and Quest Design notes link to the RunicGame repository; people without
@@ -115,6 +118,9 @@ python3 tools/check_vault.py
 
 It reports broken links, anchors that no longer match a heading, frontmatter that does not parse, and note names used
 more than once.
+
+The dates the site shows come from each note's `created` and `modified` frontmatter: the Google Doc's dates for the
+converted notes, the build date for the generated ones. Update `modified` when you change a note.
 
 ## Rebuilding from the Drive documents
 

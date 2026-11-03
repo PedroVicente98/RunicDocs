@@ -34,7 +34,7 @@ modified: "2026-10-30"
 
 * Role efficiency and per-component coefficients (PvE and PvP) are data tables reloadable at runtime. Every value has a base, and a skill, item or effect may declare its own PvE and/or PvP values (e.g., base 100, PvP 85, PvE 105); the rule pipeline’s per-hit context picks the variant. Proposal: the context is decided by the target of each hit.
 
-$${D}_{final}={D}_{base}\times \prod\limits_{c\in C}^{}{k}_{c}\times {E}_{role}\times \left({1-min\left({{R}_{max}, \sum\limits_{c\in C}^{}{r}_{c}}\right)}\right)$$
+$${D}_{final}={D}_{base}\times \prod\limits_{c\in C}^{}{k}_{c}\times {E}_{role}\times \left({1-min\left({{R}_{max},\,\sum\limits_{c\in C}^{}{r}_{c}}\right)}\right)$$
 
 ---
 

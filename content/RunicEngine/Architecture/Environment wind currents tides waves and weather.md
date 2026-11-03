@@ -70,7 +70,7 @@ s \= the ship’s sail force; w\_app \= apparent wind; θ \= angle between appar
 
 The base current comes from the water body (river profile, vector field or ocean current field). The Environment modulates it with a tidal term, a seasonal factor, the weather’s current multiplier and any active override:
 
-$$c\left({p,t}\right)={c}_{0}\left({p}\right)\times \left({1+a\left({p}\right) sin\left({{\phi }_{tide}\left({t}\right)+\delta \left({p}\right)}\right)}\right)\times {k}_{season}\left({t}\right)\times {k}_{weather}\left({p,t}\right)$$
+$$c\left({p,t}\right)={c}_{0}\left({p}\right)\times \left({1+a\left({p}\right)\,sin\left({{\phi }_{tide}\left({t}\right)+\delta \left({p}\right)}\right)}\right)\times {k}_{season}\left({t}\right)\times {k}_{weather}\left({p,t}\right)$$
 
 c0 \= cooked base current, which follows the same cyclic baseline routine model as wind; a and δ \= cooked tidal amplitude and phase offset; k \= Game-defined factors. WaterSample.flow\_velocity already contains the result.
 

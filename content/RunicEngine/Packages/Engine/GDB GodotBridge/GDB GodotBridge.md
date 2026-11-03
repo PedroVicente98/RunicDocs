@@ -4,6 +4,8 @@ tags:
   - "runicengine"
   - "package"
   - "repo/engine"
+created: "2026-11-03"
+modified: "2026-11-03"
 ---
 
 Module **GDB** ([[How the Engine uses Godot|GodotBridge]]) in Engine.
