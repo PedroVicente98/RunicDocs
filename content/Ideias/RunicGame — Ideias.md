@@ -128,6 +128,7 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[BIZ-01 Business Model|BIZ-01 · Business Model]]
 - [[XFER-01 Transfers Between Accounts|XFER-01 · Transfers Between Accounts]]
 - [[SKIN-01 Skinning and Field Harvesting|SKIN-01 · Skinning and Field Harvesting]]
+- [[LAND-03 Region Categories and Housing Geography|LAND-03 · Region Categories and Housing Geography]]
 
 **Lore**
 

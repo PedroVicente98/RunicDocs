@@ -37,7 +37,7 @@ tools/                                        the split script, the move tool an
 | :--- | ---: |
 | `Vision/` | 22 |
 | `Architecture/` | 28 |
-| `Ideias/` | 100 |
+| `Ideias/` | 101 |
 | `Archive/` | 5 |
 | `Lore/`, `Quest Design/` | 1 each |
 
