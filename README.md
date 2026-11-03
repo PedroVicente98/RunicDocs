@@ -24,6 +24,7 @@ content/                                      ← the Obsidian vault (open this 
 │   ├── Ideias overview.md                    every idea embedded in full, in the same order
 │   ├── NAV-01 Naval Raid.md                  one note per idea ID, text unchanged; the ID is its alias
 │   └── Archived and Discarded ideas.md
+├── Development/                              the slices checklist and one note per slice (generated, see below)
 ├── Archive/                                  the original appendices, unchanged, even after they are merged
 ├── Lore/                                     one note linking to the RunicGame repository — never delete this folder
 ├── Quest Design/                             one note linking to the RunicGame repository — never delete this folder
@@ -40,6 +41,7 @@ tools/                                        the split script, the move tool an
 | `Vision/` | 22 |
 | `Architecture/` | 28 |
 | `Ideias/` | 102 |
+| `Development/` | 54 |
 | `Archive/` | 5 |
 | `Lore/`, `Quest Design/` | 1 each |
 
@@ -70,6 +72,22 @@ A note can show another note inside it, in a box with its own scrollbar, on the 
 
 `Ideias overview` embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
 `runicdocs-embeds` snippet in Obsidian: turn it on once in **Settings › Appearance › CSS snippets**.
+
+## Development notes
+
+`content/Development/` holds **RunicGame — Development** (progress and the checklist of slices), **Development
+overview** (every slice embedded) and one note per slice with its packages as a checklist. They are generated; don't
+edit them by hand:
+
+```
+python3 tools/sync_development.py
+```
+
+It reads the slices from the Architecture's Vertical-slice roadmap, the packages from its work-package tables, and the
+status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame (through `gh`, so it needs access to the three
+repositories). A package is done when its issue is closed, and a slice when its issue is closed. To change a slice or a
+package, change the Architecture (and its issue), then run the script; it warns when a package has no issue or an
+issue has no package.
 
 ## Site navigation
 

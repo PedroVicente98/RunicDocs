@@ -38,6 +38,14 @@ the documents in the [RunicMMOEngine Drive folder](https://drive.google.com/driv
 > - By status: [Open](tags/status/open) · [Partial](tags/status/partial) · [Being designed](tags/status/being-designed) · [In game vision](tags/status/in-game-vision)
 > - [[Archived and Discarded ideas|Archived and discarded]]
 
+> [!success] Development
+> The vertical slices and their work packages, with their status from the GitHub issues.
+>
+> - [[RunicGame — Development|Slices checklist]]
+> - [[Development overview]]: every slice in full
+> - [[Slice 0 · Build skeleton|Slice 0]]: where it starts
+> - [GitHub Project](https://github.com/users/PedroVicente98/projects/7)
+
 > [!note] Lore and quests
 > In the RunicGame repository.
 >

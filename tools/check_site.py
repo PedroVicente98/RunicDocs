@@ -30,11 +30,12 @@ from playwright.sync_api import sync_playwright
 
 PUBLIC = Path(sys.argv[1]).resolve()
 BASE = "/" + sys.argv[2].strip("/")
-PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias", "/Ideias/Ideias-overview"]
+PAGES = ["/", "/Vision/Combat", "/Ideias/NAV-01-Naval-Raid", "/Ideias/RunicGame-—-Ideias", "/Ideias/Ideias-overview",
+         "/Development/RunicGame-—-Development", "/Development/Development-overview"]
 EMBED_PAGE = "/Ideias/Ideias-overview"  # embeds every idea
 # in the sidebar, each folder's first note is the document's own note (quartz.config.yaml, explorer sortFn)
 PINNED = {"Vision": "RunicGame-—-Complete-MMORPG-Vision", "Architecture": "RunicEngine-—-Technical-Architecture",
-          "Ideias": "RunicGame-—-Ideias"}
+          "Ideias": "RunicGame-—-Ideias", "Development": "RunicGame-—-Development"}
 
 # The graph plugin loads d3 from a CDN as window.d3. Wrap d3.forceSimulation to record the node ids
 # of each graph it lays out, so the check can see which nodes the local and the full graph hold.

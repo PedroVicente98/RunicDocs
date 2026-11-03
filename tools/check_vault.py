@@ -25,7 +25,7 @@ except ImportError:  # the YAML check is skipped without PyYAML
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent / "content")
 LINK_RE = re.compile(r"(!?)\[\[([^\]]+?)\]\]")
-REQUIRED_FOLDERS = ["Vision", "Architecture", "Ideias", "Archive", "Lore", "Quest Design"]
+REQUIRED_FOLDERS = ["Vision", "Architecture", "Ideias", "Development", "Archive", "Lore", "Quest Design"]
 
 
 def slug(text: str) -> str:
