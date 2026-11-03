@@ -64,7 +64,7 @@ A note can show another note inside it, in a box with its own scrollbar, on the 
 | Write | Shows |
 | :--- | :--- |
 | `![[NAV-01 Naval Raid]]` | the whole note, with its title |
-| `![[Combat#Conditions]]` | one section, up to the next heading of the same level |
+| `![[Combat#Conditions, build-up and Tolerance]]` | one section, up to the next heading of the same level |
 | `![[Combat#^naval-rule]]` | one paragraph, marked with ` ^naval-rule` at its end |
 
 The Ideias list embeds every idea this way. The box comes from `quartz-styles/custom.scss` on the site and from the
