@@ -276,8 +276,10 @@ plugins:
       position: body
       priority: 100
       display: all
+  # Off: stacked-pages 90e6173 reads the page from location.pathname, so under /RunicDocs/ its tabs link to
+  # /RunicDocs/RunicDocs/... (404). Turn it back on when the plugin strips the base path.
   - source: github:quartz-community/stacked-pages
-    enabled: true
+    enabled: false
     layout:
       position: afterBody
       priority: 50

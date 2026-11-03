@@ -108,16 +108,25 @@ settings. If the site moves, change `baseUrl` in `quartz.config.yaml`.
 ### Quartz fixes for a subpath site
 
 The site lives under `/RunicDocs/`, not at the domain root. Quartz 5.0.0's graph, explorer, search and stacked-pages
-plugins looked for their data and built their links at the root, so the graph came up empty. Two files fix it until a
-Quartz release includes the fixes:
+plugins looked for their data and built their links at the root, so the graph came up empty. Three changes fix it
+until a Quartz release includes the fixes:
 
 - `quartz-patches/body-basepath.patch` backports a change from Quartz's main branch: each page's `<body>` gets
   `data-basepath="/RunicDocs"`.
-- `quartz.lock.json` is Quartz 5.0.0's plugin lockfile with those four plugins moved to their 22 March 2026 commits,
-  which read that attribute ("resolve links correctly on subdirectory deployments").
+- `quartz.lock.json` is Quartz 5.0.0's plugin lockfile with four plugins moved to newer commits that read that
+  attribute. Explorer, search and stacked-pages use their 22 March 2026 commits ("resolve links correctly on
+  subdirectory deployments"). The graph uses its 4 April 2026 commit, which also removes the base path when it works out
+  the current page from the address ("strip base path for non-root domains"). Without that fix the local graph showed a
+  single unknown dot and linked to `/RunicDocs/RunicDocs/`.
+- `quartz.config.yaml` turns **stacked-pages off**. That plugin also works out the current page from the address and has
+  no fix yet, so its tabs opened `/RunicDocs/RunicDocs/...`. Turn it back on when a newer commit removes the base path.
 
-After the build, `tools/check_site.py` opens the site under `/RunicDocs/` in Chrome and fails the deploy if the graph
-draws nothing, the explorer has no links, search finds nothing, or a link leaves the site.
+After the build, `tools/check_site.py` opens the site under `/RunicDocs/` in Chrome and fails the deploy if:
+
+- the local graph isn't drawn around the page itself with its neighbours, or the full graph doesn't hold every page;
+- a plugin remembers a page under the base path;
+- the explorer has no links or search finds nothing;
+- a link leaves the site or opens a missing page.
 
 ## Preview on your machine
 
