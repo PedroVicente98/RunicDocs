@@ -19,8 +19,8 @@ rm -rf .quartz/content
 cp -r content .quartz/content
 cp quartz.config.yaml .quartz/quartz.config.yaml
 cp quartz-styles/custom.scss .quartz/quartz/styles/custom.scss
-
-node quartz-patches/decode-graph-slug.mjs .quartz/.quartz/plugins/graph/dist
+rm -rf .quartz/quartz-plugins
+cp -r quartz-plugins .quartz/quartz-plugins
 
 cd .quartz
 npx quartz build --serve

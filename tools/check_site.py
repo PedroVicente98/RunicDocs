@@ -10,7 +10,9 @@ the site:
 - every link on the checked pages and in the search results opens a page (no 404, such as
   /RunicDocs/RunicDocs/);
 - embedded notes (![[Note]]) are filled in and shown in a scroll box;
-- in the sidebar, each document's own note is the first note of its folder.
+- in the sidebar, each document's own note is the first note of its folder;
+- the graph settings panel opens, its search counts matches, its toggles rebuild the graph and a change survives a
+  reload.
 
     python3 tools/check_site.py PUBLIC_DIR BASE_PATH      e.g.  .quartz/public RunicDocs
 
@@ -220,6 +222,48 @@ def main() -> int:
                 failures.append(f"{path}: console error: {e[:200]}")
             for m in missing:
                 failures.append(f"{path}: not found: {m}")
+
+        # the graph settings panel, on the full graph of one page
+        try:
+            page.goto(root + BASE + urllib.parse.quote("/Vision/Combat"), wait_until="networkidle")
+            page.wait_for_function("window.__graphSims.length > 0", timeout=15000)
+            if page.locator(".runic-graph-gear-local").count() != 1:
+                failures.append("graph panel: the local graph has no settings gear")
+            before = page.evaluate("window.__graphSims.length")
+            page.locator(".global-graph-icon").first.click()
+            page.wait_for_function(f"window.__graphSims.length > {before}", timeout=15000)
+            page.locator(".runic-graph-gear-global").first.click()
+            panel = ".runic-graph-panel-global"
+            if not page.is_visible(panel):
+                failures.append("graph panel: the full graph's gear doesn't open the panel")
+            page.fill(f"{panel} [data-key=search]", "Combat")
+            page.wait_for_timeout(300)
+            count = page.text_content(f"{panel} [data-out=matches]") or ""
+            print(f"graph panel: search 'Combat' -> {count!r}")
+            if "matching note" not in count or count.startswith("0 "):
+                failures.append(f"graph panel: the search found nothing ({count!r})")
+            before = page.evaluate("window.__graphSims.length")
+            page.click(f"{panel} [data-key=showTags]")
+            page.wait_for_function(f"window.__graphSims.length > {before}", timeout=15000)
+            tags = page.evaluate("window.__graphSims[window.__graphSims.length - 1].filter(id => id.startsWith('tags/')).length")
+            print(f"graph panel: Tags on -> {tags} tag nodes")
+            if not tags:
+                failures.append("graph panel: turning Tags on added no tag nodes")
+            page.evaluate("""() => { const el = document.querySelector('.runic-graph-panel-global [data-key=repel]');
+                el.value = '13'; el.dispatchEvent(new Event('input', { bubbles: true })); }""")
+            page.reload(wait_until="networkidle")
+            page.wait_for_function("window.__graphSims.length > 0", timeout=15000)
+            page.locator(".global-graph-icon").first.click()
+            page.locator(".runic-graph-gear-global").first.click()
+            kept = page.input_value(f"{panel} [data-key=repel]")
+            print(f"graph panel: repel after a reload = {kept}")
+            if kept != "13":
+                failures.append(f"graph panel: a change didn't survive a reload (repel = {kept})")
+            page.click(f"{panel} [data-act=reset]")
+            page.keyboard.press("Escape")
+            page.keyboard.press("Escape")
+        except Exception as e:
+            failures.append(f"graph panel could not be checked: {str(e).splitlines()[0][:200]}")
 
         # search: type a word and check where the results point
         page.goto(root + BASE + "/", wait_until="networkidle")

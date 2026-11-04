@@ -1,0 +1,57 @@
+{
+  "name": "runic-graph",
+  "version": "0.1.0",
+  "description": "RunicDocs graph: Quartz's graph component (quartz-community/graph, MIT) with an Obsidian-style settings panel.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Quartz Community; RunicDocs changes by PedroVicente98",
+  "homepage": "https://quartz.jzhao.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PedroVicente98/RunicDocs"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "sideEffects": false,
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "peerDependencies": {
+    "preact": "^10.0.0"
+  },
+  "quartz": {
+    "name": "runic-graph",
+    "displayName": "RunicDocs graph",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "Graph": {
+        "displayName": "Graph",
+        "defaultPosition": "right",
+        "defaultPriority": 10
+      }
+    }
+  },
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10.9.2"
+  }
+}

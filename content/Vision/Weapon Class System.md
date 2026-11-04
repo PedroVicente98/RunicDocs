@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-04"
 ---
 
 The class is a weapon loadout plus a Discipline. There are ten fixed loadouts and five Disciplines, which make 50 named classes, each with a single role: Damage, Tank or Support (heals and buffs). There is no separate role choice: the role comes from the class. E.g. Sword \+ Shield \+ Defense \= Guardian (Tank); Sword \+ Shield \+ Vitality \= Paladin (Support); Sword \+ Shield \+ War \= Legionnaire (Damage).
@@ -76,7 +76,8 @@ Each Discipline exists because it creates a different play pattern, not just a d
 * **One merged tree per named class:** the merge of the weapon and Discipline skills whose requirements match the equipped weapons; a skill in several pools appears once. Discipline skills are filtered by the weapon, so a skill that needs a shield is shared by Sword \+ Shield and Wand \+ Shield.  
 * **Discipline skills follow the weapon.** Most Discipline skills are written against what every weapon has (light and heavy attack, the off-hand action, Guard, dodge, and tags like Blunt or Finisher), so they work with any loadout. E.g. Bastion (your next Guard within 2 s reflects 30%) works as the shield block, the quarterstaff timed Guard or the spear's Guard while sprinting. Variants by weapon exist only where the form really changes, and Discipline skills reuse the weapon's animations by default.  
 * **Values per class:** the same skill can scale differently in different classes. *Proposal: requirement tags on each skill (e.g. needs an instrument); the named-class list is the allowlist; trees are generated at cook time, with nodes pinned, removed or moved by hand per class; the most specific value wins (class \+ PvP over class, over PvP, over base); per-class overrides stay exceptions.*  
-* Combat skill points come only from leveling, and everyone at max level has the same total. There is no limit on active skills: balance is through the points, and each skill's power is capped.  
+* Combat skill points come only from leveling, and everyone at max level has the same total. Balance is through the points and the skill cap below, and each skill's power is capped.  
+* **At most 28 combat skills.** A character's weapon skills and Discipline skills together add up to at most 28 skills usable in combat, close to ArcheAge's count. Auxiliary skills don't count: emotes, the context kit (mount, glider and wing) and other non-combat skills are separate categories. *Open: whether a skill added by an item's unique effect counts toward the 28.*  
 * Weapons and effects that grant extra skills make the class stronger, and that is accepted.  
 * **Tags as a contract.** Interactions are reusable conditions and modifiers, not hand-written pairs (see [[Skills by components]]).  
 * **Class signature.** Each named class has a small effect of its own: the per-class balance lever, used sparingly.

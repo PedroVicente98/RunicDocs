@@ -29,6 +29,13 @@
       }
     },
     {
+      "query": "path:\"Development\"",
+      "color": {
+        "a": 1,
+        "rgb": 3066993
+      }
+    },
+    {
       "query": "path:\"Archive\"",
       "color": {
         "a": 1,
