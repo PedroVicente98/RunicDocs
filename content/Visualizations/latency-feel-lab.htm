@@ -1,0 +1,872 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Latency Feel Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Oxanium:wght@500;700&display=swap">
+<style>
+/* Layout: one narrow column of three hands-on labs under a shared connection bar, then a reference table. */
+:root {
+  --bg: #f2f4f6; --surface: #ffffff; --ink: #162028; --muted: #5a6773; --line: #d6dde3;
+  --server: #3557d4; --screen: #b86e00; --ok: #1d8049; --bad: #c03a2b; --soft: #e8edf2;
+  --display: "Oxanium", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1317; --surface: #161d23; --ink: #e5eaee; --muted: #94a2ae; --line: #29333c;
+  --server: #8aa2ff; --screen: #f2a640; --ok: #4fc483; --bad: #ff6f61; --soft: #1e272e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1317; --surface: #161d23; --ink: #e5eaee; --muted: #94a2ae; --line: #29333c;
+  --server: #8aa2ff; --screen: #f2a640; --ok: #4fc483; --bad: #ff6f61; --soft: #1e272e; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; }
+.wrap { max-width: 920px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; }
+h2 { font-size: 20px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.muted { color: var(--muted); }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+header { display: grid; gap: 8px; }
+.bar, .lab, .ref { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: 500 14px var(--mono); padding: 7px 11px; border: 0; border-right: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.toggle { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--server); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--server); outline-offset: 2px; }
+.act { font: 600 15px var(--body); padding: 11px 18px; border-radius: 8px; border: 1px solid var(--ink); background: var(--ink); color: var(--surface); cursor: pointer; touch-action: manipulation; user-select: none; }
+.act.alt { background: var(--surface); color: var(--ink); }
+.lab[data-active="true"] { border-color: var(--server); }
+.hint { font-size: 13px; color: var(--muted); }
+kbd { font: 500 12px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; background: var(--soft); }
+.stage { position: relative; height: 120px; background: var(--soft); border-radius: 8px; overflow: hidden; }
+.result { min-height: 3.2em; font-size: 15px; }
+.result b.ok { color: var(--ok); } .result b.bad { color: var(--bad); }
+/* Lab 1 */
+.track { position: absolute; left: 24px; right: 24px; top: 50%; height: 2px; background: var(--line); }
+.token { position: absolute; top: calc(50% - 18px); width: 36px; height: 36px; border-radius: 50%; background: var(--server); left: 24px; }
+/* Lab 2 */
+.mob { position: absolute; left: 22%; top: 50%; width: 84px; height: 84px; transform: translate(-50%, -50%); }
+.mob svg { width: 100%; height: 100%; overflow: visible; }
+.mob .ring-bg { fill: none; stroke: var(--line); stroke-width: 8; }
+.mob .ring { fill: none; stroke: var(--bad); stroke-width: 8; stroke-linecap: butt; transform: rotate(-90deg); transform-origin: 50% 50%; }
+.mob .core { fill: var(--muted); }
+.mob.flash .core { fill: var(--bad); }
+.hero { position: absolute; left: 72%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; background: var(--server); transition: none; }
+.hero.iframe { box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 45%, transparent); }
+.hero.hit { background: var(--bad); }
+.verdict { position: absolute; right: 14px; top: 10px; font: 700 15px var(--display); }
+.timeline { overflow-x: auto; }
+.timeline svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.tl-text { fill: var(--muted); font: 11px var(--mono); }
+.tl-label { fill: var(--ink); font: 600 12px var(--body); }
+.t-server { fill: var(--server); } .t-screen { fill: var(--screen); } .t-ok { fill: var(--ok); } .t-bad { fill: var(--bad); }
+.s-server { stroke: var(--server); } .s-screen { stroke: var(--screen); } .s-bad { stroke: var(--bad); } .s-line { stroke: var(--line); } .s-ink { stroke: var(--ink); } .s-muted { stroke: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+/* Lab 3 */
+.target { position: absolute; left: 64%; top: 50%; width: 44px; height: 70px; margin: -35px 0 0 -22px; border-radius: 10px; background: var(--muted); opacity: .55; }
+.blade { position: absolute; left: 38%; top: 50%; width: 120px; height: 6px; margin-top: -3px; background: var(--ink); border-radius: 3px; transform-origin: 0 50%; transform: rotate(-70deg); }
+.spark { position: absolute; left: 64%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; background: radial-gradient(circle, var(--screen) 0 30%, transparent 62%); opacity: 0; }
+.dmg { position: absolute; left: 64%; top: 18%; font: 700 20px var(--display); color: var(--bad); opacity: 0; transform: translateX(-50%); }
+/* Reference */
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.num { white-space: nowrap; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font: 500 13px var(--mono); }
+.g { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.a { background: color-mix(in srgb, var(--screen) 20%, transparent); color: var(--screen); }
+.r { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
+.tablewrap { overflow-x: auto; }
+.cv { display: block; width: 100%; background: var(--soft); border-radius: 8px; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; }
+.toc a { font: 500 13px var(--body); padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); text-decoration: none; background: var(--surface); }
+.toc a:hover { border-color: var(--server); }
+.status { font: 600 11px var(--body); text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; vertical-align: 3px; margin-left: 8px; white-space: nowrap; }
+.status.locked { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.status.open { background: var(--soft); color: var(--muted); border: 1px solid var(--line); }
+.lab { scroll-margin-top: 120px; }
+.c-ok { color: var(--ok); } .c-bad { color: var(--bad); }
+.num-in { font: 500 14px var(--mono); width: 7.5em; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.field { display: inline-flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Latency Feel Lab</h1>
+    <p class="muted">Pick a ping, then try each lab to feel what it does to action combat. Labs 1–3 are locked in; labs 4–9 are still open. Times follow the server's 30 Hz combat tick, so 1 tick is about 33 ms. Your screen and browser add roughly 20–40 ms on top, as they would in the real game.</p>
+    <nav class="toc" aria-label="Labs">
+      <a href="#lab1">1 Own actions</a><a href="#lab2">2 Telegraphs</a><a href="#lab3">3 Hit feedback</a><a href="#lab4">4 Rewind</a><a href="#lab5">5 Projectiles</a><a href="#lab6">6 Interpolation</a><a href="#lab7">7 Packet loss</a><a href="#lab8">8 Lanes</a><a href="#lab9">9 Relays</a>
+    </nav>
+  </header>
+
+  <section class="bar" aria-label="Connection">
+    <div class="row">
+      <span class="label">Ping (round trip)</span>
+      <div class="seg" id="rtt"></div>
+    </div>
+    <div class="row hint num" id="rttinfo"></div>
+  </section>
+
+  <section class="lab" id="lab1" data-active="false" aria-labelledby="h1lab">
+    <h2 id="h1lab">1 · Your own actions<span class="status locked">Locked</span></h2>
+    <p class="muted">Press to move. With prediction, your client moves at once and the server confirms later. Without it, nothing happens until the server answers, which is the sluggish feeling of an action that waits for the network.</p>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="pred1" checked> Prediction</label>
+    </div>
+    <div class="stage" aria-hidden="true"><div class="track"></div><div class="token" id="tok1"></div></div>
+    <div class="row">
+      <button class="act" id="act1" type="button">Move</button>
+      <span class="hint">or press <kbd>Space</kbd> after clicking this lab</span>
+    </div>
+    <div class="result" id="res1" aria-live="polite"><span class="muted">Press Move a few times with prediction on and off.</span></div>
+  </section>
+
+  <section class="lab" id="lab2" data-active="true" aria-labelledby="h2lab">
+    <h2 id="h2lab">2 · Dodge a telegraphed attack<span class="status locked">Locked</span></h2>
+    <p class="muted">A monster winds up and strikes. Dodge so your invulnerability (250 ms) covers the moment the server applies the hit. Compare plain server rules with telegraph fast-forward and the defender grace window.</p>
+    <div class="row">
+      <span class="label">Windup</span>
+      <div class="seg" id="windup"></div>
+    </div>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="ff"> Telegraph fast-forward</label>
+      <label class="toggle"><input type="checkbox" id="grace"> Defender grace (up to 150 ms)</label>
+      <label class="toggle"><input type="checkbox" id="auto" checked> Repeat automatically</label>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="mob" id="mob"><svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="42"/><circle class="ring" id="ring" cx="50" cy="50" r="42"/><circle class="core" cx="50" cy="50" r="26"/></svg></div>
+      <div class="hero" id="hero"></div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+    <div class="row">
+      <button class="act" id="act2" type="button">Start</button>
+      <span class="hint">Press <kbd>Space</kbd> to start, then again to dodge</span>
+    </div>
+    <div class="result" id="res2" aria-live="polite"><span class="muted">The ring fills during the windup; the core flashes when the hit lands on your screen.</span></div>
+    <div class="timeline" id="tl" aria-label="Timeline of the last attempt"></div>
+    <div class="legend">
+      <span><i class="sw t-server" style="background:var(--server)"></i>Server windup and hit</span>
+      <span><i class="sw" style="background:var(--screen)"></i>Windup on your screen</span>
+      <span><i class="sw" style="background:var(--ok)"></i>Your invulnerability on the server</span>
+      <span><i class="sw" style="background:var(--ink)"></i>Your press and its arrival</span>
+    </div>
+    <div class="hint num" id="stats2"></div>
+  </section>
+
+  <section class="lab" id="lab3" data-active="false" aria-labelledby="h3lab">
+    <h2 id="h3lab">3 · Hit feedback<span class="status locked">Locked</span></h2>
+    <p class="muted">Your swing always starts at once. The blade reaches the target after 200 ms (a Sword light attack). Predicted impact plays the spark and sound when the blade connects on your screen; confirmed impact waits for the server. The damage number always waits for the server.</p>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="pred3" checked> Predicted impact effects</label>
+    </div>
+    <div class="stage" aria-hidden="true"><div class="target"></div><div class="blade" id="blade"></div><div class="spark" id="spark"></div><div class="dmg" id="dmg">128</div></div>
+    <div class="row">
+      <button class="act" id="act3" type="button">Swing</button>
+      <span class="hint">or press <kbd>Space</kbd> after clicking this lab</span>
+    </div>
+    <div class="result" id="res3" aria-live="polite"><span class="muted">Swing with prediction on, then off, at 150 ms or more.</span></div>
+  </section>
+
+  <section class="lab" id="lab4" data-active="false" aria-labelledby="h4lab">
+    <h2 id="h4lab">4 · Hit a moving target<span class="status open">Open</span></h2>
+    <p class="muted">A target strafes left and right. Attack when it is inside your swing on your screen. The lab uses an instant thrust, so only aiming matters. Without rewind, the server checks the target where it is when your attack arrives. With rewind, it checks where you saw it, up to a cap.</p>
+    <div class="row"><span class="label">Rewind</span><div class="seg" id="rew4"></div></div>
+    <div class="row"><span class="label">Target speed</span><div class="seg" id="spd4"></div></div>
+    <canvas class="cv" id="cv4" style="height:130px" role="img" aria-label="Target strafing through your swing"></canvas>
+    <div class="row">
+      <button class="act" id="act4" type="button">Attack</button>
+      <span class="hint">or press <kbd>Space</kbd> after clicking this lab</span>
+    </div>
+    <div class="result" id="res4" aria-live="polite"><span class="muted">Attack when the target is inside the shaded swing. Try 150 ms ping with rewind off, then on.</span></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--ink)"></i>Target as you see it</span>
+      <span><i class="sw" style="background:var(--screen)"></i>Where you aimed</span>
+      <span><i class="sw" style="background:var(--ok)"></i>Where the server checked (red if it missed)</span>
+      <span><i class="sw" style="background:var(--muted)"></i>Where the target really was</span>
+    </div>
+    <div class="hint num" id="stats4"></div>
+  </section>
+
+  <section class="lab" id="lab5" data-active="false" aria-labelledby="h5lab">
+    <h2 id="h5lab">5 · Dodge a projectile<span class="status open">Open</span></h2>
+    <p class="muted">An archer shoots an arrow at 30 m/s from 18 m away. Step out of its line before it reaches you. "Real position" draws the arrow where the server has it; otherwise it is drawn like any remote entity, late by the one-way delay plus interpolation. With defender grace, the server checks your position as of the moment you saw the arrow arrive, up to 150 ms.</p>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="real5"> Real position</label>
+      <label class="toggle"><input type="checkbox" id="grace5" checked> Defender grace (up to 150 ms)</label>
+      <label class="toggle"><input type="checkbox" id="ghost5" checked> Show where the arrow really is</label>
+      <label class="toggle"><input type="checkbox" id="auto5" checked> Repeat automatically</label>
+    </div>
+    <canvas class="cv" id="cv5" style="height:130px" role="img" aria-label="Arrow flying toward you"></canvas>
+    <div class="row">
+      <button class="act" id="act5" type="button">Start</button>
+      <span class="hint">Press <kbd>Space</kbd> to start, then again to step aside</span>
+    </div>
+    <div class="result" id="res5" aria-live="polite"><span class="muted">The dashed arrow shows where the server really has it.</span></div>
+    <div class="hint num" id="stats5"></div>
+  </section>
+
+  <section class="lab" id="lab6" data-active="false" aria-labelledby="h6lab">
+    <h2 id="h6lab">6 · Smooth remote movement<span class="status open">Open</span></h2>
+    <p class="muted">Snapshots of another player arrive 30 times a second, but the network spreads them unevenly. The client draws remote entities slightly in the past, so it always has two snapshots to blend. Too little delay stutters (the runner freezes and turns red); too much shows the world later than needed. Adaptive delay measures the jitter and keeps only what it needs.</p>
+    <div class="row"><span class="label">Delay</span><div class="seg" id="mode6"></div></div>
+    <div class="row"><span class="label">Connection</span><div class="seg" id="net6"></div></div>
+    <canvas class="cv" id="cv6" style="height:160px" role="img" aria-label="Remote runner on a loop"></canvas>
+    <div class="result num" id="stats6"></div>
+  </section>
+
+  <section class="lab" id="lab7" data-active="false" aria-labelledby="h7lab">
+    <h2 id="h7lab">7 · Packet loss on your inputs<span class="status open">Open</span></h2>
+    <p class="muted">Your client sends one input packet per tick, 30 times a second; each square is one packet, newest on the right. Lost packets turn red. With redundancy, each packet repeats the last 3 ticks, so a lost input is usually recovered from the next packet (amber). Without it, a lost dodge is noticed and resent, a round trip later. A tick mark under a square is a change of direction.</p>
+    <div class="row"><span class="label">Redundancy</span><div class="seg" id="red7"></div></div>
+    <div class="row"><span class="label">Packet loss</span><div class="seg" id="loss7"></div></div>
+    <canvas class="cv" id="cv7" style="height:90px" role="img" aria-label="Stream of input packets"></canvas>
+    <div class="row">
+      <button class="act" id="act7" type="button">Dodge</button>
+      <span class="hint">or press <kbd>Space</kbd> after clicking this lab; try 5–10% loss</span>
+    </div>
+    <div class="result" id="res7" aria-live="polite"><span class="muted">Press Dodge repeatedly and watch for red squares.</span></div>
+    <div class="hint num" id="stats7"></div>
+  </section>
+
+  <section class="lab" id="lab8" data-active="false" aria-labelledby="h8lab">
+    <h2 id="h8lab">8 · Attack warnings in a busy fight<span class="status open">Open</span></h2>
+    <p class="muted">The server sends you attack warnings (red), positions (grey) and chat or inventory updates (amber). With one ordered stream, a lost packet holds every reliable message behind it until it is resent, and warnings wait behind everything else when a fight exceeds your bandwidth. With lanes, warnings travel on their own top-priority lane.</p>
+    <div class="row"><span class="label">Delivery</span><div class="seg" id="mode8"></div></div>
+    <div class="row"><span class="label">Traffic</span><div class="seg" id="load8"></div></div>
+    <div class="row"><span class="label">Packet loss</span><div class="seg" id="loss8"></div></div>
+    <canvas class="cv" id="cv8" style="height:150px" role="img" aria-label="Messages travelling from server to you"></canvas>
+    <div class="result num" id="stats8"></div>
+  </section>
+
+  <section class="lab" id="lab9" data-active="false" aria-labelledby="h9lab">
+    <h2 id="h9lab">9 · Relay routing<span class="status open">Open</span></h2>
+    <p class="muted">Two paths from one player to the same datacenter. The public internet path crosses several networks, some congested. The relay path enters a provider's network nearby and rides its backbone. Each dot is a ping probe; red dots are lost. The route numbers are illustrative, and the ping bar above does not apply here.</p>
+    <canvas class="cv" id="cv9" style="height:180px" role="img" aria-label="Public and relay routes to a datacenter"></canvas>
+    <div class="tablewrap"><table id="stats9"></table></div>
+    <div class="row">
+      <label class="field" for="players9">Concurrent players<input class="num-in" id="players9" type="number" min="0" step="100" value="1000"></label>
+      <label class="field" for="mb9">MB per player-hour<input class="num-in" id="mb9" type="number" min="0" step="10" value="100"></label>
+      <label class="field" for="price9">Premium per GB (US$)<input class="num-in" id="price9" type="number" min="0" step="0.005" value="0.035"></label>
+    </div>
+    <div class="result" id="cost9"></div>
+    <p class="hint">Pricing example: AWS Global Accelerator charges US$0.025 per hour per accelerator plus a premium of US$0.007–0.105 per GB, in the dominant direction only.</p>
+  </section>
+
+  <section class="ref" aria-labelledby="hrefh">
+    <h2 id="hrefh">Reaction window by ping</h2>
+    <p class="muted">Time from the moment you can first see an attack to the latest press that still dodges it. Most people need about 200–250 ms to react to a cue they are watching for. Uses 70 ms interpolation delay; "with helpers" means telegraph fast-forward plus defender grace.</p>
+    <div class="tablewrap"><table id="reftable"></table></div>
+    <div class="legend"><span><span class="pill g">300+</span> reactable</span><span><span class="pill a">200–299</span> hard, needs focus</span><span><span class="pill r">under 200</span> guess or read only</span></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const INTERP = 70, IFRAME = 250, GRACE_CAP = 150, MARGIN = 20, MAX_SKIP = 150, MIN_VIS = 200, TICK = 1000 / 30;
+  const now = () => performance.now();
+  const $ = (id) => document.getElementById(id);
+  let rtt = 100, windup = 400, activeLab = 2;
+  const ow = () => rtt / 2;
+  const hold = () => Math.min(ow() + MARGIN, GRACE_CAP);
+  const ms = (v) => `${Math.round(v)} ms`;
+
+  function seg(el, values, initial, onPick, fmt) {
+    values.forEach((v) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = fmt ? fmt(v) : v; b.setAttribute("aria-pressed", String(v === initial));
+      b.addEventListener("click", () => { [...el.children].forEach((c) => c.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); onPick(v); });
+      el.appendChild(b);
+    });
+  }
+  seg($("rtt"), [0, 50, 100, 150, 200, 250], rtt, (v) => { rtt = v; info(); buildRef(); }, (v) => `${v} ms`);
+  seg($("windup"), [200, 300, 400, 500, 700], windup, (v) => { windup = v; }, (v) => `${v} ms`);
+  function info() {
+    $("rttinfo").textContent = `One way: ${ms(ow())} · ${(ow() / TICK).toFixed(1)} ticks · Remote entities drawn ${ms(ow() + INTERP)} behind the server (with 70 ms interpolation)`;
+  }
+  info();
+
+  // Active lab for the Space key
+  const LABS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  LABS.forEach((n) => $("lab" + n).addEventListener("pointerdown", () => setActive(n)));
+  function setActive(n) { activeLab = n; LABS.forEach((k) => $("lab" + k).dataset.active = String(k === n)); }
+  let lastSpace = -1e9;
+  function bindAct(btn, fn) {
+    btn.addEventListener("pointerdown", (e) => { if (e.button === 0) fn(); });
+    btn.addEventListener("click", (e) => { if (e.detail === 0 && now() - lastSpace > 500) fn(); });
+  }
+  // Mouse clicks on controls should not keep focus, so Space stays the action key.
+  document.querySelectorAll('input[type="checkbox"], .seg').forEach((el) => el.addEventListener("pointerup", () => setTimeout(() => document.activeElement && document.activeElement.blur(), 0)));
+  document.addEventListener("keydown", (e) => {
+    if (e.code !== "Space" || e.repeat) return;
+    const tg = e.target;
+    if (tg instanceof HTMLInputElement) return;
+    if (tg instanceof HTMLButtonElement && !tg.classList.contains("act")) return;
+    e.preventDefault();
+    lastSpace = now();
+    const fn = ({ 1: act1, 2: act2, 3: act3, 4: act4, 5: act5, 7: act7 })[activeLab];
+    if (fn) fn();
+  });
+  document.addEventListener("keyup", (e) => { if (e.code === "Space" && e.target instanceof HTMLButtonElement && e.target.classList.contains("act")) e.preventDefault(); });
+
+  /* Lab 1: own actions */
+  const l1 = { side: 0, move: null };
+  function act1() {
+    const p = now(), pred = $("pred1").checked;
+    const start = pred ? p : p + rtt;
+    const from = l1.move ? l1.move.to : l1.side;
+    l1.move = { p, start, from, to: 1 - from, reported: false };
+    l1.side = 1 - from;
+    $("res1").innerHTML = pred ? "" : `<span class="muted">Waiting for the server…</span>`;
+  }
+  bindAct($("act1"), act1);
+
+  /* Lab 2: dodge */
+  const l2 = { phase: "idle", S: 0, press: null, stats: {} };
+  function act2() {
+    if (l2.phase === "idle" || l2.phase === "done") return start2();
+    if (l2.press === null && !l2.decided) l2.press = now();
+  }
+  bindAct($("act2"), act2);
+  function start2() {
+    const t = now();
+    const W = windup, ff = $("ff").checked, gr = $("grace").checked, o = ow();
+    const S = t + 700 + Math.random() * 900;
+    const skip = ff ? Math.max(0, Math.min(o, MAX_SKIP, W - MIN_VIS)) : 0;
+    const visStart = ff ? S + o : S + o + INTERP;
+    const visImpact = visStart + W - skip;
+    Object.assign(l2, { phase: "run", S, W, ff, gr, o, rtt, skip, visStart, visImpact, srvImpact: S + W, press: null, verdict: null, decided: false, flashUntil: 0 });
+    $("act2").textContent = "Dodge";
+    $("verdict").textContent = "";
+    $("hero").classList.remove("hit");
+    $("res2").innerHTML = `<span class="muted">Get ready…</span>`;
+  }
+  function decide2() {
+    const st = l2, p = st.press, imp = st.srvImpact, h = Math.min(st.o + MARGIN, GRACE_CAP);
+    let dodged = false, why = "", winStart = null, arrive = null, verdictSrv;
+    if (p === null) {
+      why = "No dodge.";
+      verdictSrv = imp + (st.gr ? h : 0);
+    } else {
+      arrive = p + st.o;
+      winStart = st.gr ? p : arrive;
+      const covers = winStart <= imp && imp <= winStart + IFRAME;
+      const inTime = st.gr ? (arrive <= imp || arrive - imp <= h) : arrive <= imp;
+      dodged = covers && inTime;
+      if (dodged) why = "Dodged.";
+      else if (winStart + IFRAME < imp) why = `Too early: your invulnerability ended ${ms(imp - winStart - IFRAME)} before the hit.`;
+      else if (st.gr && p > imp) why = `Too late: you pressed ${ms(p - imp)} after the server applied the hit.`;
+      else if (st.gr) why = `Too late: your dodge reached the server ${ms(arrive - imp)} after the hit, but the grace window holds hits for only ${ms(h)}.`;
+      else why = `Too late: your dodge reached the server ${ms(arrive - imp)} after the hit.`;
+      verdictSrv = dodged ? Math.max(arrive, imp) : imp + (st.gr ? h : 0);
+    }
+    Object.assign(st, { dodged, why, winStart, arrive, verdictAt: verdictSrv + st.o, decided: true });
+    const key = `${st.rtt}|${st.W}|${st.ff ? 1 : 0}|${st.gr ? 1 : 0}`;
+    const s = (l2.stats[key] = l2.stats[key] || { n: 0, ok: 0 });
+    s.n += 1; if (dodged) s.ok += 1;
+  }
+  function show2() {
+    const st = l2;
+    $("verdict").textContent = st.dodged ? "DODGED" : "HIT";
+    $("verdict").style.color = st.dodged ? "var(--ok)" : "var(--bad)";
+    if (!st.dodged) $("hero").classList.add("hit");
+    const seen = st.press !== null ? ` You pressed ${st.press >= st.visImpact ? ms(st.press - st.visImpact) + " after" : ms(st.visImpact - st.press) + " before"} the hit you saw.` : "";
+    $("res2").innerHTML = `<b class="${st.dodged ? "ok" : "bad"}">${st.why}</b>${seen} <span class="muted">The result reached your screen ${ms(st.verdictAt - st.visImpact)} after the hit you saw.</span>`;
+    const key = `${st.rtt}|${st.W}|${st.ff ? 1 : 0}|${st.gr ? 1 : 0}`, s = l2.stats[key];
+    $("stats2").textContent = `This setting (${st.rtt} ms ping, ${st.W} ms windup${st.ff ? ", fast-forward" : ""}${st.gr ? ", grace" : ""}): ${s.ok} of ${s.n} dodged`;
+    drawTimeline(st);
+    st.phase = "done";
+    $("act2").textContent = "Start";
+    if ($("auto").checked) setTimeout(() => { if (l2.phase === "done") start2(); }, 1300);
+  }
+  function drawTimeline(st) {
+    const L = 78, R = 630, t0 = Math.min(st.S - 120, st.press !== null ? st.press - 60 : Infinity);
+    const ends = [st.srvImpact + IFRAME + 80, st.visImpact + 120, st.verdictAt + 40];
+    if (st.press !== null) ends.push(st.arrive + 60, st.press + IFRAME + 40);
+    const t1 = Math.max(...ends);
+    const x = (t) => L + ((t - t0) / (t1 - t0)) * (R - L);
+    const yS = 34, yC = 84, hB = 18;
+    const parts = [];
+    const rect = (a, b, y, cls, op) => parts.push(`<rect x="${x(a).toFixed(1)}" y="${y - hB / 2}" width="${Math.max(1, x(b) - x(a)).toFixed(1)}" height="${hB}" class="${cls}" opacity="${op}" rx="2"/>`);
+    const vline = (t, y, cls, w) => parts.push(`<line x1="${x(t).toFixed(1)}" x2="${x(t).toFixed(1)}" y1="${y - 14}" y2="${y + 14}" class="${cls}" stroke-width="${w || 2}"/>`);
+    const text = (t, y, s, anchor) => parts.push(`<text x="${x(t).toFixed(1)}" y="${y}" class="tl-text" text-anchor="${anchor || "middle"}">${s}</text>`);
+    parts.push(`<text x="8" y="${yS + 4}" class="tl-label">Server</text><text x="8" y="${yC + 4}" class="tl-label">Your screen</text>`);
+    parts.push(`<line x1="${L}" x2="${R}" y1="${yS}" y2="${yS}" class="s-line"/><line x1="${L}" x2="${R}" y1="${yC}" y2="${yC}" class="s-line"/>`);
+    rect(st.S, st.srvImpact, yS, "t-server", 0.28);
+    if (st.gr) rect(st.srvImpact, st.srvImpact + Math.min(st.o + MARGIN, GRACE_CAP), yS, "t-bad", 0.14);
+    if (st.winStart !== null) rect(st.winStart, st.winStart + IFRAME, yS, "t-ok", 0.35);
+    vline(st.srvImpact, yS, "s-bad", 3); text(st.srvImpact, yS - 18, "hit");
+    if (st.skip > 0) parts.push(`<rect x="${x(st.visStart - st.skip).toFixed(1)}" y="${yC - hB / 2}" width="${(x(st.visStart) - x(st.visStart - st.skip)).toFixed(1)}" height="${hB}" fill="none" class="s-screen" stroke-dasharray="3 3"/>`);
+    rect(st.visStart, st.visImpact, yC, "t-screen", 0.32);
+    vline(st.visImpact, yC, "s-bad", 3); text(st.visImpact, yC + 28, "hit seen");
+    if (st.press !== null) {
+      vline(st.press, yC, "s-ink", 2); text(st.press, yC - 18, "press");
+      vline(st.arrive, yS, "s-ink", 2); text(st.arrive, yS + 28, "arrives");
+      parts.push(`<line x1="${x(st.press).toFixed(1)}" y1="${yC - 12}" x2="${x(st.arrive).toFixed(1)}" y2="${yS + 12}" class="s-muted" stroke-dasharray="2 3"/>`);
+    }
+    vline(st.verdictAt, yC, "s-muted", 1.5); text(st.verdictAt, yC + 28, "result", "start");
+    // tick ruler
+    const yR = 128;
+    parts.push(`<line x1="${L}" x2="${R}" y1="${yR}" y2="${yR}" class="s-line"/>`);
+    for (let t = st.S; t <= t1; t += TICK) parts.push(`<line x1="${x(t).toFixed(1)}" x2="${x(t).toFixed(1)}" y1="${yR}" y2="${yR + 4}" class="s-line"/>`);
+    for (let k = 0; st.S + k * 100 <= t1; k += 1) { const t = st.S + k * 100; parts.push(`<line x1="${x(t).toFixed(1)}" x2="${x(t).toFixed(1)}" y1="${yR}" y2="${yR + 8}" class="s-muted"/>`); text(t, yR + 20, k === 0 ? "0" : `+${k * 100}`); }
+    text(L - 4, yR + 20, "ms", "end");
+    $("tl").innerHTML = `<svg viewBox="0 0 640 156" role="img">${parts.join("")}</svg>`;
+  }
+
+  /* Lab 3: hit feedback */
+  let l3 = null;
+  function act3() {
+    const p = now(), pred = $("pred3").checked;
+    l3 = { p, contact: p + 200, spark: pred ? p + 200 : p + 200 + rtt, dmg: p + 200 + rtt, pred, reported: false };
+    $("res3").innerHTML = "";
+  }
+  bindAct($("act3"), act3);
+
+  /* Reference table */
+  function buildRef() {
+    const pings = [0, 50, 100, 150, 200, 250], wins = [300, 500];
+    const cls = (v) => (v >= 300 ? "g" : v >= 200 ? "a" : "r");
+    const cell = (v) => `<td class="num"><span class="pill ${cls(v)}">${Math.max(0, Math.round(v))} ms</span></td>`;
+    let h = `<thead><tr><th>Ping</th><th>Attack seen late by</th>${wins.map((w) => `<th>${w} ms windup</th><th>${w} ms, with helpers</th>`).join("")}</tr></thead><tbody>`;
+    pings.forEach((r) => {
+      const o = r / 2;
+      h += `<tr${r === rtt ? ' style="background:var(--soft)"' : ""}><td class="num">${r} ms</td><td class="num">${Math.round(o + INTERP)} ms</td>`;
+      wins.forEach((w) => { const base = w - r - INTERP; const helped = o + MARGIN <= GRACE_CAP ? w - o : w - r; h += cell(base) + cell(helped); });
+      h += `</tr>`;
+    });
+    $("reftable").innerHTML = h + "</tbody>";
+  }
+  buildRef();
+
+  /* Shared canvas helpers for labs 4–9 */
+  const COL = {}; let colAt = -1e9;
+  function cols(t) {
+    if (t - colAt > 500) { const s = getComputedStyle(document.documentElement); ["ink", "muted", "line", "server", "screen", "ok", "bad", "soft", "surface"].forEach((k) => { COL[k] = s.getPropertyValue("--" + k).trim(); }); colAt = t; }
+    return COL;
+  }
+  function fit(cv) {
+    const w = cv.clientWidth, h = cv.clientHeight, d = window.devicePixelRatio || 1;
+    const W = Math.round(w * d), H = Math.round(h * d);
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    const ctx = cv.getContext("2d"); ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h };
+  }
+  function gauss() { let u = 0, v = 0; while (u === 0) u = Math.random(); while (v === 0) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const m1 = (v) => `${v.toFixed(1)} m`;
+  const visible = {};
+  const io = new IntersectionObserver((es) => es.forEach((e) => { visible[e.target.id] = e.isIntersecting; }));
+  [4, 5, 6, 7, 8, 9].forEach((n) => io.observe($("lab" + n)));
+  const lastText = {};
+  const every = (key, t, gap) => { if (!lastText[key] || t - lastText[key] > gap) { lastText[key] = t; return true; } return false; };
+  function ring(ctx, x, y, r, color, dash, width) { ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width || 2; ctx.setLineDash(dash || []); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+  function dot(ctx, x, y, r, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+  function label(ctx, s, x, y, color, align) { ctx.fillStyle = color; ctx.font = "11px 'IBM Plex Mono', ui-monospace, monospace"; ctx.textAlign = align || "center"; ctx.fillText(s, x, y); }
+
+  /* Lab 4: capped rewind */
+  const AREA4 = 8, ZONE4 = 0.9;
+  const l4 = { segs: [], speed: 6, mode: "mob", shot: null, stats: {} };
+  function pos4(t) { const s = l4.segs; for (let i = s.length - 1; i >= 0; i--) if (s[i].t <= t) return s[i].x + (s[i].v * (t - s[i].t)) / 1000; return s.length ? s[0].x : 0; }
+  function extend4(tEnd) {
+    if (!l4.segs.length) l4.segs.push({ t: now() - 3000, x: 0, v: l4.speed });
+    let last = l4.segs[l4.segs.length - 1];
+    while (last.t < tEnd) {
+      const dur = 450 + Math.random() * 850;
+      let tn = last.t + dur, xn = last.x + (last.v * dur) / 1000, vn = (Math.random() < 0.5 ? -1 : 1) * l4.speed;
+      if (Math.abs(xn) > AREA4) { const b = Math.sign(xn) * AREA4; tn = last.t + Math.max(1, ((b - last.x) / last.v) * 1000); xn = b; vn = -Math.sign(b) * l4.speed; }
+      last = { t: tn, x: xn, v: vn }; l4.segs.push(last);
+    }
+    while (l4.segs.length > 2 && l4.segs[1].t < now() - 4000) l4.segs.shift();
+  }
+  seg($("rew4"), ["off", "mob", "player"], "mob", (v) => { l4.mode = v; }, (v) => ({ off: "Off", mob: "Against mobs · 200 ms", player: "Against players · 100 ms" })[v]);
+  seg($("spd4"), [3, 6, 9], 6, (v) => { l4.speed = v; const t = now(); l4.segs = [{ t, x: pos4(t), v }]; }, (v) => `${v} m/s`);
+  function act4() {
+    const p = now(), o = ow(); extend4(p + 2000);
+    const cap = l4.mode === "mob" ? 200 : l4.mode === "player" ? 100 : 0;
+    const need = rtt + INTERP, rew = Math.min(need, cap);
+    const seen = pos4(p - o - INTERP), tested = pos4(p + o - rew), actual = pos4(p + o);
+    l4.shot = { p, seen, tested, actual, rew, need, hit: Math.abs(tested) <= ZONE4, aimed: Math.abs(seen) <= ZONE4, show: p + rtt, until: p + rtt + 1800, reported: false, rtt, mode: l4.mode, speed: l4.speed };
+    $("res4").innerHTML = `<span class="muted">Waiting for the server…</span>`;
+  }
+  bindAct($("act4"), act4);
+  function report4(s) {
+    s.reported = true;
+    const behind = s.need - s.rew;
+    let html;
+    if (s.hit) html = `<b class="ok">Hit.</b> The server checked the target ${s.rew ? `${ms(s.rew)} in the past` : "where it was when your attack arrived"}${s.rew ? (behind > 0 ? `, ${ms(behind)} short of what you saw` : ", exactly where you saw it") : ""}.`;
+    else html = `<b class="bad">Miss.</b> ${s.aimed ? `It was inside your swing on your screen, but the server checked it ${ms(behind)} later than what you saw, ${m1(Math.abs(s.tested - s.seen))} away.` : "It was outside your swing on your screen too."}`;
+    if (s.hit && s.rew > 0) html += ` <span class="muted">When the hit counted, the target had already moved ${m1(Math.abs(s.actual - s.tested))} from where it was checked.</span>`;
+    $("res4").innerHTML = html;
+    const key = `${s.rtt}|${s.mode}|${s.speed}`, st = (l4.stats[key] = l4.stats[key] || { aimed: 0, ok: 0 });
+    if (s.aimed) { st.aimed += 1; if (s.hit) st.ok += 1; }
+    $("stats4").textContent = `This setting (${s.rtt} ms ping, rewind ${s.mode === "off" ? "off" : s.mode === "mob" ? "200 ms" : "100 ms"}, ${s.speed} m/s): ${st.ok} of ${st.aimed} attacks that looked like hits landed`;
+  }
+  function frame4(t) {
+    if (!visible.lab4) return;
+    extend4(t + 2000);
+    const { ctx, w, h } = fit($("cv4")), c = cols(t), o = ow();
+    const px = (x) => 24 + ((x + AREA4) / (2 * AREA4)) * (w - 48), y = h / 2 + 6;
+    ctx.globalAlpha = 0.14; ctx.fillStyle = c.server; ctx.fillRect(px(-ZONE4), 8, px(ZONE4) - px(-ZONE4), h - 16); ctx.globalAlpha = 1;
+    label(ctx, "your swing", px(0), 22, c.muted);
+    ctx.strokeStyle = c.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(24, y + 18); ctx.lineTo(w - 24, y + 18); ctx.stroke();
+    dot(ctx, px(pos4(t - o - INTERP)), y, 11, c.ink);
+    const s = l4.shot;
+    if (s && t < s.until) {
+      ring(ctx, px(s.seen), y, 15, c.screen, [4, 3], 2);
+      if (t >= s.show) { ring(ctx, px(s.actual), y, 19, c.muted, [2, 3], 2); ring(ctx, px(s.tested), y, 15, s.hit ? c.ok : c.bad, [], 3); }
+    }
+    if (s && !s.reported && t >= s.show) report4(s);
+  }
+
+  /* Lab 5: projectiles */
+  const DIST5 = 18, SPEED5 = 30, F5 = (DIST5 / SPEED5) * 1000, OUT5 = 90, STEP5 = 150, SIDE5 = 1.5;
+  const l5 = { phase: "idle", stats: {}, press: null, decided: false };
+  function act5() { if (l5.phase !== "run") return start5(); if (l5.press === null && !l5.decided) l5.press = now(); }
+  bindAct($("act5"), act5);
+  function start5() {
+    const t = now(), S = t + 800 + Math.random() * 1000;
+    Object.assign(l5, { phase: "run", S, T: S + F5, o: ow(), rtt, real: $("real5").checked, gr: $("grace5").checked, press: null, decided: false, dodged: false });
+    $("act5").textContent = "Step aside"; $("res5").innerHTML = `<span class="muted">Get ready…</span>`;
+  }
+  function decide5() {
+    const st = l5, h5 = Math.min(st.o + MARGIN, GRACE_CAP), limit = st.gr ? st.T + h5 : st.T;
+    if (st.press === null) { st.dodged = false; st.why = "No step."; }
+    else { const out = st.press + st.o + OUT5; st.dodged = out <= limit; st.why = st.dodged ? "Dodged." : `Hit: the server had you leaving the arrow's line ${ms(out - limit)} too late.`; }
+    st.verdictAt = limit + st.o; st.decided = true;
+    const key = `${st.rtt}|${st.real ? 1 : 0}|${st.gr ? 1 : 0}`, s = (l5.stats[key] = l5.stats[key] || { n: 0, ok: 0 });
+    s.n += 1; if (st.dodged) s.ok += 1;
+  }
+  function show5() {
+    const st = l5; st.phase = "done"; $("act5").textContent = "Start";
+    const behind = (SPEED5 * (st.o + INTERP)) / 1000;
+    $("res5").innerHTML = `<b class="${st.dodged ? "ok" : "bad"}">${st.why}</b> ${st.real ? `<span class="muted">The arrow was drawn where the server had it.</span>` : `<span class="muted">On your screen the arrow was ${m1(behind)} behind its real position.</span>`}`;
+    const s = l5.stats[`${st.rtt}|${st.real ? 1 : 0}|${st.gr ? 1 : 0}`];
+    $("stats5").textContent = `This setting (${st.rtt} ms ping${st.real ? ", real position" : ""}${st.gr ? ", grace" : ""}): ${s.ok} of ${s.n} dodged`;
+    if ($("auto5").checked) setTimeout(() => { if (l5.phase === "done") start5(); }, 1300);
+  }
+  function frame5(t) {
+    if (!visible.lab5) return;
+    const { ctx, w, h } = fit($("cv5")), c = cols(t), st = l5;
+    const px = (x) => 30 + (x / DIST5) * (w - 70), laneY = h * 0.66, py = (yy) => laneY - yy * 36;
+    ctx.strokeStyle = c.line; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(30, laneY); ctx.lineTo(w - 20, laneY); ctx.stroke(); ctx.setLineDash([]);
+    label(ctx, "archer", 30, laneY + 30, c.muted); label(ctx, "you", px(DIST5), laneY + 30, c.muted);
+    dot(ctx, 30, laneY, 10, c.muted);
+    let yy = 0;
+    if (st.press !== null && st.phase !== "idle") yy = SIDE5 * (1 - Math.pow(1 - clamp((t - st.press) / STEP5, 0, 1), 3));
+    dot(ctx, px(DIST5), py(yy), 11, st.phase === "done" && !st.dodged ? c.bad : c.server);
+    if (st.phase !== "run") return;
+    const arrow = (tau, color, dash) => { const k = (tau - st.S) / F5; if (k < 0 || k > 1.08) return; const x = px(k * DIST5); ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.setLineDash(dash || []); ctx.beginPath(); ctx.moveTo(x - 22, laneY); ctx.lineTo(x, laneY); ctx.stroke(); ctx.restore(); };
+    const factIn = t >= st.S + st.o;
+    if (st.real) { if (factIn) arrow(t, c.ink); }
+    else { arrow(t - st.o - INTERP, c.ink); if ($("ghost5").checked && factIn) arrow(t, c.muted, [3, 3]); }
+    const deadline = st.T + (st.gr ? Math.min(st.o + MARGIN, GRACE_CAP) : 0) + 5;
+    if (!st.decided && t > deadline) decide5();
+    if (st.decided && t >= st.verdictAt) show5();
+  }
+
+  /* Lab 6: adaptive interpolation delay */
+  const PROF6 = { cable: { sd: 2, spike: 0, add: 0 }, wifi: { sd: 12, spike: 0.03, add: 45 }, bad: { sd: 28, spike: 0.08, add: 110 } };
+  const l6 = { mode: "adaptive", net: "wifi", snaps: [], nextSend: 0, delay: 100, target: 100, under: false, stutters: [], lastAdapt: 0, lastT: 0 };
+  seg($("mode6"), ["f40", "f100", "adaptive"], "adaptive", (v) => { l6.mode = v; l6.stutters = []; }, (v) => ({ f40: "Fixed 40 ms", f100: "Fixed 100 ms", adaptive: "Adaptive" })[v]);
+  seg($("net6"), ["cable", "wifi", "bad"], "wifi", (v) => { l6.net = v; l6.stutters = []; }, (v) => ({ cable: "Cable", wifi: "Wi-Fi", bad: "Bad Wi-Fi" })[v]);
+  function jit6() { const p = PROF6[l6.net]; let j = Math.abs(gauss()) * p.sd; if (Math.random() < p.spike) j += p.add * (0.6 + Math.random() * 0.8); return j; }
+  const pos6 = (ts) => { const a = (ts / 1000) * 1.7; return { x: Math.cos(a), y: Math.sin(a) }; };
+  function frame6(t) {
+    if (!visible.lab6) { l6.lastT = t; return; }
+    const o = ow();
+    if (!l6.nextSend || t - l6.nextSend > 3000) { l6.nextSend = t - 1500; l6.snaps = []; }
+    while (l6.nextSend <= t) { const s = l6.nextSend; l6.snaps.push({ s, a: s + o + jit6() }); l6.nextSend += TICK; }
+    while (l6.snaps.length && l6.snaps[0].s < t - 3000) l6.snaps.shift();
+    const got = l6.snaps.filter((p) => p.a <= t);
+    if (l6.mode === "adaptive") {
+      if (t - l6.lastAdapt > 250 && got.length > 10) { const dev = got.map((p) => p.a - p.s - o).sort((a, b) => a - b); l6.target = clamp(TICK + dev[Math.floor(dev.length * 0.95)] + 8, 40, 150); l6.lastAdapt = t; }
+    } else l6.target = l6.mode === "f40" ? 40 : 100;
+    const dt = Math.min(100, t - (l6.lastT || t)); l6.lastT = t;
+    if (l6.mode === "adaptive") { const step = 0.05 * dt; l6.delay += clamp(l6.target - l6.delay, -step, step); } else l6.delay = l6.target;
+    const rt = t - o - l6.delay;
+    let before = null, after = null;
+    for (const p of got) { if (p.s <= rt && (!before || p.s > before.s)) before = p; if (p.s >= rt && (!after || p.s < after.s)) after = p; }
+    let pos, under = false;
+    if (before && after && after.s > before.s) { const k = (rt - before.s) / (after.s - before.s), a = pos6(before.s), b = pos6(after.s); pos = { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k }; }
+    else if (before && after) pos = pos6(before.s);
+    else { under = true; const newest = got.reduce((m, p) => (!m || p.s > m.s ? p : m), null); pos = newest ? pos6(newest.s) : pos6(rt); }
+    if (under && !l6.under) l6.stutters.push(t);
+    l6.under = under;
+    while (l6.stutters.length && l6.stutters[0] < t - 10000) l6.stutters.shift();
+    const { ctx, w, h } = fit($("cv6")), c = cols(t);
+    const cx = w / 2, cy = h / 2 - 6, rx = Math.min(w * 0.4, 260), ry = h * 0.32;
+    ctx.strokeStyle = c.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+    const tp = pos6(t); ring(ctx, cx + tp.x * rx, cy + tp.y * ry, 13, c.muted, [3, 3], 2);
+    dot(ctx, cx + pos.x * rx, cy + pos.y * ry, 11, under ? c.bad : c.server);
+    label(ctx, "dashed ring: where the server has the runner now", 12, h - 10, c.muted, "left");
+    if (every("s6", t, 200)) $("stats6").innerHTML = `Interpolation delay <b>${Math.round(l6.delay)} ms</b> · runner drawn ${ms(o + l6.delay)} behind the server · stutters in the last 10 s: <b class="${l6.stutters.length ? "c-bad" : "c-ok"}">${l6.stutters.length}</b>`;
+  }
+
+  /* Lab 7: input redundancy */
+  const l7 = { red: false, loss: 0.02, pk: [], k: 0, nextSend: 0, lastLost: false, nextTurn: 0, pendingDodge: null, lostIn: [], corr: [], delays: [] };
+  seg($("red7"), [false, true], false, (v) => { l7.red = v; l7.lostIn = []; l7.corr = []; l7.delays = []; }, (v) => (v ? "On · 3 ticks" : "Off"));
+  seg($("loss7"), [0, 2, 5, 10], 2, (v) => { l7.loss = v / 100; l7.lostIn = []; l7.corr = []; l7.delays = []; }, (v) => `${v}%`);
+  function act7() { l7.pendingDodge = now(); }
+  bindAct($("act7"), act7);
+  function frame7(t) {
+    if (!visible.lab7) return;
+    const o = ow();
+    if (!l7.nextSend || t - l7.nextSend > 3000) { l7.nextSend = t; l7.pk = []; }
+    while (l7.nextSend <= t) {
+      const ts = l7.nextSend;
+      const lost = l7.loss > 0 && Math.random() < (l7.lastLost ? 0.4 : l7.loss); l7.lastLost = lost;
+      let turn = false; if (ts >= l7.nextTurn) { turn = true; l7.nextTurn = ts + 300 + Math.random() * 500; }
+      l7.pk.push({ ts, lost, turn, dodge: l7.pendingDodge !== null, state: lost ? "lost" : "ok", resolved: false });
+      l7.pendingDodge = null; l7.nextSend += TICK;
+    }
+    for (let i = 0; i < l7.pk.length; i++) {
+      const p = l7.pk[i];
+      if (p.resolved || t < p.ts + 2 * TICK + o + 1) continue;
+      p.resolved = true;
+      let arrive = p.lost ? null : p.ts + o;
+      if (p.lost && l7.red) { const n1 = l7.pk[i + 1], n2 = l7.pk[i + 2]; if (n1 && !n1.lost) arrive = n1.ts + o; else if (n2 && !n2.lost) arrive = n2.ts + o; if (arrive !== null) p.state = "rec"; }
+      if (arrive === null) { l7.lostIn.push(t); if (p.turn) l7.corr.push(t); }
+      if (p.dodge) {
+        const at = arrive !== null ? arrive : p.ts + rtt + 30 + o;
+        const extra = at - (p.ts + o);
+        l7.delays.push({ t, extra });
+        $("res7").innerHTML = extra < 2 ? `<b class="ok">Your dodge reached the server on time.</b>` : `<b class="bad">Your dodge reached the server ${ms(extra)} late</b> <span class="muted">${arrive !== null ? "(recovered from a later packet)" : "(lost, then resent once the client noticed)"}.</span>`;
+      }
+    }
+    while (l7.pk.length > 80) l7.pk.shift();
+    [l7.lostIn, l7.corr].forEach((a) => { while (a.length && a[0] < t - 20000) a.shift(); });
+    while (l7.delays.length && l7.delays[0].t < t - 20000) l7.delays.shift();
+    const { ctx, w, h } = fit($("cv7")), c = cols(t);
+    const n = Math.min(60, l7.pk.length), sq = Math.max(4, Math.min(11, (w - 24) / 62)), gap = sq * 0.25, y = h / 2 - sq / 2;
+    for (let i = 0; i < n; i++) {
+      const p = l7.pk[l7.pk.length - 1 - i], x = w - 12 - (i + 1) * (sq + gap);
+      ctx.fillStyle = p.state === "lost" ? c.bad : p.state === "rec" ? c.screen : c.ok;
+      ctx.globalAlpha = p.state === "ok" ? 0.45 : 1; ctx.fillRect(x, y, sq, sq); ctx.globalAlpha = 1;
+      if (p.dodge) ring(ctx, x + sq / 2, y - sq * 0.9, sq * 0.45, c.ink, [], 2);
+      if (p.turn) { ctx.fillStyle = c.muted; ctx.fillRect(x + sq / 2 - 1, y + sq + 4, 2, 6); }
+    }
+    label(ctx, "newest", w - 12, h - 8, c.muted, "right");
+    if (every("s7", t, 250)) {
+      const worst = l7.delays.reduce((m, d) => Math.max(m, d.extra), 0);
+      const up = ((42 + (l7.red ? 26 : 10)) * 30) / 1000;
+      $("stats7").textContent = `Last 20 s: ${l7.lostIn.length} inputs lost for good, ${l7.corr.length} position corrections, worst dodge delay ${ms(worst)} · upstream about ${up.toFixed(2)} KB/s`;
+    }
+  }
+
+  /* Lab 8: lanes and priority */
+  const BUDGET8 = 12;
+  const l8 = { mode: "single", load: "normal", loss: 0.02, nextTick: 0, nextAtk: 0 };
+  function reset8() { Object.assign(l8, { q: [], resend: [], inflight: [], held: { single: [], crit: [], chat: [] }, next: { single: 0, crit: 0, chat: 0 }, seq: { single: 0, crit: 0, chat: 0 }, delays: [] }); }
+  reset8();
+  seg($("mode8"), ["single", "lanes"], "single", (v) => { l8.mode = v; reset8(); }, (v) => (v === "single" ? "One ordered stream" : "Lanes with priority"));
+  seg($("load8"), ["normal", "fight"], "normal", (v) => { l8.load = v; l8.delays = []; }, (v) => (v === "normal" ? "Normal" : "Big fight"));
+  seg($("loss8"), [0, 2, 5], 2, (v) => { l8.loss = v / 100; l8.delays = []; }, (v) => `${v}%`);
+  const lane8 = (m) => (l8.mode === "single" ? "single" : m.type === "atk" ? "crit" : "chat");
+  function push8(m) { if (m.type !== "xf") { m.lane = lane8(m); m.seq = l8.seq[m.lane]++; } l8.q.push(m); }
+  function tick8(tt) {
+    const fight = l8.load === "fight";
+    for (let i = 0; i < (fight ? 22 : 5); i++) push8({ type: "xf", c: tt, u: 1 });
+    if (Math.random() < (fight ? 0.25 : 0.12)) push8({ type: "chat", c: tt, u: 2 });
+    if (tt >= l8.nextAtk) { push8({ type: "atk", c: tt, u: 1 }); l8.nextAtk = tt + 700 + Math.random() * 900; }
+    const ready = l8.resend.filter((r) => r.at <= tt); l8.resend = l8.resend.filter((r) => r.at > tt);
+    l8.q = l8.q.filter((m) => m.type !== "xf" || tt - m.c < 300);
+    let budget = BUDGET8; const msgs = [];
+    const take = (m) => { msgs.push(m); budget -= m.u; };
+    ready.forEach((r) => { if (budget >= r.m.u) take(r.m); else l8.q.unshift(r.m); });
+    if (l8.mode === "single") { while (l8.q.length && budget >= l8.q[0].u) take(l8.q.shift()); }
+    else {
+      l8.q.filter((m) => m.type === "atk").forEach((m) => { if (budget >= m.u) take(m); });
+      let chatBudget = Math.round(budget * 0.25);
+      l8.q.filter((m) => m.type === "chat").forEach((m) => { if (chatBudget >= m.u && budget >= m.u) { take(m); chatBudget -= m.u; } });
+      l8.q.filter((m) => m.type === "xf").sort((a, b) => b.c - a.c).forEach((m) => { if (budget >= m.u) take(m); });
+      l8.q = l8.q.filter((m) => !msgs.includes(m));
+    }
+    const lost = l8.loss > 0 && Math.random() < l8.loss;
+    l8.inflight.push({ t: tt, msgs, lost, done: false });
+    if (lost) msgs.filter((m) => m.type !== "xf").forEach((m) => l8.resend.push({ at: tt + rtt + 30, m }));
+  }
+  function arrive8(p, at) {
+    for (const m of p.msgs) {
+      if (m.type === "xf") continue;
+      const H = l8.held[m.lane]; H.push(m); H.sort((a, b) => a.seq - b.seq);
+      while (H.length && H[0].seq === l8.next[m.lane]) { const d = H.shift(); l8.next[m.lane]++; if (d.type === "atk") l8.delays.push({ at, extra: Math.max(0, at - d.c - ow()) }); }
+    }
+  }
+  function frame8(t) {
+    if (!visible.lab8) return;
+    const o = ow();
+    if (!l8.nextTick || t - l8.nextTick > 3000) { reset8(); l8.nextTick = t; l8.nextAtk = t + 500; }
+    while (l8.nextTick <= t) { tick8(l8.nextTick); l8.nextTick += TICK; }
+    for (const p of l8.inflight) if (!p.done && p.t + o <= t) { p.done = true; if (!p.lost) arrive8(p, p.t + o); }
+    l8.inflight = l8.inflight.filter((p) => t < p.t + o + 250);
+    while (l8.delays.length && l8.delays[0].at < t - 20000) l8.delays.shift();
+    const { ctx, w, h } = fit($("cv8")), c = cols(t);
+    const colorOf = (m) => (m.type === "atk" ? c.bad : m.type === "chat" ? c.screen : c.muted);
+    const qx = 12, qw = w * 0.2, px0 = w * 0.25, px1 = w * 0.75, hx = w * 0.79, sq = 6;
+    label(ctx, "server send queue", qx, 16, c.muted, "left"); label(ctx, "in flight", (px0 + px1) / 2, 16, c.muted); label(ctx, "held for order", hx, 16, c.muted, "left");
+    const qs = [...l8.q].sort((a, b) => (a.type === "atk" ? -1 : b.type === "atk" ? 1 : 0));
+    const perRow = Math.max(1, Math.floor(qw / (sq + 2)));
+    qs.slice(0, perRow * 14).forEach((m, i) => { ctx.fillStyle = colorOf(m); ctx.fillRect(qx + (i % perRow) * (sq + 2), 26 + Math.floor(i / perRow) * (sq + 2), sq, sq); });
+    ctx.strokeStyle = c.line; ctx.lineWidth = 1; ctx.strokeRect(px0, 28, px1 - px0, h - 44);
+    for (const p of l8.inflight) {
+      const k = clamp((t - p.t) / Math.max(o, 1), 0, 1);
+      if (p.lost && k > 0.5) continue;
+      const x = px0 + 4 + k * (px1 - px0 - 12);
+      ctx.globalAlpha = p.lost ? 1 - k : 1;
+      p.msgs.filter((m) => m.type !== "xf").concat(p.msgs.filter((m) => m.type === "xf").slice(0, 3)).slice(0, 8).forEach((m, i) => { ctx.fillStyle = p.lost ? c.bad : colorOf(m); ctx.fillRect(x, h - 24 - i * (sq + 2), sq, sq); });
+      ctx.globalAlpha = 1;
+    }
+    const held = [...l8.held.single, ...l8.held.crit, ...l8.held.chat];
+    held.slice(0, 60).forEach((m, i) => { ctx.fillStyle = colorOf(m); ctx.fillRect(hx + (i % 8) * (sq + 2), 26 + Math.floor(i / 8) * (sq + 2), sq, sq); });
+    if (every("s8", t, 250)) {
+      const ds = l8.delays.map((d) => d.extra), last = ds.length ? ds[ds.length - 1] : 0, worst = ds.reduce((m, v) => Math.max(m, v), 0), avg = ds.length ? ds.reduce((a, b) => a + b, 0) / ds.length : 0;
+      $("stats8").innerHTML = `Attack warnings, extra delay beyond normal travel: last <b class="${last > 20 ? "c-bad" : "c-ok"}">${ms(last)}</b>, average ${ms(avg)}, worst <b class="${worst > 20 ? "c-bad" : "c-ok"}">${ms(worst)}</b> in the last 20 s. <span class="muted">Every millisecond here comes straight out of your dodge window.</span>`;
+    }
+  }
+
+  /* Lab 9: relay routing */
+  const ROUTE9 = { pub: { base: 88, jit: 20, loss: 0.012, spike: 0.03, name: "Public internet" }, rel: { base: 62, jit: 3, loss: 0.001, spike: 0, name: "Relay" } };
+  const l9 = { probes: [], next: 0, samples: { pub: [], rel: [] } };
+  function sample9(r) { const R = ROUTE9[r]; let v = R.base + Math.abs(gauss()) * R.jit; if (Math.random() < R.spike) v += 60 + Math.random() * 80; return v; }
+  function path9(r, w, h) {
+    return r === "pub" ? [[28, h * 0.5], [w * 0.16, h * 0.4], [w * 0.3, h * 0.12], [w * 0.45, h * 0.38], [w * 0.58, h * 0.1], [w * 0.74, h * 0.34], [w - 28, h * 0.5]]
+      : [[28, h * 0.5], [w * 0.2, h * 0.86], [w * 0.8, h * 0.86], [w - 28, h * 0.5]];
+  }
+  function along(pts, k) {
+    const seglen = []; let total = 0;
+    for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seglen.push(d); total += d; }
+    let d = k * total;
+    for (let i = 0; i < seglen.length; i++) { if (d <= seglen[i]) { const f = d / seglen[i]; return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * f, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f]; } d -= seglen[i]; }
+    return pts[pts.length - 1];
+  }
+  function cost9() {
+    const players = Math.max(0, Number($("players9").value) || 0), mb = Math.max(0, Number($("mb9").value) || 0), price = Math.max(0, Number($("price9").value) || 0);
+    const perHour = (players * mb) / 1000 * price + 0.025, month = perHour * 730;
+    $("cost9").innerHTML = `About <b class="num">US$${month.toLocaleString(undefined, { maximumFractionDigits: 0 })}</b> per month for one accelerator <span class="muted">(US$${perHour.toFixed(2)} per hour, ${((mb / 1000) * price * 100).toFixed(2)} cents per player-hour).</span>`;
+  }
+  ["players9", "mb9", "price9"].forEach((id) => $(id).addEventListener("input", cost9));
+  cost9();
+  function frame9(t) {
+    if (!visible.lab9) return;
+    if (!l9.next || t - l9.next > 3000) { l9.next = t; l9.probes = []; }
+    while (l9.next <= t) {
+      ["pub", "rel"].forEach((r) => { const lost = Math.random() < ROUTE9[r].loss, s = sample9(r); l9.probes.push({ r, t0: l9.next, dur: s / 2, lost }); l9.samples[r].push({ t: l9.next, v: lost ? null : s }); });
+      l9.next += 120;
+    }
+    l9.probes = l9.probes.filter((p) => t < p.t0 + p.dur + 200);
+    ["pub", "rel"].forEach((r) => { const a = l9.samples[r]; while (a.length && a[0].t < t - 10000) a.shift(); });
+    const { ctx, w, h } = fit($("cv9")), c = cols(t);
+    ["pub", "rel"].forEach((r) => {
+      const pts = path9(r, w, h);
+      ctx.strokeStyle = r === "pub" ? c.screen : c.server; ctx.lineWidth = r === "pub" ? 2 : 4; ctx.globalAlpha = 0.5;
+      ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); ctx.globalAlpha = 1;
+      pts.slice(1, -1).forEach((p) => dot(ctx, p[0], p[1], 4, c.muted));
+    });
+    const pr = path9("rel", w, h);
+    label(ctx, "relay edge", pr[1][0], pr[1][1] + 16, c.muted); label(ctx, "provider backbone", (pr[1][0] + pr[2][0]) / 2, pr[1][1] - 8, c.muted);
+    label(ctx, "public internet: several networks", w * 0.45, 14, c.muted);
+    dot(ctx, 28, h * 0.5, 9, c.ink); label(ctx, "player", 28, h * 0.5 + 24, c.muted);
+    dot(ctx, w - 28, h * 0.5, 9, c.ink); label(ctx, "datacenter", w - 28, h * 0.5 + 24, c.muted);
+    for (const p of l9.probes) {
+      const k = clamp((t - p.t0) / p.dur, 0, 1); if (k >= 1) continue;
+      if (p.lost && k > 0.5) continue;
+      const [x, y] = along(path9(p.r, w, h), k);
+      dot(ctx, x, y, 3, p.lost ? c.bad : p.r === "pub" ? c.screen : c.server);
+    }
+    if (every("s9", t, 400)) {
+      const row = (r) => {
+        const a = l9.samples[r], ok = a.filter((s) => s.v !== null).map((s) => s.v);
+        const avg = ok.length ? ok.reduce((x, y) => x + y, 0) / ok.length : 0;
+        const sd = ok.length ? Math.sqrt(ok.reduce((x, y) => x + (y - avg) ** 2, 0) / ok.length) : 0;
+        const loss = a.length ? (100 * (a.length - ok.length)) / a.length : 0;
+        const win = 400 - avg / 2;
+        return `<tr><td>${ROUTE9[r].name}</td><td class="num">${ms(avg)}</td><td class="num">±${ms(sd)}</td><td class="num">${loss.toFixed(1)}%</td><td class="num"><span class="pill ${win >= 300 ? "g" : win >= 200 ? "a" : "r"}">${ms(win)}</span></td></tr>`;
+      };
+      $("stats9").innerHTML = `<thead><tr><th>Route</th><th>Ping</th><th>Jitter</th><th>Loss</th><th>Dodge window, 400 ms windup with helpers</th></tr></thead><tbody>${row("pub")}${row("rel")}</tbody>`;
+    }
+  }
+
+  /* Frame loop */
+  const CIRC = 2 * Math.PI * 42;
+  $("ring").setAttribute("stroke-dasharray", `0 ${CIRC}`);
+  function frame() {
+    const t = now();
+    // Lab 1
+    const tok = $("tok1"), stage1 = tok.parentElement.clientWidth - 48 - 36;
+    if (l1.move) {
+      const m = l1.move, k = Math.min(1, Math.max(0, (t - m.start) / 180));
+      const pos = m.from + (m.to - m.from) * (1 - Math.pow(1 - k, 3));
+      tok.style.transform = `translateX(${(pos * stage1).toFixed(1)}px)`;
+      if (!m.reported && t >= m.start) {
+        m.reported = true;
+        const d = m.start - m.p;
+        $("res1").innerHTML = d < 1 ? `<b class="ok">Moved at once.</b> <span class="muted">The server confirms ${ms(rtt)} later; you only notice if it disagrees.</span>` : `<b class="bad">Moved ${ms(d)} after your press</b> <span class="muted">(${(d / TICK).toFixed(1)} ticks, about ${Math.round(d / 16.7)} frames at 60 fps).</span>`;
+      }
+      if (k >= 1) l1.move = null;
+    } else tok.style.transform = `translateX(${(l1.side * stage1).toFixed(1)}px)`;
+    // Lab 2
+    if (l2.phase === "run") {
+      const st = l2, ring = $("ring"), mob = $("mob"), hero = $("hero");
+      let prog = 0;
+      if (t >= st.visStart) prog = Math.min(1, (t - st.visStart + st.skip) / st.W);
+      ring.setAttribute("stroke-dasharray", `${(prog * CIRC).toFixed(1)} ${CIRC}`);
+      if (t >= st.visImpact && !st.flashUntil) { st.flashUntil = t + 220; mob.classList.add("flash"); }
+      if (st.flashUntil && t > st.flashUntil) mob.classList.remove("flash");
+      hero.classList.toggle("iframe", st.press !== null && t >= st.press && t <= st.press + IFRAME);
+      if (st.press !== null) { const k = Math.min(1, (t - st.press) / IFRAME); hero.style.transform = `translateX(${(Math.sin(k * Math.PI) * 46).toFixed(1)}px)`; }
+      else hero.style.transform = "";
+      const deadline = st.srvImpact + (st.gr ? Math.min(st.o + MARGIN, GRACE_CAP) : 0) + 5;
+      if (!st.decided && (t > deadline || (st.press !== null && t > Math.max(st.srvImpact, st.press + st.o) + 5))) decide2();
+      if (st.decided && t >= st.verdictAt) { ring.setAttribute("stroke-dasharray", `${CIRC} ${CIRC}`); mob.classList.remove("flash"); hero.classList.remove("iframe"); hero.style.transform = ""; show2(); }
+    }
+    // Lab 3
+    if (l3) {
+      const b = $("blade"), sp = $("spark"), dm = $("dmg");
+      const k = Math.min(1, Math.max(0, (t - l3.p) / 266));
+      b.style.transform = `rotate(${(-70 + k * 140).toFixed(1)}deg)`;
+      const sa = t - l3.spark; sp.style.opacity = sa >= 0 && sa < 200 ? String(1 - sa / 200) : "0";
+      const da = t - l3.dmg; dm.style.opacity = da >= 0 && da < 800 ? String(1 - da / 800) : "0";
+      dm.style.transform = `translate(-50%, ${da >= 0 ? (-Math.min(da, 800) / 30).toFixed(1) : 0}px)`;
+      if (!l3.reported && t >= l3.dmg) {
+        l3.reported = true;
+        const sDelay = l3.spark - l3.contact;
+        $("res3").innerHTML = `${sDelay < 1 ? `<b class="ok">Spark and sound at contact.</b>` : `<b class="bad">Spark and sound ${ms(sDelay)} after the blade connected.</b>`} <span class="muted">The damage number arrived ${ms(l3.dmg - l3.contact)} after contact, in both modes.</span>`;
+      }
+      if (t > l3.dmg + 900) { b.style.transform = "rotate(-70deg)"; l3 = null; }
+    }
+    frame4(t); frame5(t); frame6(t); frame7(t); frame8(t); frame9(t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* RunicDocs embed helper, added by tools/add_visualization.py and tools/build_slice_map.py.
+   Inside a RunicDocs note the page sits in an iframe on the same site, so it can follow the site's
+   light/dark toggle (Quartz keeps it in the saved-theme attribute). Opened on its own, or from another
+   origin such as Obsidian, the page keeps the system theme. */
+(function () {
+  try {
+    if (window.parent === window) return;
+    var site = window.parent.document.documentElement;
+    var apply = function () {
+      var t = site.getAttribute("saved-theme");
+      if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+    };
+    apply();
+    new MutationObserver(apply).observe(site, { attributes: true, attributeFilter: ["saved-theme"] });
+  } catch (e) {}
+})();
+</script>
+</body></html>

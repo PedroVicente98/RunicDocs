@@ -15,6 +15,8 @@ if [ ! -d .quartz ]; then
   (cd .quartz && npm ci && npx quartz plugin restore)
 fi
 
+python3 tools/build_slice_map.py || echo "Slice map not rebuilt (needs Python 3); the committed copy is used."
+
 rm -rf .quartz/content
 cp -r content .quartz/content
 cp quartz.config.yaml .quartz/quartz.config.yaml

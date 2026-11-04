@@ -51,6 +51,10 @@ jobs:
           path: .quartz/.quartz/plugins
           key: quartz-plugins-${{ env.QUARTZ_VERSION }}-${{ hashFiles('quartz.config.yaml', 'quartz.lock.json') }}
 
+      # The slice map is built from the Architecture, so the site never shows a stale one.
+      - name: Build the slice map
+        run: python3 tools/build_slice_map.py
+
       - name: Add RunicDocs content and configuration
         run: |
           rm -rf .quartz/content
