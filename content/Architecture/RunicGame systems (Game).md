@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-04"
 ---
 
 RunicGame turns the Engine APIs into this game’s rules. Shared rules compile into both executables, so client prediction runs the same code as the server.
@@ -129,7 +129,7 @@ A custom behavior never replaces standard components, so defenses, coefficients,
 
 * **Factions:** faction, crime and pirate status are durable state mirrored in the simulation; PvP eligibility and group rules (pirates may group with both factions) are game data.
 
-* **Named classes:** one of ten fixed loadouts plus one of five Disciplines is a named class with exactly one role (Damage, Tank or Support); class and role are derived, never chosen. Weapon skills are the basic kit, unlocked by level with no point cost, with some level choices; skill points go only into the Discipline skills, in one merged tree per class. Combat skill points come only from levels, every max-level character has the same total, and there is no limit on active skills. There are no versatile weapons and no weapon-type swap: changing the loadout or the Discipline is an Altar reset that redistributes the points and the level choices.
+* **Named classes:** one of ten fixed loadouts plus one of five Disciplines is a named class with exactly one role (Damage, Tank or Support); class and role are derived, never chosen. Weapon skills are the basic kit, unlocked by level with no point cost, with some level choices; skill points go only into the Discipline skills, in one merged tree per class. Combat skill points come only from levels, every max-level character has the same total, and a character has at most 28 combat skills, weapon and Discipline together; emotes, the context kit and other auxiliary skills are separate categories ([[Weapon Class System#Skills, trees and points]]). There are no versatile weapons and no weapon-type swap: changing the loadout or the Discipline is an Altar reset that redistributes the points and the level choices.
 
 * **Context kits:** mounted, gliding or winged characters use only their context kit, from per-class mount and aerial trees with their own points (in definition). The mount, glider or wing can modify the kit, and a mount’s kit is the same on the ground and in the air.
 

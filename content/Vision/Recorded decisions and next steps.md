@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-04"
 ---
 
 ### Recorded decisions
@@ -19,7 +19,7 @@ modified: "2026-10-30"
 | Named classes | 50, with English names; 18 Damage, 15 Tank and 17 Support |
 | Class change | Only through the full reset at any Altar, which redistributes the skill points and level choices |
 | Weapon swap | None in combat; no weapon-type change outside the Altar reset |
-| Skills and points | Weapon skills are the basic kit, unlocked by level at no cost; skill points go only into Discipline skills; one merged tree per class; the same points for everyone at max level; no limit on active skills |
+| Skills and points | Weapon skills are the basic kit, unlocked by level at no cost; skill points go only into Discipline skills; one merged tree per class; the same points for everyone at max level; at most 28 combat skills (weapon plus Discipline), with emotes, the context kit and other auxiliary skills in their own categories |
 | Ranged | No ranged slot; the Bow is a loadout, and melee loadouts have a few cheap long-range skills |
 | Weapon Mastery and Infusion | Removed |
 | Context kit | Mount and aerial trees per class, with their own points; mounted, with a glider or with a wing only context skills apply; details being defined |
