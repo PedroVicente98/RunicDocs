@@ -129,6 +129,7 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[XFER-01 Transfers Between Accounts|XFER-01 · Transfers Between Accounts]]
 - [[SKIN-01 Skinning and Field Harvesting|SKIN-01 · Skinning and Field Harvesting]]
 - [[LAND-03 Region Categories and Housing Geography|LAND-03 · Region Categories and Housing Geography]]
+- [[LABOR-01 Bonus Labor and Labor Potions|LABOR-01 · Bonus Labor and Labor Potions]]
 
 **Lore**
 

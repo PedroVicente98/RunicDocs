@@ -108,6 +108,7 @@ to the idea's own note; the status and the game vision section are in each idea'
 - ![[XFER-01 Transfers Between Accounts]]
 - ![[SKIN-01 Skinning and Field Harvesting]]
 - ![[LAND-03 Region Categories and Housing Geography]]
+- ![[LABOR-01 Bonus Labor and Labor Potions]]
 
 **Lore**
 
