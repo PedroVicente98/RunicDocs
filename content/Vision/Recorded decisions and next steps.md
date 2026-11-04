@@ -44,10 +44,10 @@ modified: "2026-11-04"
 | Exploration XP | Spent in the exploration shop on adventurer abilities, resources and maximum stamina; never combat skills or cosmetics |
 | Professions | 23, based on ArcheAge's list; Cartography includes nautical charts and exploration; Larceny includes coin purses; Commerce, Printing and Artistry are professions; masteries per character, 3 active for now |
 | Labor | Shared by the Lineage; the same maximum for everyone; only subscribers regenerate offline; a labor reserve for subscribers that never expires; every labor cost belongs to a profession |
-| World maps | One continuous map with the surface, floating islands and the Underground; the Sky Island is a separate map, reached by the island staircase of the neutral continent; no sky layer and no geysers |
+| World maps | One continuous map with the surface, floating islands and the Underground; the Sky Island is a separate map (how it is reached is being defined); no sky layer and no geysers |
 | Underground | In the same map, below the surface |
-| Floating islands | Inside the surface map, fixed and indestructible; never split between simulation servers |
-| Flight | Only on the neutral continent and the Sky Island, unlimited inside the zones, with an altitude ceiling; aerial PvP on the neutral continent |
+| Floating islands | Inside the surface map, all in the flight-zone region of the neutral continent; fixed and indestructible; never split between simulation servers |
+| Flight | Only in flight zones: special regions of the neutral continent, for now one (the region of the floating islands), and the Sky Island; unlimited inside the zones, with an altitude ceiling; aerial PvP in the neutral continent's flight zone |
 | Ocean | Only gliding, with the wind current; gliding against it is impossible; sailing is still necessary |
 | Currents | A cyclic, mappable base routine; admin events change the routine for a while |
 | Gliders, wings and mounts | The glider only glides; the wing is equipment that glides and flies in the flight zones; mounts have gliding and flying as separate capabilities; other vehicles are summoned by scroll |
@@ -69,7 +69,7 @@ modified: "2026-11-04"
 | Main story | Mandatory, long and non-intrusive; chapters per race, then per faction, mirrored; one thread across every expansion |
 | Quests | Activities, never kill or collect chores; no markers over NPCs; an automatic Codex; a timeline Chronicle; asking NPCs through knowledge tags; secrets; quest points |
 | Repeated effects between role and Discipline | Don't stack; the strongest wins. Provisional: confirm with the skill pools |
-| Starting world size | About 600 km² per map (the surface and the Sky Island), counting land, islands and sea; the world grows with the game live |
+| Starting world size | The surface map is 51.2 × 51.2 km (about 2,621 km²), with about 600 km² of land as a baseline that follows the content and sea around every continent; the Sky Island map is the same size; the world grows with the game live |
 | Pillar 8 | Play without obligation: no dailies, login streaks or rewards that punish time away |
 | PvE and PvP coexistence | A pillar of the game: one world and one economy; PvP is the default and PvE mode is always available; full combat isolation between the modes in the open world, except in the PvE instance |
 | Content and targets | All content is PvE, PvP or PvPvE; target discovery is decided by the attacker, without marking ordinary mobs |
@@ -115,7 +115,8 @@ modified: "2026-11-04"
 * Whether profession proficiency is account-wide or per character.  
 * Whether climbing mounts use stamina.  
 * The name of the runes of living beings, the special resource from coin purses, quest points and the Market Isle.  
-* How story NPCs who die or turn traitor work in a shared world.
+* How story NPCs who die or turn traitor work in a shared world.  
+* How players reach the Sky Island, now that the island staircase is gone.
 
 ### Archived and discarded
 
@@ -135,6 +136,8 @@ modified: "2026-11-04"
 | Tank, Healer and DPS | Replaced by Damage, Tank and Support |
 | The sea, highland, rock and deep peoples | Discarded; replaced by the five races |
 | A sky layer 8 km up, geysers, spatial layers for the Sky and the Underground | Discarded |
+| The island staircase from the neutral continent to the Sky Island | Discarded on 3 November; how the Sky Island is reached is being defined |
+| Flight across the whole neutral continent | Discarded on 3 November; flight zones are special regions, for now the floating-island region |
 | Regional auction houses and local storage | Discarded; one world auction and one global chest |
 | A castle in every region | Discarded; castles exist only on the neutral continent |
 | Altars that don't teleport; a cargo fee on teleports | Discarded |

@@ -19,10 +19,10 @@ modified: "2026-11-03"
 
 Make the world have a Sky Island: a separate map, persistent and shared by everyone, the same size as the surface. There is flight allowed in the Sky Island to move around, maybe even special flying vehicles.
 
-You reach it by the island staircase that rises from the neutral continent; crossing the clouds at the top, an animation of the character flying covers the loading. The floating islands are a different thing and stay inside the surface map (see [[FLOAT-01 Floating Islands|FLOAT-01]]).
-
-Discovery happens naturally: you find the island staircase while exploring the neutral continent.
+How you reach it is being defined; entering it is a checkpoint transition, and an animation of the character covers the loading. The floating islands are a different thing and stay inside the surface map (see [[FLOAT-01 Floating Islands|FLOAT-01]]).
 
 Sky Island are endgame content, there is flight and special exploration and resources, and enemies are harder. It has story relevance. It is another world on the server, with a checkpoint transition, not a layer.
 
 *Updated 2026-10-16: separate map reached by the island staircase (was: a layer of sky islands 8 km up in a single world with the overworld, falling leads to the overworld, geysers or vents as teleport entry points, layer system from spatial partitioning).*
+
+*Updated 2026-11-03: the island staircase is gone and how you reach the Sky Island is being defined (was: you reach it by the island staircase that rises from the neutral continent; crossing the clouds at the top, an animation of the character flying covers the loading. Discovery happens naturally: you find the island staircase while exploring the neutral continent).*

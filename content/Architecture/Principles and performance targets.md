@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-03"
 ---
 
 The C++ simulation is the single authority for the world, and every other choice in this document serves two goals: hold a 500-player battle in one region, and never block the 30 Hz tick.
@@ -40,7 +40,7 @@ The C++ simulation is the single authority for the world, and every other choice
 | Combat and physics rate | 30 Hz |
 | Scheduler master clock | 60 Hz |
 | World coordinates | 64-bit doubles with a real Y axis; 1 cm minimum unit |
-| First world size | About 600 km² per map, land and sea included; underground spaces and floating islands live inside the main world, and the Game’s sky world matches its size |
+| First world size | 51.2 × 51.2 km per map (about 2,621 km²), with about 600 km² of land as a baseline (see [[Open world]]); underground spaces and floating islands live inside the main world, and the Game’s sky world matches its size |
 | Expansion | New continents and regions added to a live world by patch and streamed in seamlessly |
 | Engine ceiling | Continent-scale worlds for other teams without architectural change |
 

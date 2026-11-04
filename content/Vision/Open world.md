@@ -5,27 +5,27 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-03"
 ---
 
 The map is very large and dense, and everything in it is interactable: ruins, magical places, floating islands, desolate places and hard mobs. The inspiration comes from Tales of Demons and Gods (without separate dimensions as a theme) and from Crimson Desert's feeling of exploration and nature. Sailing and exploring are the central activities.
 
-The main world is one continuous map: the surface, with at least three continents separated by seas full of islands, the floating islands above it and the Underground below. The Sky Island is a separate map, the size of the surface. To start, each map is about 600 km², counting land, islands and sea; new regions come in with the game live.
+The main world is one continuous map: the surface, with at least three continents separated by seas full of islands, the floating islands above it and the Underground below. The Sky Island is a separate map, the size of the surface. The launch surface map is 51.2 × 51.2 km (about 2,621 km²): about 600 km² of land in the continents and islands, a baseline that grows or shrinks with how much content fits, and the rest sea, which also surrounds every continent. New regions come in with the game live. The sizes used to lay out the map are in World Measures, in the [RunicWorld vault](https://github.com/PedroVicente98/RunicGame/tree/main/docs/RunicWorld/Map).
 
 | Map or region | How you get there | What makes it special | Role in the game |
 | :---- | :---- | :---- | :---- |
 | Faction 1 continent | Character start | Cities, lore and lands of the faction; Humans and Dragonkin | Home, housing, first story |
 | Faction 2 continent | Character start | The same, with another culture and gimmick; Elves and Orcs | Home, housing, first story |
-| Neutral or wild continent | By sea | Contested land and rare resources; a flight zone with aerial PvP; the base of the island staircase to the Sky Island; the only place with castles | Open PvP, world bosses, the boss region |
+| Neutral or wild continent | By sea | Contested land and rare resources; the region of the floating islands, its only flight zone for now, with aerial PvP; the only place with castles | Open PvP, world bosses, the boss region |
 | Seas and islands | By ship, or gliding with the wind current | Naval combat, housing islands, the pirate base | Trade packs, naval raids |
-| Floating islands | On the surface map itself (e.g. 1,000 m up) | Fixed and indestructible; at most they rise and sink a little | Exploration, resources and magical places |
-| Sky Island | The island staircase that rises from the neutral continent | A separate, persistent and shared map, the size of the surface; a flight zone; stronger enemies | Endgame, resources and a story chapter |
+| Floating islands | On the surface map itself (e.g. 1,000 m up), over the flight-zone region of the neutral continent | Fixed and indestructible; at most they rise and sink a little; where there are floating islands there is flight | Exploration, resources and magical places |
+| Sky Island | *Being defined* | A separate, persistent and shared map, the size of the surface; a flight zone; stronger enemies | Endgame, resources and a story chapter |
 | Underground | Caves and rivers that go down from the surface | Caves, rivers and underground oceans in the same map, below the surface; its own NPCs and lore; permanent darkness | Unique resources, exploring with light |
 
 * **A gimmick per region.** Each region changes an exploration rule: tides that open paths, wind currents for gliders, fog that hides islands, storms that affect ships.  
-* **The Sky Island and other maps.** The Sky Island is another instance, persistent and shared by everyone. Crossing the clouds at the top of the island staircase, an animation of the character flying covers the loading. The same scheme serves other maps, linked by portals.  
-* **Floating islands** are inside the surface map and are never split between two simulation servers.  
-* **Flight** exists only on the neutral continent and the Sky Island. Inside those zones flight is unlimited, with an altitude ceiling above which you can only glide *(proposal: a soft ceiling)*. There is aerial PvP on the neutral continent.  
+* **The Sky Island and other maps.** The Sky Island is another instance, persistent and shared by everyone. How players reach it is *being defined*; entering it is a checkpoint transition, and an animation of the character covers the loading. The same scheme serves other maps, linked by portals.  
+* **Floating islands** are inside the surface map, all in the flight-zone region of the neutral continent, and are never split between two simulation servers.  
+* **Flight** exists only in flight zones: special regions of the neutral continent, not the whole continent, and the Sky Island. For now the neutral continent has one, the region of the floating islands; more may be added later. It is a first taste of the full flight of the Sky Island. Inside a flight zone flight is unlimited, with an altitude ceiling above which you can only glide *(proposal: a soft ceiling)*. There is aerial PvP in the neutral continent's flight zone; everywhere else on the surface you can only glide.  
 * **Ocean.** Over the ocean you can only glide, using the wind current, which has a direction (any angle) and a speed. Speed 0 has no effect; a negative speed suddenly reverses the direction without changing the angle. Gliding against the current is impossible, and the character is thrown back. Sailing is still necessary.  
 * **Sea and wind currents** follow a cyclic, mappable base routine. Admins create events in a panel that change them for a while; then the base routine returns.  
 * **Living world.** Escorts, trade routes, ships and mob routines follow schedules mapped to world time, without simulating empty areas: the NPC appears at the right point when a player arrives. The routine drifts slowly (a cycle that doesn't match the clock, plus a small deterministic variation). Exceptions caused by players, such as a delayed escort, are stored in a service and return to the routine over time.  
