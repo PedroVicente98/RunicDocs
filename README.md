@@ -25,6 +25,7 @@ content/                                      ← the Obsidian vault (open this 
 │   ├── NAV-01 Naval Raid.md                  one note per idea ID, text unchanged; the ID is its alias
 │   └── Archived and Discarded ideas.md
 ├── Development/                              the slices checklist and one note per slice (generated, see below)
+├── Visualizations/                           interactive pages, each shown in a note (see below)
 ├── Archive/                                  the original appendices, unchanged, even after they are merged
 ├── Lore/                                     one note linking to the RunicGame repository — never delete this folder
 ├── Quest Design/                             one note linking to the RunicGame repository — never delete this folder
@@ -34,7 +35,7 @@ quartz-styles/custom.scss                     site styles (the scroll box for em
 quartz-plugins/runic-graph/                   the site's graph, with the settings panel
 .github/workflows/deploy.yml                  builds and publishes the site on every push to main
 scripts/preview.sh|.ps1                       build and serve the site on your machine
-tools/                                        the split script, the move tool and the vault checker
+tools/                                        the split script, the move tool, the vault checker and the visualization tools
 ```
 
 | Folder | Notes |
@@ -43,6 +44,7 @@ tools/                                        the split script, the move tool an
 | `Architecture/` | 28 |
 | `Ideias/` | 102 |
 | `Development/` | 54 |
+| `Visualizations/` | 4 |
 | `Archive/` | 5 |
 | `Lore/`, `Quest Design/` | 1 each |
 
@@ -89,6 +91,34 @@ status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame (throu
 repositories). A package is done when its issue is closed, and a slice when its issue is closed. To change a slice or a
 package, change the Architecture (and its issue), then run the script; it warns when a package has no issue or an
 issue has no package.
+
+## Visualizations
+
+`content/Visualizations/` holds interactive pages, each a single `.htm` file next to a note that shows it in a frame
+(`<iframe class="runic-viz">`, styled in `quartz-styles/custom.scss`) and links to it on its own page. Quartz copies the
+`.htm` files to the site as they are. The extension matters: Quartz drops `.html` from the files it copies, and the
+site would then send the page as a download. Inside a note, a page follows the site's light and dark toggle through the
+embed helper in `tools/templates/embed-helper.html`. In Obsidian the frames may stay empty; the link opens the page.
+
+| Page | Made by |
+| :--- | :--- |
+| `slice-map.htm` (note: Slice map) | `python3 tools/build_slice_map.py`, from the roadmap, the package tables and the Development notes |
+| `latency-feel-lab.htm`, `runic-database-map.htm` | pages made in Claude chats, added with `tools/add_visualization.py` |
+
+**The slice map is generated; don't edit it by hand.** Its page comes from `tools/templates/slice-map.html`; the script
+fills in the slices, the packages' needs and, from the Development notes, which packages are done and their issues.
+The deploy workflow and the preview scripts run it before every build, so the site never shows a stale map. Run
+`tools/sync_development.py` first when the issues changed.
+
+**To add a page made in a Claude chat**, ask the chat to publish the visual as a page, save its HTML, then:
+
+```
+python3 tools/add_visualization.py SAVED.html page-name --title "Note title" --description "One line on what it shows."
+```
+
+It writes `content/Visualizations/page-name.htm` (with a document around it if the chat saved only the body, Mermaid
+from jsDelivr instead of the claude.ai runtime, and the embed helper) and creates the note unless it exists. Add the
+note to the list in **RunicGame — Visualizations**, then run `tools/check_vault.py`.
 
 ## Graph settings
 

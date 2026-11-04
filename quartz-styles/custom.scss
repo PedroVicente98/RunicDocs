@@ -40,3 +40,15 @@ article.home-dashboard {
     }
   }
 }
+
+// Visualizations: an interactive page shown in a note (content/Visualizations/). The frame has a fixed height and
+// scrolls inside, so the pages' sticky bars and bottom panels stay in view.
+iframe.runic-viz {
+  display: block;
+  width: 100%;
+  height: 85vh;
+  min-height: 32rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  background: var(--light);
+}

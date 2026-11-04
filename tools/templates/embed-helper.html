@@ -1,0 +1,18 @@
+<script>
+/* RunicDocs embed helper, added by tools/add_visualization.py and tools/build_slice_map.py.
+   Inside a RunicDocs note the page sits in an iframe on the same site, so it can follow the site's
+   light/dark toggle (Quartz keeps it in the saved-theme attribute). Opened on its own, or from another
+   origin such as Obsidian, the page keeps the system theme. */
+(function () {
+  try {
+    if (window.parent === window) return;
+    var site = window.parent.document.documentElement;
+    var apply = function () {
+      var t = site.getAttribute("saved-theme");
+      if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+    };
+    apply();
+    new MutationObserver(apply).observe(site, { attributes: true, attributeFilter: ["saved-theme"] });
+  } catch (e) {}
+})();
+</script>

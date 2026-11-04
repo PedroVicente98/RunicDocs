@@ -17,6 +17,8 @@ if (-not (Test-Path ".quartz")) {
   Pop-Location
 }
 
+try { python tools\build_slice_map.py } catch { Write-Host "Slice map not rebuilt (needs Python 3); the committed copy is used." }
+
 if (Test-Path ".quartz\content") { Remove-Item -Recurse -Force ".quartz\content" }
 Copy-Item -Recurse "content" ".quartz\content"
 Copy-Item "quartz.config.yaml" ".quartz\quartz.config.yaml" -Force
