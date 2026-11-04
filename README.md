@@ -31,6 +31,7 @@ content/                                      ← the Obsidian vault (open this 
 └── attachments/                              images
 quartz.config.yaml                            site configuration (Quartz 5)
 quartz-styles/custom.scss                     site styles (the scroll box for embedded notes)
+quartz-plugins/runic-graph/                   the site's graph, with the settings panel
 .github/workflows/deploy.yml                  builds and publishes the site on every push to main
 scripts/preview.sh|.ps1                       build and serve the site on your machine
 tools/                                        the split script, the move tool and the vault checker
@@ -88,6 +89,21 @@ status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame (throu
 repositories). A package is done when its issue is closed, and a slice when its issue is closed. To change a slice or a
 package, change the Architecture (and its issue), then run the script; it warns when a package has no issue or an
 issue has no package.
+
+## Graph settings
+
+The gear on the local graph and on the full graph opens a settings panel, like Obsidian's graph view:
+
+- **Filters:** search highlights the matching notes (text, `path:Vision`, `tag:status/open`, `file:combat`); only
+  matches, tags and orphans; the local graph's depth.
+- **Groups:** colour the notes that match a query. The defaults are the folder colours of the Obsidian graph, set as
+  `groups` in `quartz.config.yaml`.
+- **Display:** arrows, text fade threshold, node size, link thickness, and Animate.
+- **Forces:** center, repel, link force and link distance.
+
+Changes apply at once and are kept in the browser's local storage, separately for the local and the full graph; the
+search lasts until the page is reloaded. **Reset** goes back to the site's defaults. The site's defaults are the
+`localGraph` and `globalGraph` options of the graph in `quartz.config.yaml`.
 
 ## Site navigation
 
@@ -148,20 +164,20 @@ settings. If the site moves, change `baseUrl` in `quartz.config.yaml`.
 ### Quartz fixes for a subpath site
 
 The site lives under `/RunicDocs/`, not at the domain root. Quartz 5.0.0's graph, explorer, search and stacked-pages
-plugins looked for their data and built their links at the root, so the graph came up empty. Four changes fix it
+plugins looked for their data and built their links at the root, so the graph came up empty. These changes fix it
 until a Quartz release includes the fixes:
 
 - `quartz-patches/body-basepath.patch` backports a change from Quartz's main branch: each page's `<body>` gets
   `data-basepath="/RunicDocs"`.
-- `quartz.lock.json` is Quartz 5.0.0's plugin lockfile with four plugins moved to newer commits that read that
-  attribute. Explorer, search and stacked-pages use their 22 March 2026 commits ("resolve links correctly on
-  subdirectory deployments"). The graph uses its 4 April 2026 commit, which also removes the base path when it works out
-  the current page from the address ("strip base path for non-root domains"). Without that fix the local graph showed a
-  single unknown dot and linked to `/RunicDocs/RunicDocs/`.
-- `quartz-patches/decode-graph-slug.mjs` runs after the plugins are installed. The graph plugin read the page from the
-  address without decoding it, so a page with a non-ASCII character in its name (the "—" in "RunicGame — Ideias")
-  got a one-dot local graph. The script applies the later fix from `@quartz-community/utils` (`decodeURI`) to the
-  built plugin, and fails the build if the plugin has changed so the fix no longer applies.
+- `quartz.lock.json` is Quartz 5.0.0's plugin lockfile with explorer, search and stacked-pages moved to their 22 March
+  2026 commits, which read that attribute ("resolve links correctly on subdirectory deployments"). The graph is not in
+  the lockfile: the site uses its own copy (below).
+- **The graph** is `quartz-plugins/runic-graph`, a copy of the graph plugin (commit c54226d, which removes the base path
+  when it works out the current page) with an Obsidian-style settings panel. It also decodes the page address, so a page
+  with a non-ASCII character in its name (the "—" in "RunicGame — Ideias") finds itself instead of drawing a single
+  unknown dot. The deploy and the preview scripts copy `quartz-plugins/` into Quartz, and `quartz.config.yaml` loads
+  it from `./quartz-plugins/runic-graph`. Its `dist/` is committed; see its README to rebuild it after changing
+  `src/`.
 - `quartz.config.yaml` turns **stacked-pages off**. That plugin also works out the current page from the address and has
   no fix yet, so its tabs opened `/RunicDocs/RunicDocs/...`. Turn it back on when a newer commit removes the base path.
 

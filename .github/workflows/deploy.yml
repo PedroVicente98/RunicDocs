@@ -58,6 +58,8 @@ jobs:
           cp quartz.config.yaml .quartz/quartz.config.yaml
           cp quartz.lock.json .quartz/quartz.lock.json
           cp quartz-styles/custom.scss .quartz/quartz/styles/custom.scss
+          rm -rf .quartz/quartz-plugins
+          cp -r quartz-plugins .quartz/quartz-plugins
 
       - name: Install Quartz
         working-directory: .quartz
@@ -66,11 +68,6 @@ jobs:
       - name: Restore Quartz plugins
         working-directory: .quartz
         run: npx quartz plugin restore
-
-      # The graph plugin reads the page from the address without decoding it, so pages with a "—" in their
-      # name got a one-dot local graph. This applies utils' later fix (decodeURI) to the built plugin.
-      - name: Patch the graph plugin for non-ASCII page names
-        run: node quartz-patches/decode-graph-slug.mjs .quartz/.quartz/plugins/graph/dist
 
       - name: Build site
         working-directory: .quartz
