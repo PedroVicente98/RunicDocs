@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-05"
 ---
 
 ### Inventory
@@ -32,4 +32,5 @@ An instanced area that works like a big shop, like ArcheAge's Mirage Isle: the p
 * Designs and everything built from them are bound and never tradeable; only the resources supplied for construction are tradeable.  
 * Inventory expansions are paid with in-game gold, and the island can use special currencies. It never sells anything for real money.  
 * Buying a house design doesn't give land: placing the house follows the land rules (8x8 slots, the limit per account and an active subscription).  
+* It also sells home crafting-station designs and basement expansion designs (see [[Economy, housing and land]] › Houses).  
 * The portal is free, since it isn't travel; it returns the player to the same spot and requires being idle.

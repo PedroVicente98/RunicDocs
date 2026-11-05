@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-04"
+modified: "2026-11-05"
 ---
 
 ### Recorded decisions
@@ -79,6 +79,9 @@ modified: "2026-11-04"
 | Outlaw and Infamy | A toggle skill only in PvP mode; a cooldown of about 30 min restarted by each hit on your own faction; Infamy only for reported kills; enough Infamy makes a pirate; support only from another Outlaw |
 | Runes | Nothing is ever called just "Rune": every use carries a qualifier (see [[Runes]]) |
 | Names | Every specific name in the game is in English |
+| Housing | Open-world plots only, no instanced housing; two-floor designs with balconies; farming and husbandry on the plot; recall with a cost and a cooldown; home crafting stations need the profession's mastery; any house can have a packing bench and a resource-pack processing station; buffs only from rare-reward furniture, never combat; no bank, commerce, workers or expeditions at the house |
+| Basements | An extra added after the house: an entrance (trapdoor or staircase), then one cell per expansion, horizontally up to the plot's area or vertically; each expansion needs a new Market Isle design and resource packs; a room like any other, with a cellar by default |
+| Crops and climate | Every crop grows anywhere; the node's climate sets growth efficiency; only neutral-continent crops are exclusive |
 
 ### Still proposed
 
@@ -117,6 +120,10 @@ modified: "2026-11-04"
 * The name of the runes of living beings, the special resource from coin purses, quest points and the Market Isle.  
 * How story NPCs who die or turn traitor work in a shared world.  
 * How players reach the Sky Island, now that the island staircase is gone.
+* The basement's vertical limit. It has to be set before housing zones are cooked.  
+* Which professions get home stations, and whether those stations get the node's specialty return.  
+* What a chest placed in a house does.  
+* Which profession owns aging (Cooking is the likely one).
 
 ### Archived and discarded
 

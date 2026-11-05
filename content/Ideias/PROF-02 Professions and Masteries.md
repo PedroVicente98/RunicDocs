@@ -12,7 +12,7 @@ game_vision: "Real exploration › Professions"
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-03"
+modified: "2026-11-05"
 ---
 
 **ID:** PROF-02 · **Status:** In game vision · **Game vision:** [[Real exploration#Professions|Real exploration › Professions]]
@@ -27,3 +27,5 @@ Every action that spends labor belongs to a profession. An action with no profes
 23 professions: ArcheAge's 22, with Exploration folded into the new Cartography, plus Language. Names are provisional: Farming, Husbandry, Gathering, Mining, Logging, Fishing, Alchemy, Cooking, Handicrafts, Machining, Metalwork, Tailoring, Leatherwork, Weaponry, Carpentry, Masonry, Construction, Commerce, Larceny, Artistry, Printing, Cartography and Language. Cartography includes every chart and exploration: the labor spent on exploration discoveries is Cartography labor. Larceny includes opening coin purses, with a lockpicking minigame for the high tiers.
 
 **Profession quests:** each profession has branching quest lines that give extra XP for that profession and cosmetics, help define the specialization and pay a profession currency, like ArcheAge's. *(proposal: these are quest lines, never dailies, following pillar 8.)*
+
+*Updated 2026-11-05: Buying a home crafting station's design needs that profession's mastery ([[HOUSE-01 Houses and Home Functions|HOUSE-01]]).*

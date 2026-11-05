@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-04"
+modified: "2026-11-05"
 ---
 
 RunicGame turns the Engine APIs into this game’s rules. Shared rules compile into both executables, so client prediction runs the same code as the server.
@@ -186,3 +186,22 @@ A custom behavior never replaces standard components, so defenses, coefficients,
 * Cost: the same as at sea. Cooked terrain and volumes cost nothing at rest, and an event is one override fact, a flag flip or a few hazard entities.
 
 * Acceptance: an earthquake opens a cave entrance for a while and closes it again, at the same world time in two simulations. In a monsoon, the same cells flood in two simulations and their clients with no flood marker placed, and a flash flood front reaches a given point at the same world time; on wet ground, a character slips more often as the slope gets steeper, with no step at any single angle, and its client predicts the same slip as the server.
+
+### Housing and basements
+
+The rules are in the Vision: [[Economy, housing and land]] › Houses and Basements. The housing zone's tray is in [[World authoring and cooking (Engine, Game)#Housing zones and basements|World authoring › Housing zones and basements]].
+
+* **The cell mask:** a plot's basement is a cell mask (64 cells per level on a 32x32 plot), plus its placed pieces and furniture.
+* **Building the pieces:** the server and the client build them from the mask with one deterministic rule:
+  * a floor in each dug cell;
+  * a wall on each face between a dug cell and earth, or the plot's edge;
+  * corners and pillars.
+
+  Only the mask is replicated.
+* **Collision:** the server rebuilds the plot's collision (a Jolt compound shape) only when the basement changes.
+* **An expansion command:**
+  * The server validates the new Market Isle design and the resource packs.
+  * It checks that the cell connects to the entrance and stays inside the plot and the vertical limit.
+  * The service applies the change as an idempotent operation.
+* **Moving the plot:** the Deed carries the mask and the contents, and placing the plot elsewhere rebuilds the same basement, since every zone has the tray.
+* *(proposal: aging stations check that they stand inside the basement's sheltered volume.)*

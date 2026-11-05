@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-04"
+modified: "2026-11-05"
 ---
 
 Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10-30 (game vision version of 2026-10-30, rewritten in English). Every conflict of the earlier version was resolved in the game vision, so the Conflict subsections were removed, entries were updated to match it, and the notes that were in Portuguese were translated into English.
@@ -132,6 +132,8 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[SOC-02 Speech to Text Chat|SOC-02 · Speech to Text Chat]]
 - [[CAMP-01 Campfires and Camp Placeables|CAMP-01 · Campfires and Camp Placeables]]
 - [[LABOR-01 Bonus Labor and Labor Potions|LABOR-01 · Bonus Labor and Labor Potions]]
+- [[HOUSE-01 Houses and Home Functions|HOUSE-01 · Houses and Home Functions]]
+  - [[HOUSE-02 Basements and Cellars|HOUSE-02 · Basements and Cellars]]
 
 **Lore**
 

@@ -12,7 +12,7 @@ game_vision: "Economy, housing and land; Movement and vehicles; Inventory, equip
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-03"
+modified: "2026-11-05"
 ---
 
 **ID:** TRADE-01 · **Status:** In game vision · **Game vision:** [[Economy, housing and land]]; [[Movement and vehicles]]; [[Inventory, equipment and the Market Isle]]
@@ -24,3 +24,5 @@ They are not inventory items: they are world objects, carried on the back or in 
 They drop on the spot when the carrier dies or the vehicle is destroyed or dismissed, and become a PvP target.
 
 Decided 2026-10-30, copied from ArcheAge: specialty packs from each region's packing bench, aged packs from the larder, cargo packs that pay more the faster they arrive, resource packs from the processing stations (for construction and node missions), and military aid packs by tier. Specialty packs pay the route payout times the destination region's demand, which moves like a stock market; resource packs never pay more than their contents plus the effort. A pack delivered by someone else pays 80% to the deliverer and 20% to the crafter. Details: [[RunicGame — Appendix Nodes, Economy and Exploration|RunicGame — Appendix: Nodes, Economy and Exploration]].
+
+*Updated 2026-11-05: Any house can have a packing bench and a resource-pack processing station ([[HOUSE-01 Houses and Home Functions|HOUSE-01]]).*

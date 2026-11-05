@@ -3,7 +3,7 @@ title: "Ideias overview"
 tags:
   - "ideias"
 created: "2026-11-03"
-modified: "2026-11-04"
+modified: "2026-11-05"
 ---
 
 Every idea of [[RunicGame — Ideias]], shown in full in its own box, in the document's order. Each box ends with a link
@@ -111,6 +111,8 @@ to the idea's own note; the status and the game vision section are in each idea'
 - ![[SOC-02 Speech to Text Chat]]
 - ![[CAMP-01 Campfires and Camp Placeables]]
 - ![[LABOR-01 Bonus Labor and Labor Potions]]
+- ![[HOUSE-01 Houses and Home Functions]]
+  - ![[HOUSE-02 Basements and Cellars]]
 
 **Lore**
 

@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-05"
 ---
 
 Land is limited per account, fitted to a grid and never lost: if the tax isn't paid, the plot freezes and returns to the owner as a Deed, with everything in it.
@@ -22,10 +22,52 @@ Land is limited per account, fitted to a grid and never lost: if the tax isn't p
 * A limit of plots per account (the Lineage), not per character, globally or per region: Continent 1, Continent 2, open-sea islands, the wild continent, floating islands, the Sky Island and the Underground. Land is shared by the characters of the Lineage.  
 * **Tax fund:** an advance deposit paid automatically every week. E.g. with a 15 gold tax, 150 gold covers 10 weeks without logging in.  
 * **Unpaid tax:** the plot is freed for other players and its contents become a frozen Deed; crops and farm items keep their state.  
-* **Placing in another region:** what is exclusive to the old region is harvested if ready or returned as a seed. A neutral result for the owner.  
+* **Placing in another region:** crops that only grow on the neutral continent are harvested if ready or returned as a seed when the plot leaves it. A neutral result for the owner.  
 * **Manual move:** the owner picks up the Deed and places the plot again whenever they want, under the same rules.  
 * **Subscription:** paying tax and placing houses needs an active subscription; without it the Deed waits and loses nothing.  
 * **Crops and animals:** ready crops never wither; animals neglected for a long time get sick but never die, unless the player slaughters them for meat.
+
+**Houses**
+
+* Plots are only in the open world. There is no instanced housing.  
+* **House designs:** models bought on the Market Isle, with two floors and balconies with covered space under them. A basement can be added later (see Basements below).  
+* **Production:**
+  * farming and husbandry on the plot;
+  * no workers, laborers or dispatched expeditions.
+* **Crafting stations:**
+  * some professions have a home station;
+  * its design is bought on the Market Isle and needs that profession's mastery.
+  * *Open: which professions, and whether a home station gets the specialty return of the node where the plot is.*
+  * *(proposal: the professions fed by the land get home stations: Cooking, Alchemy, Tailoring, Leatherwork and Handicrafts. Metalwork, Weaponry and Machining stay in cities and nodes.)*
+* **Packs at home:**
+  * any house can have a packing bench and a resource-pack processing station, with no mastery needed.
+  * *(proposal: the home bench uses the recipes of the plot's region, and its packs take that region as their origin. The regional bench stays for players without land.)*
+* **Recall:** the house is a recall destination, with a cost and a cooldown (the rule lives in [[Real exploration#Altars, death, respawn and teleports|Real exploration › Teleports]]).  
+* **Furniture:**
+  * buffs come only from furniture given by rare rewards, and never affect combat;
+  * *(proposal: the effect applies only on the plot, for example crop growth, stations or the recall cooldown.)*
+* **No bank and no commerce at the house:**
+  * storage and trade happen only at NPCs and places made for them.
+  * *Open: what a chest placed in a house does, since personal storage is one global chest.*
+* **Crops and climate:**
+  * any crop grows anywhere, and the node's climate sets how efficiently it grows (a potato grows faster in a temperate climate);
+  * the exception is crops that only grow on the neutral continent.
+  * *(proposal: each crop has a climate affinity, ideal, good or poor, that multiplies its growth time. The numbers go in data tables.)*
+
+**Basements**
+
+* **An extra:** the basement isn't part of the house's first construction.  
+* **The entrance comes first:** a trapdoor or a staircase, the player's choice.  
+* **Growth:** one cell at a time, horizontally or vertically. Each cell is one expansion.  
+* **Limits:**
+  * horizontally, the whole plot;
+  * *Open: the vertical limit.*
+* **Cost:** each expansion needs a new design from the Market Isle and is paid in resource packs.  
+* **Use:**
+  * the basement is a room like any other: chests, workbenches, trophies, furniture;
+  * it is also a cellar by default, for wine and aged delicacies.
+  * *(proposal: cellar barrels and racks only work inside the basement, so its size is its aging capacity. Aged packs age there too. Aging runs in real time, keeps its state in the Deed and yields the same in every climate.)*
+* **Housing zones:** they are built with the basement enabled from the start, and the basement dictates the ground. How: [[World authoring and cooking (Engine, Game)#Housing zones and basements|World authoring › Housing zones and basements]].
 
 **The world economy**
 
@@ -38,7 +80,7 @@ Land is limited per account, fitted to a grid and never lost: if the tax isn't p
 * **Prosperity:** each node has a prosperity level from 1 to 5, raised by weekly node missions (about three rotating kinds per node type, not all deliveries), which pay a fixed price above the market. Delivering more than 100% gives a temporary buff, never a level; two 100% weeks, not necessarily in a row, raise the level.  
 * **Guilds:** guilds take child nodes through scheduled node wars, and a large guild can take a whole region instead. A guild holds at most 3 nodes or one region, never both. Guild income is a fixed weekly payout by tier and prosperity, paid by the game, like Black Desert's; bonuses count only inside the weekly cap.  
 * **Region projects:** the ruling guild spends the packs delivered to the city on building and repairing the region's structures (roads, bridges, docks, workshops, watch towers, a shipyard, a lighthouse, an inn, an Altar and temple). Projects give players bonuses and wear down over time.  
-* **Trade packs**, copied from ArcheAge: specialty packs from each region's packing bench, aged packs from the larder, cargo packs that pay more the faster they arrive, resource packs from the processing stations, and military aid packs by tier. Specialty packs pay the route payout times the destination region's demand, which moves like a stock market; resource packs never pay more than their contents plus the effort. A pack delivered by someone else pays 80% to the deliverer and 20% to the crafter. Packs delivered to a city go entirely to its projects; construction, repairs and new vehicles use packs.  
+* **Trade packs**, copied from ArcheAge: specialty packs from each region's packing bench or a house's bench (see Houses), aged packs from the larder, cargo packs that pay more the faster they arrive, resource packs from the processing stations, and military aid packs by tier. Specialty packs pay the route payout times the destination region's demand, which moves like a stock market; resource packs never pay more than their contents plus the effort. A pack delivered by someone else pays 80% to the deliverer and 20% to the crafter. Packs delivered to a city go entirely to its projects; construction, repairs and new vehicles use packs.  
 * **Black market:** four passive goblins (one in an alley of each faction capital, one in the neutral continent's starting city and one on the pirate island) buy only crafted equipment at the current average auction price. Each piece sold lowers their price for that type and tier until mobs drop the stock; bought items go into the drops of mobs of that tier, and a piece sold to them a second time is destroyed.  
 * **Mobs never drop gold**, only materials and coin purses, which cost labor to open (Larceny).  
 * **Labor:** the same maximum for everyone, shared by the Lineage. Only subscribers regenerate offline, and once the bar is full, offline regeneration fills a labor reserve (e.g. 25% of the maximum per week) up to 1× the maximum, which never expires and is spent first.  

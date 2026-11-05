@@ -7,7 +7,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-05"
 ---
 
 The world is assembled in the RunicEditor (Godot) as one low-detail world scene plus detailed region scenes, Blender makes the assets, and the Cooker turns those scenes into Runic-native server and client packages; the shipping client and server never read an editor scene or a Blender file.
@@ -229,6 +229,26 @@ interactions:
 * **States and visuals:** the resource definition maps each state to its visual and its collision; the asset comes from Blender with its states as parts or separate meshes. Falling when chopped is a client presentation cue; the server only records the state change.
 
 * **In the editor:** the area previews its candidate points and expected density so the designer can adjust before running.
+
+### Housing zones and basements
+
+The rules are in the Vision: [[Economy, housing and land]] › Houses and Basements.
+
+* **The tray:**
+  * A housing zone is authored on the 8x8 slot grid.
+  * The cook cuts a hole in the terrain heightfield under each zone, with the hole masks terrain sources already carry.
+  * A cooked tray takes its place: a bottom at the deepest basement level, retaining edges, and one sheltered volume over the whole hollow. Like a cave volume, it has no wind or weather, and light comes only from emitters.
+  * The cook rejects a zone whose tray meets a cave, rock, water body or Underground cell.
+* **The cells:** the hollow is a grid of cells, 4x4 m wide and 3.5 m high per level.
+* **The lids:** over each cell sits a 4x4 m lid, and the lids are the zone's ground.
+  * Over earth, a lid is ordinary ground in the zone's material, so an empty plot looks like terrain.
+  * Over a dug cell, the lid is the basement's ceiling and the floor of whatever is above.
+* **The building grid:** the 4 m module is the plot's grid, and house designs snap to it. Sloped zones are built as terraces with retaining walls.
+* **The tray's depth:** it is the basement's vertical limit, so that limit has to be set before housing zones are cooked.
+* **Engine and Game:**
+  * Hole masks, sheltered volumes and runtime building pieces with collision are generic Engine mechanisms.
+  * The housing zone, the cell size and every housing rule are Game.
+  * No runtime terrain edit and no runtime volume are needed.
 
 ### Interchange: glTF and terrain sources
 

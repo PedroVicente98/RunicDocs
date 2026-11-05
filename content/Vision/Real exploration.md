@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-05"
 ---
 
 Exploring is risky and knowledge is worth money: maps are merchandise, even the most basic mob needs attention, night is truly dark and death sends you to the nearest Altar.
@@ -56,7 +56,7 @@ Night is truly dark: without light you can barely see the terrain and the enemie
 * **Altars and the Lineage:** the Lineage sees on the map every Altar any of its characters has found, but respawn and teleports use only the Altars the character has visited, so each character has to rediscover them.  
 * Every city has an Altar; others are scattered across the world, including islands, floating islands, the Sky Island and the Underground.  
 * **At the Altar:** choosing and resetting the class (loadout and Discipline, with skill points and level choices redistributed), the respawn point and teleports. Switching between the PvE and PvP modes happens only at a faction capital's Great Altar.  
-* **Teleports:** settlement Altars of the player's faction or neutral ones are destinations. A teleport only starts when the character is idle: out of combat, with no event, survey, trade pack or vehicle. The cost grows with distance, with a fixed fee and a much higher price between continents, and there is no cargo fee. From the field, a teleport also uses a consumable and has a long cooldown; from one Altar to another, only the cost.  
+* **Teleports:** settlement Altars of the player's faction or neutral ones are destinations. A teleport only starts when the character is idle: out of combat, with no event, survey, trade pack or vehicle. The cost grows with distance, with a fixed fee and a much higher price between continents, and there is no cargo fee. From the field, a teleport also uses a consumable and has a long cooldown; from one Altar to another, only the cost. A player's own house is also a destination (recall), with a cost and a cooldown. *(proposal: the same idle rule and distance cost as other teleports, so a house is never a cheap teleport anchor.)*  
 * **World portals:** fixed portals connect specific places (e.g. the bottom of one faction's continent to the bottom of the other's) and charge a high toll. Trade packs and mounts can't go through. The Market Isle portal is free.  
 * **Unstuck** only moves the player to the nearest safe spot within about 200 m, with a cooldown. Quest and event teleports go only to fixed destinations.  
 * **A light death penalty:** equipment loses durability; maps, equipment and quest items are not lost; trade packs drop on the spot and become a PvP target.

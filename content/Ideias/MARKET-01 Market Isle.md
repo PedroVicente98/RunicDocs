@@ -12,7 +12,7 @@ game_vision: "Inventory, equipment and the Market Isle › Market Isle (working 
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-03"
+modified: "2026-11-05"
 ---
 
 **ID:** MARKET-01 · **Status:** In game vision · **Game vision:** [[Inventory, equipment and the Market Isle#Market Isle (working name)|Inventory, equipment and the Market Isle › Market Isle]] (working name)
@@ -22,3 +22,5 @@ An instanced area that works as a big shop, like ArcheAge’s Mirage Isle: the p
 Categories: inventory expansions, furniture, houses, vehicles, gliders and others (convenience items and cosmetics, to define).
 
 Inventory expansions are paid with in-game money *(proposal: the currency for the other categories is still to define)*. Buying a house doesn’t give land: placing it follows the land rules (8x8 slots, limit per account, active subscription).
+
+*Updated 2026-11-05: The Market Isle also sells home station designs, which need the profession's mastery, and basement expansion designs, one per expansion ([[HOUSE-01 Houses and Home Functions|HOUSE-01]], [[HOUSE-02 Basements and Cellars|HOUSE-02]]).*

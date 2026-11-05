@@ -12,7 +12,7 @@ game_vision: "Economy, housing and land"
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-03"
+modified: "2026-11-05"
 ---
 
 **ID:** LAND-01 · **Status:** Partial · **Game vision:** [[Economy, housing and land]]
@@ -26,3 +26,5 @@ Allow for a tax fund, where weekly tax is auto paid using this fund, so if tax i
 Land is shared between characters, the scriptures goes in a shared inventory fo the family.
 
 **Not in [[RunicGame — Complete MMORPG Vision|the game vision]] yet:** scriptures (Deeds) in the Lineage shared inventory (see [[FAM-01 Account and Alts and The Family|FAM-01]]).
+
+*Updated 2026-11-05: Crops grow anywhere and climate sets their growth efficiency; only neutral-continent crops are exclusive. The basement travels with the Deed. See [[HOUSE-01 Houses and Home Functions|HOUSE-01]] and [[HOUSE-02 Basements and Cellars|HOUSE-02]].*
