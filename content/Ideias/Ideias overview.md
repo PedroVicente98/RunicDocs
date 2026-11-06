@@ -113,6 +113,7 @@ to the idea's own note; the status and the game vision section are in each idea'
 - ![[LABOR-01 Bonus Labor and Labor Potions]]
 - ![[HOUSE-01 Houses and Home Functions]]
   - ![[HOUSE-02 Basements and Cellars]]
+- ![[NODE-01 Enemy Activity Tied to Nodes]]
 
 **Lore**
 

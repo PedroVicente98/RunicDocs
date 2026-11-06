@@ -134,6 +134,7 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[LABOR-01 Bonus Labor and Labor Potions|LABOR-01 · Bonus Labor and Labor Potions]]
 - [[HOUSE-01 Houses and Home Functions|HOUSE-01 · Houses and Home Functions]]
   - [[HOUSE-02 Basements and Cellars|HOUSE-02 · Basements and Cellars]]
+- [[NODE-01 Enemy Activity Tied to Nodes|NODE-01 · Enemy Activity Tied to Nodes]]
 
 **Lore**
 
