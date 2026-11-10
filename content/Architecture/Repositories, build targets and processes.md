@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-10"
 ---
 
 Three repositories and one CMake build graph: RunicGame owns the executables, the Engine and Platform are libraries and services it builds on, and the server never links rendering or player UI code.
@@ -29,10 +29,10 @@ RunicGame is the superproject: it pins RunicEngine and RunicPlatform as git subm
 | Foundation | Runic::Events | Typed tick-safe event buffers and readers, multi-consumer delivery, stable event IDs | Core | yes | EVT-1 |
 | Foundation | Runic::Content | Namespaced ContentId (engine:, game:), registries, versioned schemas, validation, loading, live reload | Core | yes | CNT-1, CNT-2 |
 | Foundation | Runic::Assets | AssetId, handles, cache, native cooked formats, random-access packages with Zstandard decompression, manifests, client and server package selection, streaming | Core, Content | yes | ASSET-1, ASSET-2 |
-| Simulation core | Runic::ECS | Flecs integration and conventions | Core; Flecs is re-exported only to Engine modules that register systems | yes | ECS-1 |
+| Simulation core | Runic::ECS | Flecs integration behind the Runic API, conventions, state declarations and their storage categories; the opt-in Runic::ECSNative target | Core; Flecs stays private, reachable only through Runic::ECSNative | yes | ECS-1, ECS-2 |
 | Simulation core | Runic::World | 64-bit double coordinates (real Y, 1 cm minimum unit), worlds (WorldId), region-local origins, Regions, Sectors, sparse 3D Cells, authored volumes (including indivisible ones), spatial index and exact XYZ queries, activation volumes and streaming state | Core, ECS | yes | WORLD-1 to WORLD-3 |
 | Simulation core | Runic::Physics | Jolt v5.6 in double precision behind Runic types: bodies, shapes, CharacterVirtual, queries, collision layers, debug-geometry extraction, the Jolt job system on the Core worker pool | Core, World (Jolt private) | yes | PHYS-1 to PHYS-5 |
-| Simulation core | Runic::Simulation | SimulationRuntime: multi-rate scheduler, phases, barriers, commands, event flush, worker integration, client prediction subset, the replication registry, the service port (outgoing durable operations, accepted results applied at safe ticks; header-only Runic::SimulationPort target); the Simulation layer | Core, Application, ECS, Events, World, Physics, Content | yes | SIM-1 to SIM-6 |
+| Simulation core | Runic::Simulation | SimulationRuntime: multi-rate scheduler, phases, barriers, commands, event flush, worker integration, client prediction subset, the replication registry, the service port (outgoing durable operations, accepted results applied at safe ticks; header-only Runic::SimulationPort target); the physics bridge (transforms and Physics handles in Flecs, sync around the step); the Simulation layer | Core, Application, ECS, Events, World, Physics, Content | yes | SIM-1 to SIM-8 |
 | GameplayAPI | Runic::Gameplay | Attributes, modifiers, resources, tags, death and kill facts, the movement-mode registry and modes, restrictions, interaction framework, item and equipment runtime, factions, spawn and routine spawning | Simulation, Environment (wind for gliding) | yes | GPL-1 to GPL-8 |
 | GameplayAPI | Runic::Combat | Ability toolkit and timelines, hit timing per skill, one-slot input queue, targeting modes and volumes, hit detection, statuses and effects, cooldowns, rule pipeline, behavior registries, damage pipeline and interception, invulnerability windows, threat table, crowd control, foreign combat | Gameplay, Physics, Environment (projectile wind), DistributedSimulation | yes | CMB-1 to CMB-8 |
 | GameplayAPI | Runic::GameplayFlow | Sequences with trigger, condition and action registries, timers on simulation time, presentation cues, source-owned cleanup, handoff policies | Gameplay, DistributedSimulation (handoff snapshot) | yes | FLOW-1 to FLOW-3 |

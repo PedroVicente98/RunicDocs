@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-10"
 ---
 
 Each slice is small, ends in something runnable and testable, and adds one piece of this architecture on top of the previous ones. The Packages column names the work packages each slice needs (defined under Modules, work packages and the implementation contract); a slice is done when those packages are merged and its runnable result passes. Slices with a letter (20a, 23a, 25a, 33a, 42a, 42b, 43a) were inserted later between their neighbors, so existing numbers never change. Godot is part of the build from slice 0: it may stay idle or headless while the simulation is built, and each slice pulls one piece of presentation or tooling into it (the Godot column).
@@ -16,10 +16,10 @@ Each slice is small, ends in something runnable and testable, and adds one piece
 | 1\. Application and layers | A Godot window opens from the client; layers push, pop and replace at safe points; events stop when handled | Entry point, ApplicationHost with RunFrame, LayerStack, GodotLayer | CORE-1, APP-1, GDB-1, GAME-0 | Engine, Game | GodotLayer on top of the client stack; the window comes from Godot |
 | 2\. Debug drawing | Grid, camera, colored shapes with opacity and text drawn by Godot | Debug-draw API, Godot debug layers, development overlay | GDB-2 | Engine | Debug shapes and text drawn by Godot; development overlay panel |
 | 3\. Fixed-step clock | The scheduler runs 60/30/20/10 Hz on the server loop with metrics | Scheduler, TickContext, DomainTickCount, metrics registry | SIM-1, CORE-2 | Engine | — |
-| 4\. ECS and world coordinates | Entities with 64-bit positions are created and queried; one fact reaches two consumers | Flecs integration, 64-bit coordinates and 3D cell keys, event buffers | ECS-1, WORLD-1, EVT-1 | Engine | — |
+| 4\. ECS and world coordinates | Entities with 64-bit positions are created and queried; one fact reaches two consumers; a state of each category is set and read through the API, with benchmark numbers | Flecs integration behind the Runic API, state categories, 64-bit coordinates and 3D cell keys, event buffers | ECS-1, ECS-2, WORLD-1, EVT-1 | Engine | — |
 | 5\. Moving entities | Entities move on a plane through commands and are drawn | Phases, commands, RenderFrame, render extraction, presenter | SIM-2, CORE-3, CLI-1, GDB-3 | Engine | Presenter draws entities from the RenderFrame |
 | 6\. Editor shell | The RunicEditor opens the RunicGame project and a dock inspects entities of a local world | RunicEditor on LibGodot, project template, the game’s editor library, ECS dock | GDT-2, GAME-1 | Engine | RunicEditor opens the RunicGame project; first dock |
-| 7\. Physics | A capsule walks on static terrain far from the origin under keyboard control | Jolt in double precision, CharacterVirtual, input mapping | PHYS-1, PHYS-2, CLI-2 | Engine | Input from Godot becomes commands |
+| 7\. Physics | A capsule walks on static terrain far from the origin under keyboard control | Jolt in double precision, CharacterVirtual, the Flecs and Jolt bridge, input mapping | PHYS-1, PHYS-2, SIM-8, CLI-2 | Engine | Input from Godot becomes commands |
 | 8\. Physics view | Collision shapes are drawn and can be inspected | Debug-geometry extraction, Godot debug layers, physics inspector | PHYS-3, GDB-4, GDT-3 | Engine | Collision drawn in the client and the editor viewport |
 | 9\. First cooker proof | A mesh made in Blender is imported by Godot, its collision cooked by the Runic Cooker, drawn and walked on | Content IDs, asset loading, Godot import plus Runic collision cooking | CNT-1, ASSET-1, COOK-1, GDT-4 | Engine | glTF imported by Godot; collision cooked by Runic from the same asset |
 | 10\. Worker pool | The same scene with several workers gives identical results | Phases on workers, per-worker buffers, deterministic merge, Jolt on the worker pool | PHYS-4, SIM-3 | Engine | — |

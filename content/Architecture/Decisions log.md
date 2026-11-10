@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-03"
+modified: "2026-11-10"
 ---
 
 | Area | Decision |
@@ -44,6 +44,7 @@ modified: "2026-11-03"
 | Server layers | The Engine supplies the Network, Simulation and Diagnostics layers; the Platform supplies the services-bridge and lifecycle layers; the Engine never supplies infrastructure or communication layers |
 | Scripted gameplay | GameplayFlow runs quests, boss phases, cutscenes and world events through commands; restrictions are owned by their source and released on every exit path |
 | Jolt version | Jolt 5.6, pinned in the build, in double precision, with its AVX2 path enabled |
+| Flecs version | Flecs 4.2, pinned in the build (non-fragmenting components, DontFragment, need 4.1 or later) |
 | Roadmap | Small slices, each tagged with the modules’ work packages it needs |
 | Render data | RenderData lives in Core as plain structs shared by extraction, GodotBridge and debug tools; instances carry a stable RenderInstanceId; the debug layers come first, the production look later |
 | World UI | Diegetic first, authored as Godot UI scenes; anchored (Label3D, Sprite3D) and batched (MultiMesh) modes as fallbacks chosen by distance, count and battle budgets |
@@ -56,7 +57,9 @@ modified: "2026-11-03"
 | Contextual values | Every value has a base; skills, items and effects may declare PvE and PvP values; Proposal: the target of each hit chooses the context |
 | Archived and discarded | Archived: a moving island carrying a castle (the architecture keeps room for it as a kinematic indivisible volume that hands off as one group). Discarded: destructible islands, exploration points that unlock combat skills or cosmetics, a central memory shared between simulations, an aerial counterpart for every skill |
 | Engine seams | Combat owns the input queue; Network owns all wire encoding, including ghost deltas; the Simulation’s service port is the Engine’s only door to durable services; Physics runs Jolt jobs on the Core worker pool; DistributedSimulation carries other modules’ state through a snapshot-contributor registry; the Environment clock arrives before night-time perception; interfaces the Platform implements ship as header-only Engine targets with Core types only (Runic::NetworkTransport, Runic::SimulationPort); Runic::Network encodes all realtime traffic and Protobuf carries only service APIs, facts and tickets |
-| Public headers | Library types stay out of Public/; four approved exceptions: GLM math types in Core, the Flecs world handle for modules that register systems, BehaviorTree.CPP node base types for Game custom AI nodes, and godot-cpp types in GodotTools for the Game’s editor library |
+| Public headers | Library types stay out of Public/; three approved exceptions: GLM math types in Core, BehaviorTree.CPP node base types for Game custom AI nodes, and godot-cpp types in GodotTools for the Game’s editor library; the Flecs world is reachable only through the opt-in Runic::ECSNative target |
+| Runic API | Everything goes through the Runic API over Flecs and Jolt, in one vocabulary of states, facts, volumes, conditions, triggers and actions; whatever is missing is added to the API; native Flecs only through Runic::ECSNative, discouraged and the responsibility of whoever uses it; a state’s category picks its Flecs storage |
+| Authoring path | Every system ships with the tools to create its content: registry entries, a data format and Cooker validation in the slice that adds the system, a visual dock in the RunicEditor later; Obsidian notes are only for the creative process |
 | Repository wiring | Hybrid: RunicGame pins Engine and Platform as submodules and RunicPlatform pins the Engine, for CI and releases; a CMake option points at sibling checkouts for daily work |
 | CPU baseline | x86-64-v3 (AVX2, FMA) for servers and clients; Jolt and the Engine build with AVX2 on |
 | Test framework | GoogleTest (with GoogleMock) for C++ in all three repositories, pinned in the build; module-local Tests/ registered with CTest through test discovery; Go uses its standard testing package |

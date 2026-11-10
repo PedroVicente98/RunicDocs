@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-10"
 ---
 
 The Engine provides generic, thread-safe building blocks for gameplay, grouped under the GameplayAPI umbrella: Runic::Gameplay (character state, movement, restrictions, interactions, items), Runic::Combat (abilities, hits, statuses, rules, damage, threat), Runic::GameplayFlow (scripted sequences) and Runic::Quest (the quest runtime). Each is its own module with its own boundary and tests. The Engine knows timelines, tags, statuses, rules, threat and perception, but not Stagger, Guard or any concrete rule.
@@ -147,9 +147,27 @@ The quest-creation API is how the Game makes quests:
 
 * **Definitions are data.** A quest is an ID, its states and objectives, and for each transition a trigger, conditions, actions and the next state. Designers write them without C++, and the Cooker validates them.
 
-* **Registries extend the vocabulary.** The Engine ships generic triggers (entity killed, item acquired, interaction completed, area entered, sequence ended), conditions (quest state, has item, entity alive, time window) and actions (set objective, start sequence, request an item grant or removal through a service, spawn). The Game registers game: triggers, conditions and actions in C++ for anything specific to RunicGame.
+* **Registries extend the vocabulary.** The Engine ships generic triggers (entity killed, item acquired, interaction completed, area entered, state entered, sequence ended), conditions (quest state, has item, has state, entity alive, time window) and actions (set objective, start sequence, request an item grant or removal through a service, spawn). The Game registers game: triggers, conditions and actions in C++ for anything specific to RunicGame. They are items of the Runic API’s vocabulary (see [[Simulation core Flecs and Jolt (Engine)#The Runic API over Flecs and Jolt|The Runic API over Flecs and Jolt]]).
 
 * **A builder for code.** The same definitions can be built in C++ for tests and generated content; data and code end in the same registry.
+
+* **Triggers are facts, conditions are states.** “When the player mounts” is a trigger: an instant fact. “The player must be mounted” is a condition: a lasting state. Only observable states can be triggers, and the Cooker rejects a trigger on any other state.
+
+* **WhenState fires once either way.** A state trigger fires when the state changes or, if the state already holds, when the quest enters that step, so a player who is already mounted is never stuck waiting for a change.
+
+* **A quest never writes a state it does not own.** It requests the owner’s action: Mount, never Set(Mounted). The Cooker rejects a quest that writes another owner’s state.
+
+* **Waiting belongs to the sequence.** An NPC that waits for the player is a WaitUntil(condition, timeout) step in GameplayFlow or in the NPC’s AI, not a quest state.
+
+```cpp
+Quest: game:the_stablemasters_test
+  State WaitForMount
+    Trigger:     WhenState(engine:mounted)
+    Conditions:  InVolume(game:stable_yard)
+                 Near(game:npc_stablemaster, 10 m)
+    Actions:     StartSequence(game:ride_with_stablemaster)
+    Next:        RideToVillage
+```
 
 ```cpp
 Quest: game:rescue_the_prisoner

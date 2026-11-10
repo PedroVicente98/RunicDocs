@@ -3,12 +3,12 @@ title: "RunicGame — Development"
 tags:
   - "development"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-10"
 ---
 
 The development plan: the slices of the [[Vertical-slice roadmap]] and the packages of [[Modules, work packages and the implementation contract (Engine, Platform, Game)|Modules and work packages]], with their status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame ([GitHub Project](https://github.com/users/PedroVicente98/projects/7)). A slice is small, ends in something runnable and testable, and is done when its packages are merged and its result passes. Each slice note lists its packages; [[Development overview]] shows them all on one page.
 
-**Progress:** 0 of 52 slices done · 0 of 206 packages done (Engine 0 of 141, Game 0 of 39, Platform 0 of 26) · 6 packages ready to start: BUILD-1, GDT-1, CORE-1, APP-1, GDB-1, GAME-0.
+**Progress:** 0 of 52 slices done · 0 of 208 packages done (Engine 0 of 143, Game 0 of 39, Platform 0 of 26) · 6 packages ready to start: BUILD-1, GDT-1, CORE-1, APP-1, GDB-1, GAME-0.
 
 **Slices**
 
@@ -16,10 +16,10 @@ The development plan: the slices of the [[Vertical-slice roadmap]] and the packa
 - [ ] [[Slice 1 · Application and layers]] · 0/4 packages · Engine, Game
 - [ ] [[Slice 2 · Debug drawing]] · 0/1 packages · Engine
 - [ ] [[Slice 3 · Fixed-step clock]] · 0/2 packages · Engine
-- [ ] [[Slice 4 · ECS and world coordinates]] · 0/3 packages · Engine
+- [ ] [[Slice 4 · ECS and world coordinates]] · 0/4 packages · Engine
 - [ ] [[Slice 5 · Moving entities]] · 0/4 packages · Engine
 - [ ] [[Slice 6 · Editor shell]] · 0/2 packages · Engine
-- [ ] [[Slice 7 · Physics]] · 0/3 packages · Engine
+- [ ] [[Slice 7 · Physics]] · 0/4 packages · Engine
 - [ ] [[Slice 8 · Physics view]] · 0/3 packages · Engine
 - [ ] [[Slice 9 · First cooker proof]] · 0/4 packages · Engine
 - [ ] [[Slice 10 · Worker pool]] · 0/2 packages · Engine

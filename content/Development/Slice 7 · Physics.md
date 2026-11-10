@@ -11,16 +11,16 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/150"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-10"
 ---
 
-**Slice:** 7 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#150](https://github.com/PedroVicente98/RunicEngine/issues/150)
+**Slice:** 7 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#150](https://github.com/PedroVicente98/RunicEngine/issues/150)
 
 ← [[Slice 6 · Editor shell]] · [[RunicGame — Development|All slices]] · [[Slice 8 · Physics view]] →
 
 **Runnable result:** A capsule walks on static terrain far from the origin under keyboard control
 
-**Proves:** Jolt in double precision, CharacterVirtual, input mapping
+**Proves:** Jolt in double precision, CharacterVirtual, the Flecs and Jolt bridge, input mapping
 
 **Godot:** Input from Godot becomes commands
 
@@ -34,6 +34,10 @@ modified: "2026-11-03"
     - CharacterVirtual integration and ground movement
     - **Done when:** A capsule walks, climbs steps and stops at walls
     - **Needs:** PHYS-1
+- [ ] **SIM-8** · Physics bridge between Flecs and Jolt · [RunicEngine#196](https://github.com/PedroVicente98/RunicEngine/issues/196) · not started
+    - Physics bridge: Flecs holds transforms and opaque Physics handles; a sync phase writes kinematic targets and character movement before the step and transforms back after it; body creation and removal follow their entities at the barrier; contact and sensor callbacks only fill buffers read as facts in the next phase
+    - **Done when:** The capsule’s Flecs transform matches its CharacterVirtual after every step; destroying an entity removes its body at the next barrier; a contact reaches the next phase as a fact and no callback touches Flecs
+    - **Needs:** [[Slice 5 · Moving entities|SIM-2]], PHYS-2
 - [ ] **CLI-2** · Input mapping, actions and command builder over the AppEvents the… · [RunicEngine#22](https://github.com/PedroVicente98/RunicEngine/issues/22) · not started
     - Input mapping, actions and command builder over the AppEvents the GodotLayer forwards
     - **Done when:** Key presses become movement commands; input Godot’s UI consumed never reaches them

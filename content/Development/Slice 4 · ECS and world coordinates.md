@@ -11,23 +11,27 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/147"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-10"
 ---
 
-**Slice:** 4 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#147](https://github.com/PedroVicente98/RunicEngine/issues/147)
+**Slice:** 4 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#147](https://github.com/PedroVicente98/RunicEngine/issues/147)
 
 ← [[Slice 3 · Fixed-step clock]] · [[RunicGame — Development|All slices]] · [[Slice 5 · Moving entities]] →
 
-**Runnable result:** Entities with 64-bit positions are created and queried; one fact reaches two consumers
+**Runnable result:** Entities with 64-bit positions are created and queried; one fact reaches two consumers; a state of each category is set and read through the API, with benchmark numbers
 
-**Proves:** Flecs integration, 64-bit coordinates and 3D cell keys, event buffers
+**Proves:** Flecs integration behind the Runic API, state categories, 64-bit coordinates and 3D cell keys, event buffers
 
 ### Packages
 
 - [ ] **ECS-1** · Flecs world wrapper, component registration, query helpers, conventions · [RunicEngine#14](https://github.com/PedroVicente98/RunicEngine/issues/14) · not started
-    - Flecs world wrapper, component registration, query helpers, conventions
-    - **Done when:** Entities are created, queried and destroyed; Flecs types appear in public headers only through the approved world-registration exception
+    - Flecs world wrapper on Flecs 4.2; component, system and query registration through Runic types; conventions; the opt-in Runic::ECSNative target
+    - **Done when:** Entities are created, queried and destroyed through Runic types; Flecs types appear only in Runic::ECSNative, and the configure check lists every module that links it
     - **Needs:** [[Slice 1 · Application and layers|CORE-1]]
+- [ ] **ECS-2** · State declarations and storage categories · [RunicEngine#195](https://github.com/PedroVicente98/RunicEngine/issues/195) · not started
+    - State declarations: one declaration per state, whose category picks its Flecs storage (hot flag as a toggle, fact with a target as a relationship with DontFragment for high-cardinality targets, content flag as a bit in a compact per-entity container, value as a container field, derived as a computed condition), with owner, observable, visibility and lifetime fields; a benchmark harness for tag, toggle, container and DontFragment
+    - **Done when:** A state of each category is set, read and cleared through the API, and hot and content flags never move the entity to another table; observable states emit StateEntered and StateExited facts; the benchmark reports nanoseconds per operation and milliseconds per tick for 2,000 entities, recorded in the package docs
+    - **Needs:** ECS-1, EVT-1
 - [ ] **WORLD-1** · 64-bit double coordinates · [RunicEngine#16](https://github.com/PedroVicente98/RunicEngine/issues/16) · not started
     - 64-bit double coordinates (real Y, 1 cm minimum unit), WorldId, region-local origins, Region, Sector and sparse 3D Cell keys
     - **Done when:** Conversions round-trip exactly far from the origin; a cell key round-trips at any altitude or depth

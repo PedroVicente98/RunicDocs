@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-10"
 ---
 
 The RunicEditor is the Godot editor run through LibGodot with the Runic tools inside; the Cooker runs in it, or in the same binary headless on build machines. Neither is ever distributed to players.
@@ -22,6 +22,20 @@ The RunicEditor is the Godot editor run through LibGodot with the Runic tools in
 * **Live attach** to development and staging servers through the GameServer’s Diagnostics layer, drawing the server’s debug shapes in the viewport.
 
 * **The project’s editor library** adds the game’s own marker nodes and docks and reloads with the editor open.
+
+### Authoring path for every system
+
+Every system ships with the tools to create its content, and creating content for it must be easy. The path has two levels, both on the same Runic API (see [[Simulation core Flecs and Jolt (Engine)#The Runic API over Flecs and Jolt|The Runic API over Flecs and Jolt]]):
+
+* **Base, in the slice that adds the system:** its items registered with their metadata, a data format for its content and validation in the Cooker. Content is written as data files from day one, and the Cooker reports unknown IDs, a trigger on a state that is not observable and a write to a state the content does not own.
+
+* **Visual, later:** a dock in the RunicEditor (a quest editor with a palette of triggers, conditions and actions, for example) that writes the same data files through the same API. It comes when the amount of content justifies it.
+
+* **One registration, many consumers.** The registry that the runtime uses also fills the editor’s palettes and the Cooker’s checks. (Proposal: the same registry generates a reference page of the vocabulary for RunicDocs.)
+
+* **Assistants** create new vocabulary items (a state, a condition, a trigger, a volume kind): the C++ registration, a test and the entry in the reference.
+
+* **Obsidian notes are for the creative process only.** Quest and other content definitions live in the project’s data format (the versioned schemas of CNT-2), not in the notes.
 
 ### Cooker
 
