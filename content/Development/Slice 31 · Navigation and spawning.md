@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/174"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-12"
 ---
 
 **Slice:** 31 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#174](https://github.com/PedroVicente98/RunicEngine/issues/174)
@@ -20,13 +20,13 @@ modified: "2026-11-03"
 
 **Runnable result:** Spawned NPCs walk navmesh paths across cells
 
-**Proves:** Factions and spawns, Recast cooking, Detour runtime
+**Proves:** Spawns, Recast cooking, Detour runtime
 
 ### Packages
 
 - [ ] **GPL-6** · Factions and spawn primitives, including spawn areas driven by rule… · [RunicEngine#93](https://github.com/PedroVicente98/RunicEngine/issues/93) · not started
-    - Factions and spawn primitives, including spawn areas driven by rule data over cooked candidate points
-    - **Done when:** A spawner keeps its population; a spawn area keeps its rule’s count and refills by elapsed time when its cell loads; faction checks drive hostility
+    - Spawn primitives, including spawn areas driven by rule data over cooked candidate points
+    - **Done when:** A spawner keeps its population; a spawn area keeps its rule’s count and refills by elapsed time when its cell loads
     - **Needs:** [[Slice 15 · Character state|GPL-2]], [[Slice 21 · World partitions|COOK-3]]
 - [ ] **COOK-6** · Navigation tiles with Recast · [RunicEngine#92](https://github.com/PedroVicente98/RunicEngine/issues/92) · not started
     - Navigation tiles with Recast; candidate points for spawn areas checked against the navmesh

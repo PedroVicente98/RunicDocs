@@ -7,7 +7,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-12"
 ---
 
 AI is reasoning, not authority. The Engine’s AI module reads permitted facts, keeps bounded working memory, ticks behavior trees and emits intents; the simulation validates and executes those intents exactly like player commands. RunicGame supplies the trees, personalities, perception values and game-specific nodes.
@@ -444,7 +444,7 @@ DefensiveAction ChooseDefensiveAction(const CombatPersonality& p, const CombatSt
 | Mobile rogue | Medium-high | Medium | None or low | High | High |
 | Berserker | High | Low | Low | Low-medium | Medium-high |
 
-These are personality dimensions, not balance; RunicGame authors the actual profiles, and all three reuse the same tree.
+These are personality dimensions, not balance; RunicGame authors the actual profiles, and all three reuse the same tree. The defensive actions in the example (Block, Dodge, Counter) are RunicGame’s list; the Engine provides threat perception, the reaction timer and the scoring helper.
 
 **Bosses use the same contract at greater complexity:** a root that checks critical mechanics, then reacting to threats, then phase behavior (phase one, two, three), then positioning, then default combat. A boss may weigh tank Guard, a Support starting a long cast, a rogue moving behind it or a dangerous ground cast; the tree decides which concern wins, and the boss still emits ordinary intents under the same authoritative combat rules.
 

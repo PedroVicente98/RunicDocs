@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/161"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-12"
 ---
 
 **Slice:** 18 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine, Game · **Issue:** [RunicEngine#161](https://github.com/PedroVicente98/RunicEngine/issues/161)
@@ -20,7 +20,7 @@ modified: "2026-11-03"
 
 **Runnable result:** Dodge with charges, shield Guard, a Resolve chain
 
-**Proves:** Restrictions, damage interception, Game defense rules
+**Proves:** Restrictions, the impact pipeline, Game defense rules
 
 ### Packages
 
@@ -29,11 +29,11 @@ modified: "2026-11-03"
     - **Done when:** Blocked commands are rejected on the server; releasing a source clears everything it held
     - **Needs:** [[Slice 15 · Character state|GPL-2]]
 - [ ] **CMB-5** · Damage pipeline, interception hooks, invulnerability windows · [RunicEngine#50](https://github.com/PedroVicente98/RunicEngine/issues/50) · not started
-    - Damage pipeline, interception hooks, invulnerability windows
-    - **Done when:** Interception follows hook order; invulnerability blocks hits
+    - Impact pipeline: hits become impacts with Game-defined fields and run through Game-registered stages in order; invulnerability as a restriction that ignores impacts by tag
+    - **Done when:** Stages run in registration order; an invulnerability restriction blocks tagged impacts; the Engine applies no damage of its own
     - **Needs:** [[Slice 17 · Statuses and rules|CMB-4]], GPL-3
 - [ ] **GSH-4** · Defense rules · [RunicGame#11](https://github.com/PedroVicente98/RunicGame/issues/11) · not started
-    - Defense rules: Evasion charges, Guard modes, Resolve T1 and T2, Tolerance
+    - Defense rules: impact stages (Guard modes, armor), Evasion charges and the dodge’s invulnerability restriction, Resolve T1 and T2 and Tolerance as status application policies
     - **Done when:** A dodge spends a charge; Guard blocks from the front
     - **Needs:** CMB-5
 

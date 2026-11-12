@@ -6,28 +6,51 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-10"
+modified: "2026-11-12"
 ---
 
-The Engine provides generic, thread-safe building blocks for gameplay, grouped under the GameplayAPI umbrella: Runic::Gameplay (character state, movement, restrictions, interactions, items), Runic::Combat (abilities, hits, statuses, rules, damage, threat), Runic::GameplayFlow (scripted sequences) and Runic::Quest (the quest runtime). Each is its own module with its own boundary and tests. The Engine knows timelines, tags, statuses, rules, threat and perception, but not Stagger, Guard or any concrete rule.
+The Engine provides generic, thread-safe building blocks for gameplay, grouped under the GameplayAPI umbrella: Runic::Gameplay (character state, movement, restrictions, interactions, items), Runic::Combat (abilities, targeting, hits, statuses, rules, impacts, threat), Runic::GameplayFlow (scripted sequences) and Runic::Quest (the quest runtime). Each is its own module with its own boundary and tests. The Engine knows timelines, tags, statuses, rules, threat and perception, but not Health, Stagger, Guard, factions or any other concrete rule.
 
 | API | Module | What the Engine provides | What a game supplies |
 | :---- | :---- | :---- | :---- |
-| Ability toolkit | Combat | Timeline runner in DomainTickCount (startup, active, recovery, cancel windows); hit volumes and projectile queries; cooldowns; resource pools; one-slot input queue | Ability definitions, timings, costs, queue window |
+| Ability toolkit | Combat | Timelines of named phases from data, in DomainTickCount; phase lengths set by a Game hook when the ability starts; phase events, cancel requests and phase-time adjustment; a release input routed to the active ability; hit volumes and projectile queries; cooldowns with shared groups and charges; costs as a list against the Game’s pools | Ability definitions, the phases and their timings (RunicGame: startup, active, recovery), cancel rules, costs |
+| Input buffer | Combat | Buffered actions with a depth, a window and priority classes the Game sets; a buffered action is validated when it starts | The depth, the window and the priority inputs (RunicGame: one slot; Dodge and Guard first) |
+| Targeting | Combat | Target slots the Game names on each entity; selection helpers (under the aim ray, nearest in a cone, cycling a filtered list); targets in the command payload, checked on the server for range, line of sight and relation; aim-assist and homing hooks | Which slots exist and how they are chosen (RunicGame: free aim, FriendlyLock, the aim-assist strength) |
 | Hit timing | Combat | ServerTime and CappedRewind (with a per-character position history), chosen per ability | The choice per ability and the cap |
 | Tags | Gameplay | Hierarchical, interned tags on abilities, statuses and entities | The vocabulary (Impact, Finisher, Opener…) |
-| Status container | Combat | Timed statuses with stacking policy, duration, periodic tick and immunity windows | Every concrete status (Bleed, Stagger, Freeze) |
-| Attributes and modifiers | Gameplay | Base values and modifier stacks (add, multiply, override) with caps | Stats and formulas |
-| Rule pipeline | Combat | Registration of typed conditions and modifiers; evaluation in named stages; outputs to per-worker buffers; compilation into a resolved loadout per character; value variants chosen by a per-hit context (e.g., PvE and PvP) | Stage order and every condition and modifier |
-| Damage interception | Combat | Hooks before and after damage is applied; invulnerability windows | Guard, Evasion, armor, the damage formula |
+| Status storage | Combat | Status instances (source, target, start, duration, data); timers and periodic ticks; apply, refresh and remove; applied, refreshed, ticked and expired events; queries by tag; replication and handoff. Every application goes through an application policy the Game registers | Every status and every policy: stacking, refresh, intensity, immunity, diminishing returns (RunicGame: build-up, Tolerance, Resolve) |
+| Attributes and modifiers | Gameplay | An API to declare attributes (ID, type, default, limits, replication, prediction); modifier stacks in a deterministic order, with an aggregation the Game can replace (e.g., P ÷ (P \+ K)). The only Engine-owned attributes are those the Engine’s own systems read: movement (speed, acceleration, turn rate, jump, gravity scale, step height, air control), interaction reach and concealment | Every game attribute and its formulas (RunicGame: Health, Stamina, Mana, Guard, the Powers, critical) |
+| Resource pools | Gameplay | Pools over attributes (current and maximum), clamping, change events, and a regeneration scheduler that runs the Game’s rule | Which pools exist and how they regenerate |
+| Lifecycle | Gameplay | Kill(entity, source): the death and kill facts with stable IDs and the dead state; the Engine never calls it on its own | When something dies (RunicGame: Health reaching zero) |
+| Relations | Gameplay | A relation hook: hits, targeting, interest and AI ask a Game-registered function whether two entities are hostile, friendly or neutral | Everything about factions, modes and crime (RunicGame: two factions, PvE mode, Outlaw, pirates, groups) |
+| Rule pipeline | Combat | Registration of typed conditions and modifiers; evaluation in named stages; outputs that change a value or add, remove or swap a status, written to per-worker buffers; compilation into a resolved loadout per character; value variants chosen by a per-hit context (e.g., PvE and PvP) | Stage order and every condition and modifier |
+| Impact pipeline | Combat | A hit becomes an impact with fields the Game defines and runs through the stages the Game registers, in order; invulnerability is a restriction that ignores impacts by tag | The stages and the formula (RunicGame: Guard, Evasion, armor, shields, damage to Health) |
+| Control primitives | Combat | Restriction sets for control (input, movement, abilities), forced motion (push, launch, pull) through Movement, and control-state hooks for animation | Every crowd-control type and its limits (RunicGame: Stun, Knockdown, Trip, Stagger, Root, Resolve, the CC target cap) |
 | Threat table | Combat | Per-NPC threat storage read by AI target selection | What generates threat; taunt; Challenge |
 | Behavior registries | Combat | ID-to-C++ registration, parameter schemas, a fixed hook list, read-only context and output buffers | The behaviors |
-| Restrictions | Gameplay | Source-owned restriction sets (input, movement, abilities, interactions, targeting, damage, external motion), release by source, command validation | Which skills, effects and sequences acquire which restrictions |
-| Interactions | Gameplay | Interaction volumes, reach and permission checks, reservation, an interaction registry | Levers, rituals, gathering, cartography |
-| Movement | Gameplay | CharacterVirtual integration; a movement-mode registry with walk, glide (reads Environment wind), flight inside flight-zone volumes, mount and vehicle modes; Water registers swimming (CharacterWaterMovement); prediction hooks; server validation | Speeds, dashes, mount, glider and wing stats |
+| Restrictions | Gameplay | Source-owned restriction sets (input, movement with an optional speed factor, abilities, interactions, targeting, impacts, external motion), release by source, command validation | Which skills, effects and sequences acquire which restrictions |
+| Interactions | Gameplay | Interaction volumes, reach and permission checks, reservation, an interaction registry; an interactable may offer several options, and the command names the chosen one | Levers, rituals, gathering, cartography |
+| Movement | Gameplay | CharacterVirtual integration; a movement-mode registry with walk, sprint, glide (reads Environment wind), flight, climbing, mount and vehicle modes; mode permission through restrictions and Game rules; a mode may drain a resource pool per second; Water registers swimming (CharacterWaterMovement); prediction hooks; server validation | Speeds, dashes, mount, glider and wing stats; where each mode is allowed (RunicGame: flight zones and the altitude ceiling); which pool a mode drains |
 | Item runtime | Gameplay | Runtime item instances and containers mirrored from services | Item definitions and rules |
 | Scripted sequences | GameplayFlow | Sequence runtime, trigger, condition and action registries, timers, termination path, handoff policies | Boss phases, cutscenes, dungeon and world-event scripts |
 | Quests | Quest | Quest runtime and quest-creation API, generic triggers, conditions and actions, durable-fact bridge | Every quest, Game-specific triggers, conditions and actions |
+
+### Mechanism and policy
+
+The Engine stores, times, queries, replicates and calls hooks; the Game decides how things behave. The test for any API: if it lets a game come as close as an action-combat engine allows to another game’s system, it belongs to the Engine; if it fixes one game’s rule, it belongs to the Game.
+
+| Another game’s system | Engine mechanisms it uses |
+| :---- | :---- |
+| World of Warcraft: tab target, global cooldown, cast bars, diminishing returns per category, threat | Target slots and cycling; a shared cooldown group; ability phases; a status application policy; the threat table |
+| Guild Wars 2: Stability stacks, the defiance bar, combo fields and finishers | A status policy that spends a stack per control effect; a Game attribute for the bar; rules that read a field volume |
+| Black Desert: command combos, protections, a CC count | Input mapping with modifiers; Game statuses that stop impacts in the impact pipeline; a status policy that counts control |
+| Dark Souls: stamina spent by attacks, poise | A Game pool as a cost; a Game attribute and a rule that breaks it |
+
+A game can also leave the GameplayAPI out and build its own combat on Runic::ECS, Runic::World and Runic::Physics.
+
+### Starter templates
+
+Common policies are not Engine code. The new-project assistant in the RunicEditor writes them into the game’s own code as starting points that the game edits or deletes: a Health pool with death at zero, refresh and intensity stacking, diminishing returns per category, stacks spent per control effect, a tab-target selector. The Engine never links them.
 
 ### Behavior registry contract
 
@@ -53,7 +76,7 @@ Light scales how far mobs notice entities and how far players see each other; it
 | Luminosity | Effective light on an entity: the brighter of ambient light and emitters reaching it | Nothing; computed |
 | Concealment | Multiplier on how far others detect or see the entity | Stealth, invisibility, gear values |
 | PerceptionProfile | Warn and detect base radii, minimum and maximum, light curve, dark vision | Per mob definition |
-| VisibilityProfile | Maximum visible range, silhouette range, light curve | Global or per region |
+| VisibilityProfile | Maximum visible range, a range per visibility level, light curve | Global or per region |
 
 * Emitters are indexed in cells, so luminosity is a few lookups in neighboring cells. It updates at 10 Hz for players and for mobs awake or near players; lighting a torch updates it at once.
 
@@ -85,7 +108,7 @@ Triggers and conditions read authoritative facts and state. Actions change the w
 | Timing | Delay, timeout, wait until a simulation time |
 | Sequence | Start, stop or wait for a nested sequence |
 | Event | Wait for or emit an authoritative fact |
-| Restriction | Acquire or release input, movement, ability, interaction, targeting or damage restrictions |
+| Restriction | Acquire or release input, movement, ability, interaction, targeting or impact restrictions |
 | Presentation | Start dialogue or emit a presentation cue for clients |
 | Service | Submit an asynchronous durable operation and wait for its accepted result |
 | Branching | If, switch, random choice with an explicit seed |
@@ -105,7 +128,7 @@ Sequence: BossPhase2
   Wait:     Boss.Health <= 70%
   Actions:  SetBossPhase(2)
             LockArenaDoors
-            AcquireRestriction(Boss, DamageImmune)
+            AcquireRestriction(Boss, ImpactImmune)
             PresentationCue("game:dragon_phase_2")
             SpawnAdds
             WaitFor(AllAddsDead)
@@ -124,12 +147,12 @@ The phase, the adds, the cue and the ability are Game content. The waits, the cl
 RestrictionHandle handle = restrictions.Acquire(player, RestrictionSet{
     .input = Blocked, .movement = Blocked, .abilities = Blocked,
     .interactions = Blocked, .targeting = Untargetable,
-    .damage = Immune, .externalMotion = Immune }, sequenceInstanceId);
+    .impacts = Immune, .externalMotion = Immune }, sequenceInstanceId);
 ```
 
 restrictions.ReleaseAllFromSource(sequenceInstanceId);   // on every terminal path
 
-Intangible during a cutscene is several separate policies (input, movement, abilities, interactions, targeting, damage, external motion, optional collision), so other systems can hold their own restrictions at the same time. Restrictions live in Runic::Gameplay; dodge invulnerability windows use the same mechanism.
+Intangible during a cutscene is several separate policies (input, movement, abilities, interactions, targeting, impacts, external motion, optional collision), so other systems can hold their own restrictions at the same time. Restrictions live in Runic::Gameplay; dodge invulnerability windows use the same mechanism.
 
 **One termination path.** Complete, abort, cancel, timeout, disconnect, owner destruction, quest abandon, shutdown and transfer failure all converge on one routine. It cancels timers, releases the sequence’s restrictions and reservations, clears sequence-owned control and emits SequenceEnded or SequenceAborted. Temporary restrictions also carry an expiry and a watchdog diagnostic, so no fault can leave a player permanently invulnerable.
 

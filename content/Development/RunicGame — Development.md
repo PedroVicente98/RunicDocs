@@ -3,12 +3,12 @@ title: "RunicGame — Development"
 tags:
   - "development"
 created: "2026-11-03"
-modified: "2026-11-10"
+modified: "2026-11-12"
 ---
 
 The development plan: the slices of the [[Vertical-slice roadmap]] and the packages of [[Modules, work packages and the implementation contract (Engine, Platform, Game)|Modules and work packages]], with their status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame ([GitHub Project](https://github.com/users/PedroVicente98/projects/7)). A slice is small, ends in something runnable and testable, and is done when its packages are merged and its result passes. Each slice note lists its packages; [[Development overview]] shows them all on one page.
 
-**Progress:** 0 of 52 slices done · 0 of 208 packages done (Engine 0 of 143, Game 0 of 39, Platform 0 of 26) · 6 packages ready to start: BUILD-1, GDT-1, CORE-1, APP-1, GDB-1, GAME-0.
+**Progress:** 0 of 52 slices done · 0 of 211 packages done (Engine 0 of 143, Game 0 of 39, Platform 0 of 26, no issue 0 of 3) · 6 packages ready to start: BUILD-1, GDT-1, CORE-1, APP-1, GDB-1, GAME-0.
 
 **Slices**
 
@@ -27,8 +27,8 @@ The development plan: the slices of the [[Vertical-slice roadmap]] and the packa
 - [ ] [[Slice 12 · Transport]] · 0/4 packages · Engine, Platform
 - [ ] [[Slice 13 · Replication]] · 0/3 packages · Engine
 - [ ] [[Slice 14 · Prediction]] · 0/5 packages · Engine, Game
-- [ ] [[Slice 15 · Character state]] · 0/2 packages · Engine
-- [ ] [[Slice 16 · Ability toolkit]] · 0/3 packages · Engine, Game
+- [ ] [[Slice 15 · Character state]] · 0/3 packages · Engine, Game
+- [ ] [[Slice 16 · Ability toolkit]] · 0/4 packages · Engine, Game
 - [ ] [[Slice 17 · Statuses and rules]] · 0/4 packages · Engine, Game
 - [ ] [[Slice 18 · Defense]] · 0/3 packages · Engine, Game
 - [ ] [[Slice 19 · Combat prototype]] · 0/5 packages · Engine, Game
@@ -39,7 +39,7 @@ The development plan: the slices of the [[Vertical-slice roadmap]] and the packa
 - [ ] [[Slice 23 · Animated characters]] · 0/4 packages · Engine
 - [ ] [[Slice 23a · World UI]] · 0/3 packages · Engine, Game
 - [ ] [[Slice 24 · Sound and music]] · 0/4 packages · Engine, Game
-- [ ] [[Slice 25 · Interest]] · 0/4 packages · Engine
+- [ ] [[Slice 25 · Interest]] · 0/5 packages · Engine, Game
 - [ ] [[Slice 25a · Night on screen]] · 0/3 packages · Engine
 - [ ] [[Slice 26 · Service foundation]] · 0/3 packages · Platform
 - [ ] [[Slice 27 · Accounts and characters]] · 0/4 packages · Platform, Game

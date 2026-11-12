@@ -11,7 +11,7 @@ status: "Not started"
 owners: "All"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/190"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-12"
 ---
 
 **Slice:** 44+ · **Status:** Not started · **Packages done:** 0 of 29 · **Owners:** All · **Issue:** [RunicEngine#190](https://github.com/PedroVicente98/RunicEngine/issues/190)
@@ -51,8 +51,8 @@ modified: "2026-11-03"
     - **Done when:** Only changed inputs cook again across a continent
     - **Needs:** [[Slice 21 · World partitions|COOK-3]]
 - [ ] **GPL-7** · Flight and climbing movement modes · [RunicEngine#140](https://github.com/PedroVicente98/RunicEngine/issues/140) · not started
-    - Flight and climbing movement modes: flight inside flight-zone volumes with an altitude ceiling above which only gliding works, glide and flight as separate mount capabilities, flying vehicles, climbing mounts; restrictions can forbid flight and gliding
-    - **Done when:** Above the ceiling flight stops and gliding takes over; outside a flight zone a flying mount only glides; a restriction blocks both; a mount climbs a marked wall
+    - Flight and climbing movement modes: flight, glide and climbing as separate modes, the modes each mount or vehicle can use set by data, flying vehicles, climbing mounts; mode permission through restrictions and Game rules
+    - **Done when:** A Game rule that forbids flight hands over to gliding; a restriction blocks both; a mount climbs a marked wall
     - **Needs:** [[Slice 14 · Prediction|GPL-1]], [[Slice 18 · Defense|GPL-3]], [[Slice 11 · Spatial index|WORLD-2]], [[Slice 42 · Ships, wind and currents|ENV-2]]
 - [ ] **PTR-4** · Simulation links chosen by locality · [RunicPlatform#29](https://github.com/PedroVicente98/RunicPlatform/issues/29) · not started
     - Simulation links chosen by locality: an in-memory queue in one process, a local socket or shared-memory channel on one machine, GameNetworkingSockets between machines
@@ -79,7 +79,7 @@ modified: "2026-11-03"
     - **Done when:** Two simulations with heavy link traffic end on one node with no loading screen; no node passes its cap
     - **Needs:** [[Slice 36 · Multiple simulations|PCS-2]], [[Slice 39 · Operations|PINF-2]], PTR-4
 - [ ] **GSH-7** · Context kits · [RunicGame#32](https://github.com/PedroVicente98/RunicGame/issues/32) · not started
-    - Context kits: mount and aerial skill trees per named class with their own points; mount, glider and wing kit swaps and modifications
+    - Context kits: mount and aerial skill trees per named class with their own points; mount, glider and wing kit swaps and modifications; flight zones and the altitude ceiling as movement-mode permissions
     - **Done when:** Defined when the expansion slices are planned
     - **Needs:** [[Slice 20a · Arena prototype|GSH-6]], GPL-7
 - [ ] **GSVC-4** · Economy, trade, the global auction house, guild, mail and housing services · [RunicGame#36](https://github.com/PedroVicente98/RunicGame/issues/36) · not started

@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-12"
 ---
 
 Each client receives a priority-ordered, bandwidth-capped delta of only what it may perceive, which keeps a 500-player battle near 50 KB/s per player.
@@ -32,7 +32,7 @@ Beyond the budget, degradation follows a fixed order: lower update rates for dis
 
 ### Interest and visibility tiers (decided)
 
-Candidates come from the 3D cells around the client inside its interest volume (plus a preload margin), filtered by category. Each candidate pair then gets a tier — server-side fog of war:
+Candidates come from the 3D cells around the client inside its interest volume (plus a preload margin), filtered by category. Each candidate pair then gets a visibility tier — server-side fog of war. The tiers and what each one sends are data, and a function the Game registers picks the tier from distance, light, concealment and its own rules. RunicGame uses three (GSRV-10):
 
 | Tier | Condition | Data sent |
 | :---- | :---- | :---- |
@@ -40,13 +40,21 @@ Candidates come from the 3D cells around the client inside its interest volume (
 | Silhouette | Within the minimum silhouette range in any light, or revealed by contact in the last few seconds | Coarse position and pose at a low rate; no name, gear or identity |
 | Hidden | Otherwise | Nothing |
 
-* Contact reveals: hitting or being hit, a heal nearby, AoE contact.
+* Contact reveals (RunicGame): hitting or being hit, a heal nearby, AoE contact.
 
-* Projectiles and effects from hidden players are sent without the caster’s identity.
+* Projectiles and effects from an entity in a tier without identity are sent without the caster’s identity.
 
 * Cost: one multiplication per candidate pair inside an interest pass that already runs.
 
 * Combat never uses tiers; the server resolves every hit regardless of visibility.
+
+### Detail levels and focus
+
+* A replicated component can declare detail levels; the Game says which fields each level carries and who receives which level.
+
+* The client tells the server which entities it is focusing (in RunicGame, the action target and the Ward). The hint only raises priority and detail; it never grants authority and never lifts a visibility tier.
+
+* RunicGame, as planning numbers: everyone in view gets health and a status bitmask (about 8 bytes per change); the focused entities and the party get every status with its time, build-up, Resolve and shields (about 50–100 bytes per change).
 
 ### Simulations, handoff and ghosts
 

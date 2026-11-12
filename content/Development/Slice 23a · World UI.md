@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/167"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-12"
 ---
 
 **Slice:** 23a · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine, Game · **Issue:** [RunicEngine#167](https://github.com/PedroVicente98/RunicEngine/issues/167)
@@ -28,7 +28,7 @@ modified: "2026-11-03"
 
 - [ ] **CLI-6** · World-anchor extractor · [RunicEngine#73](https://github.com/PedroVicente98/RunicEngine/issues/73) · not started
     - World-anchor extractor: position, distance, visibility tier and priority per entity
-    - **Done when:** Anchors follow entities; Hidden players produce none
+    - **Done when:** Anchors follow entities; an entity in a tier without anchors produces none
     - **Needs:** [[Slice 5 · Moving entities|CLI-1]], [[Slice 22 · World rendering|CORE-4]]
 - [ ] **GDB-10** · World UI: anchored Label3D and Sprite3D elements · [RunicEngine#74](https://github.com/PedroVicente98/RunicEngine/issues/74) · not started
     - World UI: anchored Label3D and Sprite3D elements; diegetic panels in SubViewports on quads or mesh surfaces, with ray input into panel coordinates

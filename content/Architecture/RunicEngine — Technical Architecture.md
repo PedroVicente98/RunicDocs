@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-12"
 ---
 
 Oct 14, 2026 · Pedro
@@ -102,6 +102,8 @@ Oct 14, 2026 · Pedro
   - [[Environment wind, currents, tides, waves and weather (Engine)#Performance|Performance]]
   - [[Environment wind, currents, tides, waves and weather (Engine)#Acceptance tests|Acceptance tests]]
 - [[Engine gameplay APIs (Engine)]]
+  - [[Engine gameplay APIs (Engine)#Mechanism and policy|Mechanism and policy]]
+  - [[Engine gameplay APIs (Engine)#Starter templates|Starter templates]]
   - [[Engine gameplay APIs (Engine)#Behavior registry contract|Behavior registry contract]]
   - [[Engine gameplay APIs (Engine)#Light and perception|Light and perception]]
   - [[Engine gameplay APIs (Engine)#Scripted sequences (GameplayFlow) and restrictions|Scripted sequences (GameplayFlow) and restrictions]]
@@ -130,6 +132,7 @@ Oct 14, 2026 · Pedro
   - [[AI architecture (Engine, Game)#Example NPC lifecycle|Example NPC lifecycle]]
 - [[RunicGame systems (Game)]]
   - [[RunicGame systems (Game)#Skills mapped to Engine APIs|Skills mapped to Engine APIs]]
+  - [[RunicGame systems (Game)#RunicGame policies on Engine APIs|RunicGame policies on Engine APIs]]
   - [[RunicGame systems (Game)#Resolver|Resolver]]
   - [[RunicGame systems (Game)#Custom behaviors|Custom behaviors]]
   - [[RunicGame systems (Game)#Defense and threat|Defense and threat]]
@@ -157,6 +160,7 @@ Oct 14, 2026 · Pedro
   - [[Networking replication, interest and handoff (Engine)#Replication|Replication]]
   - [[Networking replication, interest and handoff (Engine)#Priority and bandwidth budget|Priority and bandwidth budget]]
   - [[Networking replication, interest and handoff (Engine)#Interest and visibility tiers (decided)|Interest and visibility tiers (decided)]]
+  - [[Networking replication, interest and handoff (Engine)#Detail levels and focus|Detail levels and focus]]
   - [[Networking replication, interest and handoff (Engine)#Simulations, handoff and ghosts|Simulations, handoff and ghosts]]
 - [[Platform and operations]]
   - [[Platform and operations#Services|Services]]

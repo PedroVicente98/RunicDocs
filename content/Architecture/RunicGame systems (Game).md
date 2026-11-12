@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-05"
+modified: "2026-11-12"
 ---
 
 RunicGame turns the Engine APIs into this game’s rules. Shared rules compile into both executables, so client prediction runs the same code as the server.
@@ -16,15 +16,15 @@ RunicGame turns the Engine APIs into this game’s rules. Shared rules compile i
 | Skill component | Holds | Engine API used |
 | :---- | :---- | :---- |
 | Identity | ID, weapon, skill tree and slot, tags | Tags |
-| Activation | Cost, cooldown, cast time, requirements | Ability toolkit |
+| Activation | Cost, cooldown, cast time, requirements | Ability toolkit (costs against RunicGame’s pools) |
 | Timeline | Startup, active, recovery, cancel windows | Ability toolkit |
 | Shape | Cone, circle, line, projectile; origin; range | Ability toolkit |
-| Damage | Parts with domain, delivery and optional subtype or element | Attributes, rule pipeline |
-| Effect | Conditions with build-up (Burn, Chill, Shock, Poison, Bleed, Curse, Madness, Acid) through Tolerance, Armor Break, buffs | Status container |
-| Control | Stagger, Trip, Knockdown, Stun, Root through Resolve (T1 and T2); slows capped by the light-CC Resolve | Status container, rule pipeline |
+| Damage | Parts with domain, delivery and optional subtype or element | RunicGame attributes, rule pipeline, impact pipeline |
+| Effect | Conditions with build-up (Burn, Chill, Shock, Poison, Bleed, Curse, Madness, Acid) through Tolerance, Armor Break, buffs | Status storage with RunicGame’s application policies |
+| Control | Stagger, Trip, Knockdown, Stun, Root through Resolve (T1 and T2); slows capped by the light-CC Resolve | RunicGame statuses on the control primitives, rule pipeline |
 | Movement | Dash, leap, root while casting | Movement |
-| Defense | Guard or iframe granted by the skill | Damage interception |
-| Threat and protection | Threat multiplier, Challenge | Threat table, damage interception |
+| Defense | Guard or iframe granted by the skill | Impact pipeline, restrictions |
+| Threat and protection | Threat multiplier, Challenge | Threat table, impact pipeline |
 | World utility | Light emitter, reveal | Light and perception |
 | Hit timing | ServerTime or CappedRewind | Hit timing |
 | Custom | Behavior ID and parameters | Behavior registries |
@@ -37,6 +37,23 @@ RunicGame turns the Engine APIs into this game’s rules. Shared rules compile i
 * Role efficiency and per-component coefficients (PvE and PvP) are data tables reloadable at runtime. Every value has a base, and a skill, item or effect may declare its own PvE and/or PvP values (e.g., base 100, PvP 85, PvE 105); the rule pipeline’s per-hit context picks the variant. Proposal: the context is decided by the target of each hit.
 
 $${D}_{final}={D}_{base}\times \prod\limits_{c\in C}^{}{k}_{c}\times {E}_{role}\times \left({1-min\left({{R}_{max},\,\sum\limits_{c\in C}^{}{r}_{c}}\right)}\right)$$
+
+### RunicGame policies on Engine APIs
+
+The Engine stores, times and calls hooks; every rule below is RunicGame code or data registered on it (see [[Engine gameplay APIs (Engine)#Mechanism and policy|Mechanism and policy]]).
+
+| Engine API | RunicGame registers | Package |
+| :---- | :---- | :---- |
+| Attributes and resource pools | Health, Stamina, Mana, Guard and Evasion charges, the Powers and the rest of the character sheet; their regeneration rules | GSH-8 |
+| Lifecycle | Death when Health reaches zero, which calls Kill | GSH-8 |
+| Relations | Hostile, friendly or neutral from the two factions, PvE mode, Outlaw, pirates and groups | GSH-9 |
+| Status storage | Application policies: build-up, Tolerance, stacking per status, Resolve | GSH-3, GSH-4 |
+| Control primitives | Stun, Knockdown, Trip, Stagger, Root and the CC target cap | GSH-4, GSH-5 |
+| Impact pipeline | Stages in order: Guard, armor, shields, damage to Health; the dodge’s iframes are an invulnerability restriction | GSH-4 |
+| Targeting | Free aim, FriendlyLock and the aim-assist strength | GSH-5 |
+| Input buffer | One slot, the queue window, Dodge and Guard as priority inputs | GSH-5 |
+| Visibility levels | Full, Silhouette and Hidden with reveal on contact | GSRV-10 |
+| Movement permission | Flight zones and the altitude ceiling | GSH-7 |
 
 ### Resolver
 
@@ -91,11 +108,11 @@ A custom behavior never replaces standard components, so defenses, coefficients,
 
 | Game system | Holds | Built on |
 | :---- | :---- | :---- |
-| Evasion | Charges by the class’s role, dodge form by Discipline, iframe length by armor, minimum recovery | Resource pools, invulnerability windows |
-| Guard | One resource; modes Free (shield arc), Timed (the Quarterstaff), DuringMovement (greatsword dash, spear run), Filtered (mage, by damage domain and delivery) | Damage interception |
-| Resolve | CC immunity buff: full CC, then Resolve T1 (about 2 s; a CC during it drops one level), then Resolve T2 (about 2 s, immune to every CC); slows last at most about 10 s, then about 5 s of slow immunity. Tolerance, per condition: after about 10 s active, or at once on a peak, about 5 s with no added time or build-up | Status container |
+| Evasion | Charges by the class’s role, dodge form by Discipline, iframe length by armor, minimum recovery | A RunicGame pool, invulnerability restrictions |
+| Guard | One resource; modes Free (shield arc), Timed (the Quarterstaff), DuringMovement (greatsword dash, spear run), Filtered (mage, by damage domain and delivery) | Impact pipeline |
+| Resolve | CC immunity buff: full CC, then Resolve T1 (about 2 s; a CC during it drops one level), then Resolve T2 (about 2 s, immune to every CC); slows last at most about 10 s, then about 5 s of slow immunity. Tolerance, per condition: after about 10 s active, or at once on a peak, about 5 s with no added time or build-up | Status application policy on the Engine’s status storage |
 | Threat and taunt | Threat values per action; spatial taunt | Threat table |
-| Challenge | PvP protection: a share of damage redirected to the Tank, non-stacking | Damage interception |
+| Challenge | PvP protection: a share of damage redirected to the Tank, non-stacking | Impact pipeline |
 
 ### Items, progression and inventory
 
@@ -127,7 +144,7 @@ A custom behavior never replaces standard components, so defenses, coefficients,
 
 * **Altars:** world entities in the spatial index; the Altars a character has discovered are durable character state. Death respawns the character at the nearest Altar that character has discovered, in the world where it died, and choosing or resetting the loadout and the Discipline, which redistributes the skill points, is an altar interaction that rebuilds the resolved loadout. The Lineage sees on the map every Altar its characters found, but respawn and teleports use only the character's own discovered Altars, so each character rediscovers them. Settlement Altars are teleport destinations once the character has visited them, for a fixed fee plus distance, much more between continents, and no cargo fee; from the field a teleport also uses a consumable and has a long cooldown, and from one Altar to another it costs only the fee (RunicGame — Appendix: Nodes, Economy and Exploration).
 
-* **Factions:** faction, crime and pirate status are durable state mirrored in the simulation; PvP eligibility and group rules (pirates may group with both factions) are game data.
+* **Factions:** faction, crime and pirate status are durable state mirrored in the simulation; PvP eligibility and group rules (pirates may group with both factions) are game data. The relation function the Engine asks (hostile, friendly or neutral) is RunicGame code built from these states (GSH-9).
 
 * **Named classes:** one of ten fixed loadouts plus one of five Disciplines is a named class with exactly one role (Damage, Tank or Support); class and role are derived, never chosen. Weapon skills are the basic kit, unlocked by level with no point cost, with some level choices; skill points go only into the Discipline skills, in one merged tree per class. Combat skill points come only from levels, every max-level character has the same total, and a character has at most 28 combat skills, weapon and Discipline together; emotes, the context kit and other auxiliary skills are separate categories ([[Weapon Class System#Skills, trees and points]]). There are no versatile weapons and no weapon-type swap: changing the loadout or the Discipline is an Altar reset that redistributes the points and the level choices.
 

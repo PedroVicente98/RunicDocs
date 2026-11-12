@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-12"
 ---
 
 Clients talk directly to their simulation through the Engine’s transport interface, implemented by the Platform on GameNetworkingSockets; the player’s own actions feel instant through prediction that runs the game’s shared code, plus an input queue.
@@ -58,12 +58,12 @@ Runic::Network encodes every message on the realtime connection, envelope includ
 
 ### Input queue (decided)
 
-* The queue lives in Runic::Combat, which knows each skill’s recovery and cancel windows; Network only carries the inputs. The client may send the next action before the current one ends, inside a queue window the game sets (e.g., 200–400 ms).
+* The buffer lives in Runic::Combat, which knows each ability’s phases and cancel requests; Network only carries the inputs. Its depth, window and priority classes come from the Game. The client may send the next action before the current one ends, inside the window (e.g., 200–400 ms).
 
-* The server keeps at most one queued action per character and starts it on the first tick after recovery ends, so at most 33 ms late.
+* RunicGame uses one slot: the server keeps at most one buffered action per character and starts it on the first tick it is legal, so at most 33 ms late.
 
-* A queued action is validated when it starts, not when it arrives; a stun in between cancels it.
+* A buffered action is validated when it starts, not when it arrives; a restriction in between (in RunicGame, a stun) cancels it.
 
-* Priority inputs the game names (in RunicGame, Dodge and Guard) skip the queue when the current skill’s cancel window allows.
+* Priority inputs the Game names (in RunicGame, Dodge and Guard) skip the buffer when the current ability allows the cancel.
 
 * Regional datacenters keep typical latency low, which is what makes ServerTime hit timing comfortable.

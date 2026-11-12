@@ -5,12 +5,13 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-10"
+modified: "2026-11-12"
 ---
 
 | Area | Decision |
 | :---- | :---- |
 | Ownership | Engine provides generic mechanisms, Game provides rules, content and executables, Platform provides shared services, SDK and infrastructure |
+| Mechanism and policy | An Engine API must let a game come close to another game’s system; anything that fixes one game’s rule is Game: attributes such as Health and Stamina, status stacking and immunity, crowd control, factions, PvP visibility, flight zones (12 November 2026) |
 | Executables | GameClient and GameServer belong to RunicGame; the Engine owns the entry point, the ApplicationHost (Run and RunFrame), the RunicEditor and the RunicBot |
 | Application | Layers with events top-down and updates bottom-up; changes at safe points; loop policy per executable |
 | Authority | The C++ simulation is authoritative; Go services own durable and distributed state |
@@ -23,9 +24,9 @@ modified: "2026-11-10"
 | Networking stack | Engine transport interface; Platform GameNetworkingSockets transport; gRPC with answers; Protobuf service contracts; Engine-encoded realtime messages; NATS publish/subscribe; Go services; Agones and Kubernetes |
 | Hit timing | ServerTime by default; CappedRewind per skill; full rewind not offered |
 | Responsiveness | Prediction runs shared game code; predicted skill starts; input queue |
-| Gameplay split | Engine GameplayAPI group (Gameplay, Combat, GameplayFlow and Quest modules): ability toolkit, tags, statuses, rule pipeline, interception, threat table, registries, restrictions, sequences, quest runtime; Game: skills, resolver, damage, defense, threat rules |
+| Gameplay split | Engine GameplayAPI group (Gameplay, Combat, GameplayFlow and Quest modules): ability toolkit, input buffer, target slots, tags, attribute API and pools, lifecycle, relation hook, status storage with Game policies, rule pipeline, impact pipeline, control primitives, threat table, registries, restrictions, sequences, quest runtime; Game: every attribute and policy — skills, resolver, statuses, crowd control, damage, defense, threat rules, factions |
 | Light and perception | Engine API with game values; warn and detect radii; concealment; detection at zero light |
-| PvP visibility | Full, Silhouette and Hidden tiers with reveal on contact |
+| PvP visibility | Engine: visibility tiers as data, picked by a Game function; RunicGame: Full, Silhouette and Hidden with reveal on contact |
 | Custom logic | Data first; custom behaviors in C++ through registries; no scripting language in the game; GDScript only for editor tools |
 | Cold content | The quest runtime runs in the simulation; quests are made through the Engine quest API from data plus registered Game C++; the Go Quest service stores progress; dialogue is data; physical interactions in C++ |
 | Services split | Platform: core services (accounts, World Coordinator, instances, directives, chat and party groups), Go SDK, item ledger and wallets as mechanisms; Game: character, inventory rules, economy, trade, guild, mail, housing, rankings, quest progress |

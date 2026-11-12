@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/160"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-12"
 ---
 
 **Slice:** 17 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine, Game · **Issue:** [RunicEngine#160](https://github.com/PedroVicente98/RunicEngine/issues/160)
@@ -20,15 +20,15 @@ modified: "2026-11-03"
 
 **Runnable result:** Bleed, Stagger and one interaction (a Stagger on an already staggered target becomes Trip)
 
-**Proves:** Status container, rule pipeline, the resolver and its debugger
+**Proves:** Status storage with Game application policies, rule pipeline, the resolver and its debugger
 
 **Godot:** Resolver debugger dock
 
 ### Packages
 
 - [ ] **CMB-3** · Statuses and effects, cooldowns, resource costs · [RunicEngine#47](https://github.com/PedroVicente98/RunicEngine/issues/47) · not started
-    - Statuses and effects, cooldowns, resource costs
-    - **Done when:** Durations, stacks and cooldowns expire on the right tick
+    - Status storage (instances, timers, periodic ticks, apply, refresh and remove, events, queries by tag, replication), every application going through a policy the Game registers; cooldowns with shared groups and charges; costs as a list against Game pools
+    - **Done when:** Durations, ticks and cooldowns expire on the right tick; two test policies (refresh and intensity stacking) change the result with no Engine change; a shared cooldown group behaves as a global cooldown
     - **Needs:** [[Slice 16 · Ability toolkit|CMB-1]]
 - [ ] **CMB-4** · Rule pipeline and behavior registries · [RunicEngine#48](https://github.com/PedroVicente98/RunicEngine/issues/48) · not started
     - Rule pipeline and behavior registries (fixed hooks for Game code); value variants selected by a per-hit context the Game defines
@@ -39,7 +39,7 @@ modified: "2026-11-03"
     - **Done when:** It shows which rules applied to a hit and why
     - **Needs:** [[Slice 6 · Editor shell|GDT-2]], CMB-4
 - [ ] **GSH-3** · Damage types, resolver order, Bleed, Stagger and one interaction · [RunicGame#10](https://github.com/PedroVicente98/RunicGame/issues/10) · not started
-    - Damage types, resolver order, Bleed, Stagger and one interaction
+    - Damage types, resolver order, status application policies (build-up and stacking), Bleed, Stagger and one interaction
     - **Done when:** A Stagger on an already staggered target becomes Trip
     - **Needs:** CMB-4
 

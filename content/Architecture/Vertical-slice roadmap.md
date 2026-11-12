@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-10"
+modified: "2026-11-12"
 ---
 
 Each slice is small, ends in something runnable and testable, and adds one piece of this architecture on top of the previous ones. The Packages column names the work packages each slice needs (defined under Modules, work packages and the implementation contract); a slice is done when those packages are merged and its runnable result passes. Slices with a letter (20a, 23a, 25a, 33a, 42a, 42b, 43a) were inserted later between their neighbors, so existing numbers never change. Godot is part of the build from slice 0: it may stay idle or headless while the simulation is built, and each slice pulls one piece of presentation or tooling into it (the Godot column).
@@ -27,11 +27,11 @@ Each slice is small, ends in something runnable and testable, and adds one piece
 | 12\. Transport | A client connects to a local server with a test-signed ticket; ping and echo | Transport interface, GameNetworkingSockets transport, contracts | NET-1, PCT-1, PTR-1, PTR-2 | Engine, Platform | — |
 | 13\. Replication | Two clients see each other move; the Run button starts the server and both clients | Snapshots, quantization, interpolation, Run orchestration | SIM-6, NET-2, GDT-9 | Engine | Run button starts a local server and two clients |
 | 14\. Prediction | Responsive movement with correction under simulated lag | Shared-code prediction, reconciliation, movement modes | SIM-4, GPL-1, NET-3, CLI-3, GSH-1 | Engine, Game | Presenter shows predicted and authoritative state |
-| 15\. Character state | A dummy has health, tags and modifiers; casts and overlaps are drawn | Attributes, modifiers, resources, gameplay queries | GPL-2, PHYS-5 | Engine | — |
-| 16\. Ability toolkit | One melee swing and one projectile hit a dummy | Timelines, hit queries, ServerTime hits | CMB-1, CMB-2, GSH-2 | Engine, Game | — |
-| 17\. Statuses and rules | Bleed, Stagger and one interaction (a Stagger on an already staggered target becomes Trip) | Status container, rule pipeline, the resolver and its debugger | CMB-3, CMB-4, GDT-5, GSH-3 | Engine, Game | Resolver debugger dock |
-| 18\. Defense | Dodge with charges, shield Guard, a Resolve chain | Restrictions, damage interception, Game defense rules | GPL-3, CMB-5, GSH-4 | Engine, Game | — |
-| 19\. Combat prototype | The full acceptance list below | Game systems end to end, threat and CC, input queue, first GameUI in Godot | CMB-6, CMB-7, GDB-9, GCL-1, GSH-5 | Engine, Game | HUD as Godot UI scenes with the view-model binder |
+| 15\. Character state | A dummy has health, tags and modifiers; casts and overlaps are drawn | Attribute API, modifiers, pools and the lifecycle API, gameplay queries; Health declared by the Game | GPL-2, PHYS-5, GSH-8 | Engine, Game | — |
+| 16\. Ability toolkit | One melee swing and one projectile hit a dummy | Phase timelines, target slots, hit queries, ServerTime hits, the relation hook | CMB-1, CMB-2, GSH-2, GSH-9 | Engine, Game | — |
+| 17\. Statuses and rules | Bleed, Stagger and one interaction (a Stagger on an already staggered target becomes Trip) | Status storage with Game application policies, rule pipeline, the resolver and its debugger | CMB-3, CMB-4, GDT-5, GSH-3 | Engine, Game | Resolver debugger dock |
+| 18\. Defense | Dodge with charges, shield Guard, a Resolve chain | Restrictions, the impact pipeline, Game defense rules | GPL-3, CMB-5, GSH-4 | Engine, Game | — |
+| 19\. Combat prototype | The full acceptance list below | Game systems end to end, threat, control primitives and the Game’s crowd control, the input buffer, first GameUI in Godot | CMB-6, CMB-7, GDB-9, GCL-1, GSH-5 | Engine, Game | HUD as Godot UI scenes with the view-model binder |
 | 20\. Data-driven content | Skills, items and effects as data with live reload; one custom behavior | Registries, schemas, Cooker validation, schema inspectors in the editor, assistants | CNT-2, COOK-2, GDT-6, GDT-10, GCNT-1 | Engine, Game | Runic data edited through schema inspectors; assistants and IDE bridge |
 | 20a. Arena prototype | Three named classes, one per role, fight 3v3 in an arena with their skill trees and armor | Class variety on the combat systems, classes and skill trees as data | GSH-6 | Game | — |
 | 21\. World partitions | Walk across regions authored as scenes, down into a cave volume and up a cliff with activation-volume streaming | World cooking from region scenes, packages, activation volumes, region tools, marker nodes, GDScript locks | WORLD-3, ASSET-2, COOK-3, GDT-7, GDT-8, GDT-14 | Engine | Region scenes, marker nodes and spawn areas cooked into cells; GDScript enabled in the editor with its locks |
@@ -39,14 +39,14 @@ Each slice is small, ends in something runnable and testable, and adds one piece
 | 23\. Animated characters | A skinned character animates with blended clips | Animation runtime, skinned extractor, skinned presentation in Godot, skinned-mesh import | ANIM-1, CLI-5, GDB-6, COOK-5 | Engine | Skinned characters (open animation decision) |
 | 23a. World UI | Nameplates and health bars follow entities; a notice board in the world accepts clicks | World anchors, Label3D and Sprite3D, SubViewport panels | CLI-6, GDB-10, GCL-3 | Engine, Game | Anchored Label3D and Sprite3D; diegetic SubViewport panels |
 | 24\. Sound and music | Sound events play through buses; a music context switches albums | Audio on the AudioServer, MusicDirector, soundtrack settings | AUD-1, AUD-2, GDB-12, GCL-2 | Engine, Game | Audio backend on the AudioServer |
-| 25\. Interest | Only relevant entities arrive; visibility tiers at night | Environment clock, light, visibility tiers, priority budgets | ENV-1, PRC-1, PRC-2, NET-4 | Engine | — |
+| 25\. Interest | Only relevant entities arrive; visibility tiers at night | Environment clock, light, visibility tiers, priority budgets, detail levels and focus | ENV-1, PRC-1, PRC-2, NET-4, GSRV-10 | Engine, Game | — |
 | 25a. Night on screen | Torches light the night; darkness zones and fog draw, matching what the server treats as dark | Light, environment and volume render data, extractors, Godot lights and fog | CORE-5, CLI-7, GDB-7 | Engine | Godot lights, environment and fog from RenderData |
 | 26\. Service foundation | A Go service writes to PostgreSQL idempotently on the local stack | Go SDK, persistence, local development stack | PINF-1, PSDK-1, PSDK-2 | Platform | Run keeps the local service stack running |
 | 27\. Accounts and characters | Log in, receive a real ticket, load and save a character | Service port, accounts, real tickets, services-bridge layer, Character service | SIM-5, PCS-1, PBND-1, GSVC-1 | Platform, Game | — |
 | 28\. Persistence | Kill, loot, log out, keep the item | Item runtime, item ledger, Inventory service, loot grants | GPL-4, PBB-1, GSVC-2, GSRV-1 | Engine, Platform, Game | — |
 | 29\. Scripted sequences | A boss phase locks the arena; a cutscene protects the player; a disconnect releases everything | Interactions, GameplayFlow, restrictions, termination path | GPL-5, FLOW-1, FLOW-2, GSRV-2 | Engine, Game | — |
 | 30\. Quests | A persistent quest driven by gameplay facts | Quest runtime and API, NATS in the SDK and the services bridge, Quest service | QST-1, QST-2, PSDK-3, PBND-4, GSVC-3, GSRV-3 | Engine, Platform, Game | — |
-| 31\. Navigation and spawning | Spawned NPCs walk navmesh paths across cells | Factions and spawns, Recast cooking, Detour runtime | GPL-6, COOK-6, NAV-1 | Engine | — |
+| 31\. Navigation and spawning | Spawned NPCs walk navmesh paths across cells | Spawns, Recast cooking, Detour runtime | GPL-6, COOK-6, NAV-1 | Engine | — |
 | 32\. AI brains | An NPC patrols and chases through behavior-tree intents | BehaviorTree.CPP adapter, intents, command bridge | AI-1, AI-2 | Engine | — |
 | 33\. Perception at night | Mobs warn, detect, fight and leash at night | Perception radii, AI lifecycle, Game mob profiles | PRC-3, AI-3, GSRV-4 | Engine, Game | — |
 | 33a. Exploration prototype | Explore at night with a torch, die to a mob, respawn at an Altar, and keep both the map you uncovered and your build | The exploration loop end to end: night, light, mobs, Altars, map knowledge, build persistence | PBB-2, GSRV-5, GSRV-6, GSVC-5, GCL-4 | Platform, Game | Map screen as a Godot UI scene |
