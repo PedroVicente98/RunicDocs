@@ -44,7 +44,7 @@ tools/                                        the split script, the move tool, t
 | `Architecture/` | 28 |
 | `Ideias/` | 108 |
 | `Development/` | 54 |
-| `Visualizations/` | 4 |
+| `Visualizations/` | 5 |
 | `Archive/` | 5 |
 | `Lore/`, `Quest Design/` | 1 each |
 
@@ -103,7 +103,7 @@ embed helper in `tools/templates/embed-helper.html`. In Obsidian the frames may 
 | Page | Made by |
 | :--- | :--- |
 | `slice-map.htm` (note: Slice map) | `python3 tools/build_slice_map.py`, from the roadmap, the package tables and the Development notes |
-| `latency-feel-lab.htm`, `runic-database-map.htm` | pages made in Claude chats, added with `tools/add_visualization.py` |
+| `latency-feel-lab.htm`, `runic-database-map.htm`, `targeting-lab.htm` | pages made in Claude chats, added with `tools/add_visualization.py` |
 
 **The slice map is generated; don't edit it by hand.** Its page comes from `tools/templates/slice-map.html`; the script
 fills in the slices, the packages' needs and, from the Development notes, which packages are done and their issues.
