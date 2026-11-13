@@ -19,7 +19,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 | Sailing controls: helm, sail trim, anchor, oars | WatercraftMovement intents, wind | — |
 | Cargo and trade packs on board | CargoOf relationships, group handoff | — (trade packs are world entities) |
 | Passengers, boarding, falling overboard | PassengerOf, CharacterVirtual on moving bodies, CharacterWaterMovement | — |
-| Naval combat: cannons, ramming, hull damage, breaches and flooding, sinking | Ability toolkit with the ship as source, the impact pipeline, BuoyancyProfile scale and righting strength, water samples at breach points | Repairs through the economy game service |
+| Naval combat: cannons, ramming, hull damage, breaches and flooding, sinking | Ability toolkit with the ship as source, hit resolution, BuoyancyProfile scale and righting strength, water samples at breach points | Repairs through the economy game service |
 | Swimming, diving and breath | CharacterWaterMovement, WaterInteractionState | — |
 | Sea threats and water bosses | AI framework, CharacterWaterMovement, perception, SwimMovementModifiers | — |
 | Nautical charts | Map knowledge, cooked current and wind fields | Learned charts in the character service |
@@ -46,7 +46,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 
 * **Cannons** are abilities whose source is a crewed ship station, using projectile shapes that hit hulls and characters on deck. Wind affects them only if the skill sets the wind flag.
 
-* **Hull damage** goes through the impact pipeline on the ship entity, with Game defense stages and values per ship class. A ship has one Game resource pool of hull points: cannons, ramming and sea creatures deal fixed damage; environment events (big waves, lightning, waterspouts, maelstroms) deal a percentage of the ship's maximum hull points, small per hit for events that hit many times and large for a single hit, so every ship class takes them the same way; and water counts as hull points drained.
+* **Hull damage** goes through hit resolution on the ship entity, with Game defense stages and values per ship class. A ship has one Game resource pool of hull points: cannons, ramming and sea creatures deal fixed damage; environment events (big waves, lightning, waterspouts, maelstroms) deal a percentage of the ship's maximum hull points, small per hit for events that hit many times and large for a single hit, so every ship class takes them the same way; and water counts as hull points drained.
 
 * **Ramming** reads Jolt contacts; the Game turns contact speed and mass into damage.
 
