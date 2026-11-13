@@ -29,7 +29,7 @@ modified: "2026-11-13"
 - [ ] **CORE-1** · Plain ID types · [RunicEngine#9](https://github.com/PedroVicente98/RunicEngine/issues/9) · ready to start
     - Plain ID types (GlobalEntityId, GlobalPlayerId, SimulationId, WorldId, InstanceId, TickId, AuthorityEpoch, and value types other modules give meaning to, such as AssetId, WaterBodyId, FieldId and WidgetId; Core defines the types, the Game’s data gives the values), Result, asserts, logging hooks, time types, GLM math, the world-space types every spatial operation uses (WorldPosition and WorldDelta in Core/Public/WorldSpace.hpp, ToLocal to 32-bit), and fixed-capacity containers for allocation-free paths (ring buffers, small vectors)
     - **Done when:** Unit tests cover IDs, Result, time conversions and world-space arithmetic; adding two WorldPositions or converting one to a float vector does not compile; fixed-capacity containers never allocate after construction
-    - **Needs:** [[Slice 0 · Build skeleton|BUILD-1]]
+    - **Needs:** [[Slice 0 · Build skeleton|BUILD-2]]
 - [ ] **APP-1** · Entry point, Application, ApplicationHost, Layer, LayerStack with… · [RunicEngine#8](https://github.com/PedroVicente98/RunicEngine/issues/8) · ready to start
     - Entry point, Application, ApplicationHost, Layer, LayerStack with queued changes at safe points, application events, loop policies, RunFrame so a host can drive one frame at a time; the Engine’s RunicServer program on the entry point (fixed 60 Hz loop)
     - **Done when:** Layer order, events top-down until handled, updates bottom-up, safe-point push and pop, no allocation per event; RunicServer starts and stops cleanly
