@@ -11,7 +11,7 @@ created: "2026-10-14"
 modified: "2026-11-13"
 ---
 
-The code is organized at two working sizes. A **module** is a build target with one owner, a public interface and its own tests; the dependency rules are written between modules. A **work package** is what one Claude Code session implements and one pull request delivers: one subsystem of one module, with its tests. Modules keep the architecture honest; packages keep each piece of work small enough to be built well.
+The code is organized at two working sizes. A **module** is a build target with one owner, a public interface and its own tests; the dependency rules are written between modules. A **work package** is one subsystem of one module, with its tests, built in the slice pipeline (section Building with Claude Code): a contract session, an implementation session and a verify step, with its commits on the slice branch. Modules keep the architecture honest; packages keep each piece of work small enough to be built well.
 
 ### Sizes of work
 
@@ -20,7 +20,7 @@ The code is organized at two working sizes. A **module** is a build target with 
 | Group | A folder plus an umbrella build target that links related modules under one name; no code of its own | Runic::GameplayAPI \= Gameplay, Combat, GameplayFlow, Quest | The Game links one name; the documents categorize by it |
 | Module | A CMake target with its own folder, public headers, tests and ARCHITECTURE.md; the unit of ownership and dependency | Runic::Combat | Other modules link it and include only its public headers |
 | Subsystem | A folder inside a module’s Source/; not linkable on its own | Combat/Cooldowns | Only its own module |
-| Work package | One Claude Code session and one pull request: a subsystem, or part of one, at a stated maturity stage, with its tests and docs | CMB-3: statuses, cooldowns and resource costs | You review and merge it; the roadmap lists it |
+| Work package | A subsystem, or part of one, at a stated maturity stage, with its tests and docs, built in three steps of the slice pipeline: contract, implementation, verify | CMB-3: statuses, cooldowns and resource costs | You approve its plan, its contract and its result; the roadmap lists it |
 
 ### Why the code is segmented this way
 
@@ -408,25 +408,54 @@ The server bindings implement the Engine’s Layer interface and the Simulation�
 
 ### Building with Claude Code
 
-Every package goes through the same short cycle. It keeps design decisions with you and gives each coding session a closed, testable problem.
+Claude Code builds the roadmap one slice at a time, and each slice one package at a time, in a fixed pipeline (decided 13 November 2026). Each step ends when you say so, after as many prompts as it needs. A design is fixed before code depends on it, and a package that would not suit the next one is caught at that package’s plan, before the slice is built. Each coding session gets a closed, testable problem.
 
-1. **Contract session.** Claude Code writes or updates the module’s ARCHITECTURE.md, the public headers the package adds and the acceptance tests, which fail at first. Nothing in Source/ yet.
+#### The slice pipeline
 
-2. **Contract review.** You approve the interface and the tests or ask for changes. This is the cheapest moment to change a design.
+1. **Slice kickoff** (once per slice). Claude Code writes the slice brief in the slice’s issue: the package order (from Needs), the seams between the packages (for each pair, a few lines showing how the later package calls the earlier one), the runnable result written as a check, and the owner decisions the slice needs, asked together. You approve the brief or change it.
 
-3. **Implementation session.** A fresh session implements Source/ until the tests pass, inside the write scope only. When it needs something from another module, it stops and reports the interface change.
+2. **Each package, in order:**
 
-4. **Checks.** CI runs the module tests, the headless server build and the dependency checks.
+   1. **Contract session.** First a one-page plan in the package’s issue: what the package adds, an API sketch, decisions, risks and its consumers (who calls this API, in this slice and in later ones, from the Needs graph). Once you approve the plan, Claude Code writes the contract: the module’s ARCHITECTURE.md, the public headers the package adds and the acceptance tests, which fail at first. Nothing in Source/ yet. You approve the contract or ask for changes; this is the cheapest moment to change a design.
 
-5. **Code review and merge.** The pull request carries the code, the tests, the updated ARCHITECTURE.md and the package status.
+   2. **Implementation session.** A fresh session implements Source/ until the tests pass, inside the write scope only. When it needs something from an earlier package of the slice, it stops and reports it, and the fix is a commit of that package, never part of this one. A need outside the slice is an interface change for you to decide.
 
-Small packages, with a few hundred lines and no new public types, may combine steps 1 and 3 in one session.
+   3. **Verify and fix.** The tests of the three repositories, a review of the diff, the module’s ARCHITECTURE.md and README.md, and the issue’s checklist. The package is done when you say so: its issue closes and its code stays on the slice branch.
+
+3. **Slice check** (once per slice). The runnable result is shown (by you, when it needs a window); pull requests from the slice branches run CI with both compilers; the branches merge into main in Needs order; the slice issue closes and the Development notes are regenerated. What later slices need to know goes into their packages’ issues and, when it changes the plan, into this vault.
+
+Small packages, with a few hundred lines and no new public types, may combine the contract and implementation sessions.
+
+When a slice’s packages share one subsystem closely (networking, for example), the kickoff writes the contracts of all of them in one design pass, reviewed together as one set, and each contract session only adjusts its own package’s contract before its implementation. A walking skeleton (a thin end-to-end version of the whole slice first) is not used: it needs placeholders in other modules and throwaway code, and risky integrations are retired by spikes first, as GDT-1 retired LibGodot.
+
+#### Sessions
+
+* A fresh session for each step: the kickoff, each contract session, each implementation session with its verify and fix, and the slice check. The slice brief, the plans and the contracts carry the slice’s context from one session to the next, not a long conversation: every prompt sends the whole conversation again, so a long session costs more per prompt and ends in lossy summaries. Each step ends by recording in the slice brief what it decided and why.
+
+* Each session starts by reading the slice brief, the package’s issue, the module’s README.md and ARCHITECTURE.md, the public headers of the packages before it, and the notes its README lists.
+
+* Effort follows the step: the highest for the kickoff and the contract sessions, where the design is decided; lower for implementing an approved contract and for the checks.
+
+* Questions are asked together at the start of a step. Each package’s issue carries the pipeline state as a checklist (plan, contract, implementation, verified).
+
+#### Branches
+
+* One branch per slice in each code repository the slice touches (`slice/1`). A package’s commits name the package (`CORE-1: …`, `CORE-1 fix: …`), and a package still writes only inside its module.
+
+* The slice check merges the branches into main in Needs order, by fast-forward or a merge commit, never squashed or rebased: RunicPlatform’s and RunicGame’s pins name commits of the slice branches.
+
+* RunicDocs changes go straight to main.
 
 This vault is the only copy of the architecture: the repositories keep no copy of it (decided 12 November 2026). Claude Code reads these notes directly, from the RunicDocs checkout next to the three repositories, together with each repository’s code-adjacent documents: CLAUDE.md, each module’s README.md (its folders and the package that fills each one) and ARCHITECTURE.md (its contract), and the build helpers' README in cmake/. A repository’s docs folder holds only generated API documentation (later, from the code); RunicGame’s also holds its content-creation vault (lore, maps, quests). A work package may also edit the Engine program that shows its result (RunicServer, RunicClient, the RunicEditor), because programs are composition roots, not modules.
+
+An implementation session starts from a task like this one:
 
 ```text
 TASK
   Implement CMB-3 (Stage A): statuses and effects, cooldowns, resource costs.
+
+SLICE BRIEF
+  [the slice’s issue: package order, seams, decisions so far]
 
 WRITE SCOPE
   Engine/GameplayAPI/Combat/**   (Public, Source, Tests, ARCHITECTURE.md)
@@ -436,8 +465,8 @@ READ-ONLY
   Public headers of Runic::Core, Events, Simulation, Gameplay
   Docs: Engine gameplay APIs, Simulation core, Modules and work packages
 
-APPROVED INTERFACE
-  [public headers from the contract session]
+APPROVED PLAN AND INTERFACE
+  [the plan in the package’s issue; public headers from the contract session]
 
 DONE WHEN
   [acceptance tests from the package table and ARCHITECTURE.md]
@@ -462,9 +491,9 @@ A consumer never waits for its dependency to reach Stage C; vertical slices vali
 
 ### Parallel work
 
-* Packages whose Needs are all merged can run at the same time, each in its own Claude Code session and git worktree. Examples: GDB-2 alongside SIM-1; PCT-1 alongside NET-1; GDT-2 alongside PHYS-1.
+* Packages whose Needs are all verified can run at the same time, each in its own Claude Code session and git worktree; inside a slice, the pipeline order is the default. Examples: GDB-2 alongside SIM-1; PCT-1 alongside NET-1; GDT-2 alongside PHYS-1.
 
-* Two or three sessions at once is the practical limit, because every contract and pull request still needs your review.
+* Two or three sessions at once is the practical limit, because every plan, contract and verify step still needs your review.
 
 * Two packages that write the same module never run at the same time.
 
