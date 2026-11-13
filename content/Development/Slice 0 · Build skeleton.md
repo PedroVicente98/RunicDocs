@@ -5,16 +5,16 @@ aliases:
 tags:
   - "development"
   - "slice"
-  - "progress/not-started"
+  - "progress/done"
 slice: "0"
-status: "Not started"
+status: "Done"
 owners: "Engine, Platform, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/143"
 created: "2026-11-03"
 modified: "2026-11-13"
 ---
 
-**Slice:** 0 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine, Platform, Game · **Issue:** [RunicEngine#143](https://github.com/PedroVicente98/RunicEngine/issues/143)
+**Slice:** 0 · **Status:** Done · **Packages done:** 3 of 3 · **Owners:** Engine, Platform, Game · **Issue:** [RunicEngine#143](https://github.com/PedroVicente98/RunicEngine/issues/143)
 
 [[RunicGame — Development|All slices]] · [[Slice 1 · Application and layers]] →
 
@@ -26,15 +26,15 @@ modified: "2026-11-13"
 
 ### Packages
 
-- [ ] **BUILD-1** · Build skeleton in all three repositories · [RunicEngine#6](https://github.com/PedroVicente98/RunicEngine/issues/6) · ready to start
+- [x] **BUILD-1** · Build skeleton in all three repositories · [RunicEngine#6](https://github.com/PedroVicente98/RunicEngine/issues/6) · done
     - Build skeleton in all three repositories: runic_add_module helper, presets, CI, the chosen test framework, automated headless and forbidden-dependency checks, submodule pins (Game pins Engine and Platform; Platform pins Engine; Engine pins Godot and godot-cpp at a release tag) with a local option for sibling checkouts, an AVX2 (x86-64-v3) CPU baseline; libgodot built from source in the editor and template targets with the module lists and the SCons cache; libgodot, godot-cpp, GodotBridge and GodotTools catalogued as presentation
     - **Done when:** Every repository configures and builds; libgodot builds in both targets; the server target links no graphics library and no Godot; a forbidden link fails CI
     - **Needs:** nothing
-- [ ] **BUILD-2** · Build plumbing: unique header paths, modules from the catalog, third parties by need · [RunicEngine#198](https://github.com/PedroVicente98/RunicEngine/issues/198) · ready to start
+- [x] **BUILD-2** · Build plumbing: unique header paths, modules from the catalog, third parties by need · [RunicEngine#198](https://github.com/PedroVicente98/RunicEngine/issues/198) · done
     - Build plumbing for module packages in all three repositories: a configure-time check that no two modules or interface targets export the same header path (case ignored); modules join the build from the catalog when their folder has a CMakeLists.txt, with each group’s umbrella target, and the Engine’s programs join the same way; third parties are pinned recipes, fetched once when a configured module links them
     - **Done when:** A duplicate header path fails configure naming both modules; a module joins the build by adding only its own CMakeLists.txt; a third party no configured module links is never downloaded
     - **Needs:** BUILD-1
-- [ ] **GDT-1** · Spike: the RunicEditor executable on libgodot · [RunicEngine#7](https://github.com/PedroVicente98/RunicEngine/issues/7) · ready to start
+- [x] **GDT-1** · Spike: the RunicEditor executable on libgodot · [RunicEngine#7](https://github.com/PedroVicente98/RunicEngine/issues/7) · done
     - Spike: the RunicEditor executable on libgodot (editor target) opens the Godot editor with a test plugin; the editor target builds and opens without GDScript
     - **Done when:** The editor opens, loads the plugin and exits cleanly in CI; the spike’s findings decide the fallback
     - **Needs:** BUILD-1
