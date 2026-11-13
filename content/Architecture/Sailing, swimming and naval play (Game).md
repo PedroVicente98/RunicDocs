@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-13"
 ---
 
 RunicGame builds its seas on the Engine water and environment APIs: ships, sails, cargo, naval combat, breath, sea threats and nautical charts are game data and rules, while the Engine only floats, moves and samples.
@@ -19,7 +19,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 | Sailing controls: helm, sail trim, anchor, oars | WatercraftMovement intents, wind | — |
 | Cargo and trade packs on board | CargoOf relationships, group handoff | — (trade packs are world entities) |
 | Passengers, boarding, falling overboard | PassengerOf, CharacterVirtual on moving bodies, CharacterWaterMovement | — |
-| Naval combat: cannons, ramming, hull damage, breaches and flooding, sinking | Ability toolkit with the ship as source, damage interception, BuoyancyProfile scale and righting strength, water samples at breach points | Repairs through the economy game service |
+| Naval combat: cannons, ramming, hull damage, breaches and flooding, sinking | Ability toolkit with the ship as source, the impact pipeline, BuoyancyProfile scale and righting strength, water samples at breach points | Repairs through the economy game service |
 | Swimming, diving and breath | CharacterWaterMovement, WaterInteractionState | — |
 | Sea threats and water bosses | AI framework, CharacterWaterMovement, perception, SwimMovementModifiers | — |
 | Nautical charts | Map knowledge, cooked current and wind fields | Learned charts in the character service |
@@ -46,7 +46,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 
 * **Cannons** are abilities whose source is a crewed ship station, using projectile shapes that hit hulls and characters on deck. Wind affects them only if the skill sets the wind flag.
 
-* **Hull damage** goes through damage interception on the ship entity, with Game defense values per ship class. A ship has one pool of hull points: cannons, ramming and sea creatures deal fixed damage; environment events (big waves, lightning, waterspouts, maelstroms) deal a percentage of the ship's maximum hull points, small per hit for events that hit many times and large for a single hit, so every ship class takes them the same way; and water counts as hull points drained.
+* **Hull damage** goes through the impact pipeline on the ship entity, with Game defense stages and values per ship class. A ship has one Game resource pool of hull points: cannons, ramming and sea creatures deal fixed damage; environment events (big waves, lightning, waterspouts, maelstroms) deal a percentage of the ship's maximum hull points, small per hit for events that hit many times and large for a single hit, so every ship class takes them the same way; and water counts as hull points drained.
 
 * **Ramming** reads Jolt contacts; the Game turns contact speed and mass into damage.
 
@@ -110,7 +110,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 
 * Static hazards (the ocean floor, reefs, sandbanks, glaciers) are terrain and collision cooked from the map's hazard layer, plus tagged hazard volumes in the spatial index: reef, shallow, freezing water, vent, kelp, fog bank and calm zone. Reef, sandbank and iceberg hits are Jolt contacts that the Game turns into damage, and reef and iceberg hits also open breaches.
 
-* Freezing water and vents are volume or water-body tags: while a character's WaterInteractionState says it is swimming inside one, the Game applies condition build-up through the status container (Chill or Burn) at the status tick rate, with the build-up rate set per water body or volume.
+* Freezing water and vents are volume or water-body tags: while a character's WaterInteractionState says it is swimming inside one, the Game applies condition build-up through status storage and its build-up policy (Chill or Burn) at the status tick rate, with the build-up rate set per water body or volume.
 
 * Fog banks are volumes whose density scales the perception radius and visibility tiers of everyone inside. They drift by the wind function, so their position is a pure function of world time, like any routine. Calm zones are areas where the wind routine's speed is zero.
 
@@ -130,7 +130,7 @@ RunicGame builds its seas on the Engine water and environment APIs: ships, sails
 
 * Engine needs: hull sockets authored per ship class in the editor (a point and a normal in ship space, flagged as reachable from the deck or only over the side), the AttachedTo relationship, and attachments in the ship's transfer-snapshot group, so they cross simulation borders with the ship (WATER-7).
 
-* Each attachment is a light Character: health, a status container and one small behavior that ticks every 0.5 to 1 s. It drains hull points, adds weight (a step in the BuoyancyProfile scale), tags the ship for an AI's or a faction's perception (tracking), spawns boarders or applies build-up to the characters on deck. Each sea region has its own attachment types, from basic to dangerous, so no region is fully safe.
+* Each attachment is a light Character: a Game health pool, its statuses and one small behavior that ticks every 0.5 to 1 s. It drains hull points, adds weight (a step in the BuoyancyProfile scale), tags the ship for an AI's or a faction's perception (tracking), spawns boarders or applies build-up to the characters on deck. Each sea region has its own attachment types, from basic to dangerous, so no region is fully safe.
 
 * Removal uses normal combat: hit volumes reach sockets near the rail; sockets low on the hull need a character leaning over the side, an interaction that exposes them and can make them fall; fire and cleanses act through the status system.
 

@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-13"
 ---
 
 Every skill is built from data components: damage type, delivery, shape, timeline, effects, CC, conditions, world utility and interaction rules. The components are also the tags that the skill pools, the role passives and the unique effects read, so tuning one component tunes every skill that uses it at once.
@@ -198,4 +198,4 @@ world_utility:
   light: { radius_m: 12, duration_s: 120, intensity: 0.8 }
 ```
 
-In the technical document each component uses an engine API: damage uses attributes and the rules pipeline, effects, conditions and control use the status container, the timeline runs in the ability toolkit in ticks of the 30 Hz domain, and interactions become condition → modifier rules in the rules pipeline. The engine provides the language and the resolver; the game provides the values and the few Customs.
+In the technical document each component uses an engine API: damage goes through the impact pipeline with the game's attributes and rules, effects and conditions use status storage with the game's application policies, control uses the control primitives, the timeline runs in the ability toolkit in ticks of the 30 Hz domain, and interactions become condition → modifier rules in the rules pipeline. The engine provides the mechanisms and the resolver; the game provides the rules, the values and the few Customs (see [[Engine gameplay APIs (Engine)#Mechanism and policy|Mechanism and policy]]).
