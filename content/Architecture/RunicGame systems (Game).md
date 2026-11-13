@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 RunicGame turns the Engine APIs into this game’s rules. Shared rules compile into both executables, so client prediction runs the same code as the server.
@@ -19,12 +19,12 @@ RunicGame turns the Engine APIs into this game’s rules. Shared rules compile i
 | Activation | Cost, cooldown, cast time, requirements | Ability toolkit (costs against RunicGame’s pools) |
 | Timeline | Startup, active, recovery, cancel windows | Ability toolkit |
 | Shape | Cone, circle, line, projectile; origin; range | Ability toolkit |
-| Damage | Parts with domain, delivery and optional subtype or element | RunicGame attributes, rule pipeline, impact pipeline |
+| Damage | Parts with domain, delivery and optional subtype or element | RunicGame attributes, rule pipeline, hit resolution |
 | Effect | Conditions with build-up (Burn, Chill, Shock, Poison, Bleed, Curse, Madness, Acid) through Tolerance, Armor Break, buffs | Status storage with RunicGame’s application policies |
 | Control | Stagger, Trip, Knockdown, Stun, Root through Resolve (T1 and T2); slows capped by the light-CC Resolve | RunicGame statuses on the control primitives, rule pipeline |
 | Movement | Dash, leap, root while casting | Movement |
-| Defense | Guard or iframe granted by the skill | Impact pipeline, restrictions |
-| Threat and protection | Threat multiplier, Challenge | Threat table, impact pipeline |
+| Defense | Guard or iframe granted by the skill | Hit resolution, restrictions |
+| Threat and protection | Threat multiplier, Challenge | Threat table, hit resolution |
 | World utility | Light emitter, reveal | Light and perception |
 | Hit timing | ServerTime or CappedRewind | Hit timing |
 | Custom | Behavior ID and parameters | Behavior registries |
@@ -49,7 +49,7 @@ The Engine stores, times and calls hooks; every rule below is RunicGame code or 
 | Relations | Hostile, friendly or neutral from the two factions, PvE mode, Outlaw, pirates and groups | GSH-9 |
 | Status storage | Application policies: build-up, Tolerance, stacking per status, Resolve | GSH-3, GSH-4 |
 | Control primitives | Stun, Knockdown, Trip, Stagger, Root and the CC target cap | GSH-4, GSH-5 |
-| Impact pipeline | Stages in order: Guard, armor, shields, damage to Health; the dodge’s iframes are an invulnerability restriction | GSH-4 |
+| Hit resolution | Stages in order: Guard, armor, shields, damage to Health; the dodge’s iframes are an invulnerability restriction | GSH-4 |
 | Targeting | Free aim, FriendlyLock and the aim-assist strength | GSH-5 |
 | Input buffer | One slot, the queue window, Dodge and Guard as priority inputs | GSH-5 |
 | Visibility levels | Full, Silhouette and Hidden with reveal on contact | GSRV-10 |
@@ -109,10 +109,10 @@ A custom behavior never replaces standard components, so defenses, coefficients,
 | Game system | Holds | Built on |
 | :---- | :---- | :---- |
 | Evasion | Charges by the class’s role, dodge form by Discipline, iframe length by armor, minimum recovery | A RunicGame pool, invulnerability restrictions |
-| Guard | One resource; modes Free (shield arc), Timed (the Quarterstaff), DuringMovement (greatsword dash, spear run), Filtered (mage, by damage domain and delivery) | Impact pipeline |
+| Guard | One resource; modes Free (shield arc), Timed (the Quarterstaff), DuringMovement (greatsword dash, spear run), Filtered (mage, by damage domain and delivery) | Hit resolution |
 | Resolve | CC immunity buff: full CC, then Resolve T1 (about 2 s; a CC during it drops one level), then Resolve T2 (about 2 s, immune to every CC); slows last at most about 10 s, then about 5 s of slow immunity. Tolerance, per condition: after about 10 s active, or at once on a peak, about 5 s with no added time or build-up | Status application policy on the Engine’s status storage |
 | Threat and taunt | Threat values per action; spatial taunt | Threat table |
-| Challenge | PvP protection: a share of damage redirected to the Tank, non-stacking | Impact pipeline |
+| Challenge | PvP protection: a share of damage redirected to the Tank, non-stacking | Hit resolution |
 
 ### Items, progression and inventory
 

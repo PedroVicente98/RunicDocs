@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 Three repositories and one CMake build graph: RunicGame owns the executables, the Engine and Platform are libraries and services it builds on, and the server never links rendering or player UI code.
@@ -14,7 +14,7 @@ Three repositories and one CMake build graph: RunicGame owns the executables, th
 
 | Repository | License | Owns |
 | :---- | :---- | :---- |
-| RunicEngine | Open source (C++) | Engine modules, the entry point and ApplicationHost, the RunicEditor (the Godot editor through LibGodot) with GodotTools and the Cooker, GodotBridge, the RunicBot, the project template; pins Godot and godot-cpp |
+| RunicEngine | Open source (C++) | Engine modules, the entry point and ApplicationHost, the RunicEditor (the Godot editor through LibGodot) with GodotTools and the Cooker, GodotBridge, its own game-agnostic RunicServer and RunicClient, the RunicBot, the project template; pins Godot and godot-cpp |
 | RunicPlatform | Open source (C++ and Go) | GameNetworkingSockets transport, server bindings (services bridge and lifecycle layers), Protobuf contracts, Go SDK, core services, building blocks, Agones and Kubernetes manifests, dashboards |
 | RunicGame | Closed source | GameClient and GameServer executables (RunicGameClient, RunicGameServer), game modules and the game’s editor library, Go game services, content; it is a RunicEngine project (project.godot, runic.project.json) |
 
@@ -24,17 +24,17 @@ RunicGame is the superproject: it pins RunicEngine and RunicPlatform as git subm
 
 | Group | Module | Contains | Depends on | Headless | Packages |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| Foundation | Runic::Core | Plain ID types, time types, math (GLM), memory, logging, config, worker pool, metrics registry, debug-stream registry; RenderData (plain render structs shared by the Client, GodotBridge and debug tools, including DebugGeometry and the debug-draw API) | — | yes | CORE-1 to CORE-7 |
+| Foundation | Runic::Core | Plain ID types, time types, math (GLM), world-space types (WorldPosition, WorldDelta), memory, logging, config, worker pool, metrics registry, debug-stream registry; RenderData (plain render structs shared by the Client, GodotBridge and debug tools, including DebugGeometry and the debug-draw API) | — | yes | CORE-1 to CORE-8 |
 | Foundation | Runic::Application | Entry point, Application, ApplicationHost (Run and RunFrame), LayerStack, loop policies, application events; no window class (the window comes from Godot) | Core | yes | APP-1 |
 | Foundation | Runic::Events | Typed tick-safe event buffers and readers, multi-consumer delivery, stable event IDs | Core | yes | EVT-1 |
 | Foundation | Runic::Content | Namespaced ContentId (engine:, game:), registries, versioned schemas, validation, loading, live reload | Core | yes | CNT-1, CNT-2 |
 | Foundation | Runic::Assets | AssetId, handles, cache, native cooked formats, random-access packages with Zstandard decompression, manifests, client and server package selection, streaming | Core, Content | yes | ASSET-1, ASSET-2 |
 | Simulation core | Runic::ECS | Flecs integration behind the Runic API, conventions, state declarations and their storage categories; the opt-in Runic::ECSNative target | Core; Flecs stays private, reachable only through Runic::ECSNative | yes | ECS-1, ECS-2 |
-| Simulation core | Runic::World | 64-bit double coordinates (real Y, 1 cm minimum unit), worlds (WorldId), region-local origins, Regions, Sectors, sparse 3D Cells, authored volumes (including indivisible ones), spatial index and exact XYZ queries, activation volumes and streaming state | Core, ECS | yes | WORLD-1 to WORLD-3 |
+| Simulation core | Runic::World | Region-local origins and conversions over Core’s 64-bit world-space types (real Y, 1 cm minimum unit), the world registry (what each WorldId is), Regions, Sectors, sparse 3D Cells, authored volumes (including indivisible ones), spatial index and exact XYZ queries, activation volumes and streaming state | Core, ECS | yes | WORLD-1 to WORLD-3 |
 | Simulation core | Runic::Physics | Jolt v5.6 in double precision behind Runic types: bodies, shapes, CharacterVirtual, queries, collision layers, debug-geometry extraction, the Jolt job system on the Core worker pool | Core, World (Jolt private) | yes | PHYS-1 to PHYS-5 |
 | Simulation core | Runic::Simulation | SimulationRuntime: multi-rate scheduler, phases, barriers, commands, event flush, worker integration, client prediction subset, the replication registry, the service port (outgoing durable operations, accepted results applied at safe ticks; header-only Runic::SimulationPort target); the physics bridge (transforms and Physics handles in Flecs, sync around the step); the Simulation layer | Core, Application, ECS, Events, World, Physics, Content | yes | SIM-1 to SIM-8 |
 | GameplayAPI | Runic::Gameplay | The attribute API and modifiers, resource pools, tags, the lifecycle API (Kill, death and kill facts), the relation hook, the movement-mode registry and modes, restrictions, interaction framework, item and equipment runtime, spawn and routine spawning | Simulation, Environment (wind for gliding) | yes | GPL-1 to GPL-8 |
-| GameplayAPI | Runic::Combat | Ability toolkit and phase timelines, hit timing per skill, the input buffer, target slots and selection helpers, combat volumes and hit detection, status storage with Game application policies, cooldowns, rule pipeline, behavior registries, the impact pipeline, invulnerability restrictions, threat table, control primitives, foreign combat | Gameplay, Physics, Environment (projectile wind), DistributedSimulation | yes | CMB-1 to CMB-8 |
+| GameplayAPI | Runic::Combat | Ability toolkit and phase timelines, hit timing per skill, the input buffer, target slots and selection helpers, combat volumes and hit detection, status storage with Game application policies, cooldowns, rule pipeline, behavior registries, hit resolution, invulnerability restrictions, threat table, control primitives, foreign combat | Gameplay, Physics, Environment (projectile wind), DistributedSimulation | yes | CMB-1 to CMB-8 |
 | GameplayAPI | Runic::GameplayFlow | Sequences with trigger, condition and action registries, timers on simulation time, presentation cues, source-owned cleanup, handoff policies | Gameplay, DistributedSimulation (handoff snapshot) | yes | FLOW-1 to FLOW-3 |
 | GameplayAPI | Runic::Quest | Quest runtime and the quest-creation API: definitions, objectives, triggers from facts, instances, durable-fact bridge | GameplayFlow, DistributedSimulation (handoff snapshot) | yes | QST-1 to QST-3 |
 | World systems | Runic::Perception | Light emitters, ambient and skylight, luminosity queries, concealment, warn and detect radii, visibility tiers chosen by a Game function | Gameplay, World, Environment (time of day, weather), Water (underwater light) | yes | PRC-1 to PRC-3 |
@@ -59,7 +59,7 @@ Godot never reads Physics or the simulation: the client builds a list of what to
 
 | Target | Contains | Depends on |
 | :---- | :---- | :---- |
-| RunicGame::Shared | Rules compiled into both executables. GameCombat: skills mapped to the ability toolkit, the character’s attributes and pools and the death rule, status application policies and crowd control, damage types and formula, resolver order, impact stages and defense, targeting selectors and input-buffer settings, threat, relations (factions, PvE mode, Outlaw, pirates, groups), custom behaviors. GameBuilds: ten fixed loadouts, named classes (loadout \+ Discipline, one role each), weapon skills unlocked by level and one merged tree per class with points in the Discipline skills, context kits (mount and aerial trees), armor rules. Movement parameters, item rules, client-safe content definitions | Runic::GameplayAPI, Perception |
+| RunicGame::Shared | Rules compiled into both executables. GameCombat: skills mapped to the ability toolkit, the character’s attributes and pools and the death rule, status application policies and crowd control, damage types and formula, resolver order, hit-resolution stages and defense, targeting selectors and input-buffer settings, threat, relations (factions, PvE mode, Outlaw, pirates, groups), custom behaviors. GameBuilds: ten fixed loadouts, named classes (loadout \+ Discipline, one role each), weapon skills unlocked by level and one merged tree per class with points in the Discipline skills, context kits (mount and aerial trees), armor rules. Movement parameters, item rules, client-safe content definitions | Runic::GameplayAPI, Perception |
 | RunicGame::Server | Server-only rules. GameCore registers Game systems, hooks and actions. GameWorld: continents, regions, volumes (caves, flight zones, castle zones), world rules, castles, world routines. GameAI: mob profiles, trees, custom nodes. GameQuests: quests built with the Quest API. GameEncounters: boss phases, dungeon scripts and cutscenes on GameplayFlow. GameNaval, GameInstances. GameExploration: death and respawn, durability, Altars, map knowledge, cartography and exploration XP. GameProduction (expansion): gathering, crafting, farming, professions, trade packs, labor. Spawns, loot, world events, service clients, persistence bridge | Shared, Runic::Simulation, Network, AI, Water, Environment; Platform server bindings and contracts |
 | RunicGame::Client | GameClientPresentation: camera rules, animation, VFX and audio binding, cutscene presentation. GameUI: Godot UI scenes bound to view models, including the map with fog of war. Audio content, input bindings | Shared, Runic::Client, GodotBridge, Animation, Audio |
 | RunicGame::Editor | The game’s marker nodes, docks and inspectors, built as the project’s editor library and loaded by the RunicEditor | Runic::GodotTools |
@@ -88,6 +88,8 @@ Godot never reads Physics or the simulation: the client builds a list of what to
 | GameServer | Game | Server layers on the Engine, one region per pod | Yes, to the server fleet |
 | RunicEditor | Engine | The Godot editor with the Runic tools and the project’s editor library; attaches to development and staging servers | Never |
 | Cooker | Engine | Inside the RunicEditor, or the RunicEditor headless on build machines | Never |
+| RunicServer | Engine | The Engine’s own game-agnostic server: the Engine’s server layers as they arrive (Network, Simulation, Diagnostics) with neutral test content and no Platform layers; where Engine slices show their server results | Never |
+| RunicClient | Engine | The Engine’s own game-agnostic client: the Engine’s client layers with the GodotLayer on top and neutral test content; where Engine slices show their client results | Never |
 | RunicBot | Engine | The client runtime without presentation, many bot sessions per process, for scale tests | Never |
 | Game services | Game | Go services built on the Platform SDK | Yes, to the server fleet |
 | Platform services | Platform | Core services and building blocks | Yes, to the server fleet |

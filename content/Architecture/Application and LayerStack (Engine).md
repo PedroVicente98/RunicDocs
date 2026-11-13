@@ -6,14 +6,14 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-13"
 ---
 
 Every executable is an Application on the Engine’s ApplicationHost: a stack of layers that receives events top-down and updates bottom-up, while the simulation’s internal order stays inside its scheduler.
 
 ### Entry point
 
-The Engine owns main(). It calls CreateApplication(), which each executable defines: RunicGame defines it twice (GameClient and GameServer), and the Engine defines it for the RunicEditor (the Cooker runs inside it) and the RunicBot. The Application then builds its LayerStack and hands control to the ApplicationHost. A whole frame fits in RunFrame and Run only repeats it under the loop policy, so a host that does not own the loop can still drive the Engine one frame at a time.
+The Engine owns main(). It calls CreateApplication(), which each executable defines: RunicGame defines it twice (GameClient and GameServer), and the Engine defines it for its own programs: the game-agnostic RunicServer and RunicClient, the RunicEditor (the Cooker runs inside it) and the RunicBot. The Application then builds its LayerStack and hands control to the ApplicationHost. A whole frame fits in RunFrame and Run only repeats it under the loop policy, so a host that does not own the loop can still drive the Engine one frame at a time.
 
 ```cpp
 // Illustrative contract, not a frozen API.
@@ -59,6 +59,8 @@ The development overlay that v3 drew with ImGui is a Godot UI panel inside the G
 | RunicEditor | Godot’s editor loop through LibGodot | Events, OnUpdate, OnRender |
 | Cooker (RunicEditor headless) | Job loop | Events, OnUpdate |
 | RunicBot | Fixed 60 Hz loop | Events, OnUpdate; no rendering |
+| RunicServer | Fixed 60 Hz loop, like the GameServer | Events, OnUpdate; no rendering |
+| RunicClient | Frame loop paced by Godot, like the GameClient | Events, OnUpdate, OnRender; the GodotLayer calls Godot’s iteration() last |
 
 ### Stacks per executable
 
@@ -69,6 +71,8 @@ The development overlay that v3 drew with ImGui is a Godot UI panel inside the G
 | RunicEditor | GodotLayer (editor build) hosting the Runic editor plugins; a local simulation layer for inspection and previews | None |
 | Cooker | Job runner inside the RunicEditor | None |
 | RunicBot | Network → bot runtime (prediction subset and bot brains for many sessions) | None |
+| RunicServer | The Engine layers of the GameServer stack as they arrive (Network, Simulation, Diagnostics); no Platform layers | None |
+| RunicClient | Network → Prediction → Presentation → GodotLayer, as they arrive | None |
 
 The Engine supplies the Network, Simulation, Prediction, Presentation, GodotLayer and Diagnostics layers as reusable classes. The Platform supplies the services-bridge and lifecycle layers as C++ server bindings that implement the Engine’s Layer interface and the Simulation’s service port, because only the Platform may talk to gRPC, NATS and Agones; the Engine never supplies infrastructure or communication layers. RunicGame configures and composes all of them and adds its own (for example the client’s game-state screens). Dependencies point downward: Platform bindings include Engine interface headers, the Engine includes nothing from the Platform or the Game.
 

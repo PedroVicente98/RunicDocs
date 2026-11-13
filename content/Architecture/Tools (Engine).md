@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-10"
+modified: "2026-11-13"
 ---
 
 The RunicEditor is the Godot editor run through LibGodot with the Runic tools inside; the Cooker runs in it, or in the same binary headless on build machines. Neither is ever distributed to players.
@@ -22,6 +22,8 @@ The RunicEditor is the Godot editor run through LibGodot with the Runic tools in
 * **Live attach** to development and staging servers through the GameServer’s Diagnostics layer, drawing the server’s debug shapes in the viewport.
 
 * **The project’s editor library** adds the game’s own marker nodes and docks and reloads with the editor open.
+
+* **Editor UI that fits the editor.** Runic tools add UI only through the editor’s own extension points (docks, the bottom panel, a main-screen tab, inspector plugins, Project › Tools and context menus) and take their colors, fonts, icons and sizes from the editor theme and the editor scale, so they look like the rest of the editor. They never insert controls into a container whose layout they do not own: the slice 0 spike’s toolbar button sat at the far right of the top bar and broke it. Player UI follows the same rule with the project’s own Theme resources.
 
 ### Authoring path for every system
 

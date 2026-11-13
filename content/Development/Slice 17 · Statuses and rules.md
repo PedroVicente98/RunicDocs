@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/160"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 17 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine, Game · **Issue:** [RunicEngine#160](https://github.com/PedroVicente98/RunicEngine/issues/160)
@@ -26,7 +26,7 @@ modified: "2026-11-12"
 
 ### Packages
 
-- [ ] **CMB-3** · Statuses and effects, cooldowns, resource costs · [RunicEngine#47](https://github.com/PedroVicente98/RunicEngine/issues/47) · not started
+- [ ] **CMB-3** · Status storage, cooldowns and costs · [RunicEngine#47](https://github.com/PedroVicente98/RunicEngine/issues/47) · not started
     - Status storage (instances, timers, periodic ticks, apply, refresh and remove, events, queries by tag, replication), every application going through a policy the Game registers; cooldowns with shared groups and charges; costs as a list against Game pools
     - **Done when:** Durations, ticks and cooldowns expire on the right tick; two test policies (refresh and intensity stacking) change the result with no Engine change; a shared cooldown group behaves as a global cooldown
     - **Needs:** [[Slice 16 · Ability toolkit|CMB-1]]

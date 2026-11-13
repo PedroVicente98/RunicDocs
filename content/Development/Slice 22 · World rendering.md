@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/165"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-13"
 ---
 
 **Slice:** 22 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#165](https://github.com/PedroVicente98/RunicEngine/issues/165)
@@ -29,7 +29,7 @@ modified: "2026-11-03"
 - [ ] **CORE-4** · RenderData scene kinds · [RunicEngine#67](https://github.com/PedroVicente98/RunicEngine/issues/67) · not started
     - RenderData scene kinds: mesh instances with a stable RenderInstanceId, skinned instances with pose buffers and animation intent, world anchors
     - **Done when:** Every kind round-trips through a frame packet in tests
-    - **Needs:** [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **CLI-4** · Mesh-instance extractor with interpolation, camera-relative conversion… · [RunicEngine#65](https://github.com/PedroVicente98/RunicEngine/issues/65) · not started
     - Mesh-instance extractor with interpolation, camera-relative conversion and a stable RenderInstanceId
     - **Done when:** Cooked meshes appear at their entities’ positions far from the origin

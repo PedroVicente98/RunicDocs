@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/162"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 19 · **Status:** Not started · **Packages done:** 0 of 5 · **Owners:** Engine, Game · **Issue:** [RunicEngine#162](https://github.com/PedroVicente98/RunicEngine/issues/162)
@@ -26,18 +26,18 @@ modified: "2026-11-12"
 
 ### Packages
 
-- [ ] **CMB-6** · Threat table and crowd control · [RunicEngine#52](https://github.com/PedroVicente98/RunicEngine/issues/52) · not started
+- [ ] **CMB-6** · Threat table and control primitives · [RunicEngine#52](https://github.com/PedroVicente98/RunicEngine/issues/52) · not started
     - Threat table and control primitives: control restriction sets (input, movement, abilities), forced motion (push, launch, pull) through Movement, control-state hooks
     - **Done when:** A test policy built on statuses and primitives stuns and knocks back a dummy; threat orders an NPC’s targets
     - **Needs:** [[Slice 18 · Defense|CMB-5]]
-- [ ] **CMB-7** · Input queue · [RunicEngine#53](https://github.com/PedroVicente98/RunicEngine/issues/53) · not started
+- [ ] **CMB-7** · Input buffer · [RunicEngine#53](https://github.com/PedroVicente98/RunicEngine/issues/53) · not started
     - Input buffer: depth, window and priority classes set by the Game; a buffered action starts on the first legal tick and is validated then; priority inputs skip it when the current ability allows the cancel
     - **Done when:** An early input fires on the first legal tick; a restriction in between cancels it
     - **Needs:** [[Slice 16 · Ability toolkit|CMB-1]], [[Slice 14 · Prediction|SIM-4]]
 - [ ] **GDB-9** · UI bridge · [RunicEngine#54](https://github.com/PedroVicente98/RunicEngine/issues/54) · not started
     - UI bridge: one Godot UI scene per client state; the view-model binder that writes only changed fields to controls
     - **Done when:** The skill bar triggers abilities and UI clicks never attack
-    - **Needs:** [[Slice 1 · Application and layers|GDB-1]], [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 1 · Application and layers|GDB-1]], [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **GCL-1** · First GameUI scenes in Godot · [RunicGame#12](https://github.com/PedroVicente98/RunicGame/issues/12) · not started
     - First GameUI scenes in Godot: HUD and skill bar, bound to view models
     - **Done when:** The skill bar triggers abilities and UI clicks never attack

@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-13"
 ---
 
 Positions are 64-bit doubles with a real Y axis, the world is indexed by sparse 3D cells, and activation volumes around players decide what loads and simulates. There are no spatial layers.
@@ -176,6 +176,8 @@ The world is presented as seamless places but authored, cooked, streamed and sim
 * **The main world** is WorldId \= MainWorld, InstanceId \= 0: the surface, its floating islands and its underground spaces in one continuous coordinate space.
 
 * **Separate persistent maps** are their own WorldId with InstanceId 0, shared by every player (the Game’s sky world is one). **Instances** (dungeons, raids, the shop island) are extra InstanceIds of a map.
+
+* **What a WorldId is.** One seamless world: every place reachable without a loading screen (in other games, a map of Guild Wars 2 or a continent of World of Warcraft). WorldId and InstanceId are plain ID types in Core (CORE-1), so every process can carry them; their values are the Game’s data (RunicGame: the main world and the sky world); World’s registry (WORLD-1) gives each WorldId its coordinate space, origin and partition.
 
 * **Worlds never share a border.** There is no handoff or ghost between worlds. A world transition is a checkpoint plus a new connect ticket: the source simulation checkpoints the character through the service port, the Platform issues a ticket for the destination simulation, and the client connects there while it loads the destination. Presentation covers the load (the Game flies the character through the clouds); portals to other maps and entries to instances use the same path.
 

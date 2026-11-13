@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/186"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-13"
 ---
 
 **Slice:** 42a · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#186](https://github.com/PedroVicente98/RunicEngine/issues/186)
@@ -29,7 +29,7 @@ modified: "2026-11-03"
 - [ ] **CORE-6** · RenderData water and field kinds · [RunicEngine#128](https://github.com/PedroVicente98/RunicEngine/issues/128) · not started
     - RenderData water and field kinds: water surface state, field grids
     - **Done when:** Versions change only when their source changes
-    - **Needs:** [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **CLI-8** · Water-surface and field-grid extractors from Water and Environment,… · [RunicEngine#127](https://github.com/PedroVicente98/RunicEngine/issues/127) · not started
     - Water-surface and field-grid extractors from Water and Environment, change-driven
     - **Done when:** Grids re-extract only when the current or the wind changes

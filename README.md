@@ -41,7 +41,7 @@ tools/                                        the split script, the move tool, t
 | Folder | Notes |
 | :--- | ---: |
 | `Vision/` | 22 |
-| `Architecture/` | 28 |
+| `Architecture/` | 29 |
 | `Ideias/` | 108 |
 | `Development/` | 54 |
 | `Visualizations/` | 5 |

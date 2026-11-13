@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-13"
 ---
 
 Godot enters the Engine as a library (LibGodot) in two roles: renderer, window, input, audio and player UI inside the client, and the authoring editor inside the RunicEditor. The simulation, networking, world, Platform and services of v3 do not change, the server never links Godot, and the RenderFrame is the only door from the Runic client into Godot.
@@ -383,13 +383,30 @@ If an editor tool needs Godot’s physics or navigation (scattering vegetation c
 
 * **Input:** Godot owns the window, so input is born there. Godot’s UI consumes first, and what is left becomes an AppEvent that goes down the LayerStack: the v3 rule “the top handles first” unchanged.
 
+### Slice 0 spike results (GDT-1)
+
+The spike ran on Godot 4.7.2-stable and godot-cpp 10.0.0-stable (API 4.7). The RunicEditor, a Runic executable that owns main(), loads the editor library, creates the one instance with the command line unchanged, starts it and calls iteration() until the editor quits; a test plugin registered at the editor level loads and unloads.
+
+| Finding | Consequence |
+| :---- | :---- |
+| The editor runs as a library, headless and windowed (Vulkan, Forward+), with the module lists and without GDScript; it exits cleanly, and the project manager opens and exits | Plan A holds; plan B stays only as the approved fallback (open decision 5) |
+| The editor library is about 178 MB and builds in about 5 minutes with clang and lld on 8 jobs; the template library (with the build profile) is about 73 MB and 3 minutes | The SCons cache keeps CI builds short |
+| Without GDScript the editor prints one benign error from the Create Plugin dialog, which selects the first script language when there is none | Report upstream (a one-line guard), carry a small documented patch, or hide plugin creation with the editor feature profile (GDT-2); it disappears when GDScript returns in slices 20–21 |
+| Export templates refuse --path (built with disable_path_overrides) and run only the .pck next to the executable | The shipping lock stays on. Until the client .pck export (COOK-4, slice 22) the development client runs the editor library; the template library is checked by loading it |
+| libgodot is loaded at runtime, not linked | One client binary runs the editor library in development and the template library when shipping; the headless check uses the link closure, so the server reaches no Godot target |
+| Without Godot’s physics modules Godot warns unless the project selects its dummy physics servers | Projects set physics/3d/physics_engine and physics/2d/physics_engine to "Dummy"; the project template carries both (GDT-2) |
+| godot-cpp 10 ships the 4.7 API; --dump-extension-api does not work through LibGodot | The published API per build needs the same profile built once as an executable (RUNIC_GODOT_API_FILE is ready for it) |
+| Without a branding patch the RunicEditor shares Godot’s editor settings folder with an official Godot on the same machine | Owner decision: apply a branding patch (separate settings folder) or not |
+
+Not verified by the spike: the project manager’s Open and New relaunching the RunicEditor with --path (GDT-2), Godot’s Play buttons relaunching it (Run is GDT-9; main() stops the relaunch until then), Windows and macOS, and the CI jobs on GitHub.
+
 ### Risks
 
-* **LibGodot is new:** one instance per process, desktop platforms only. The editor as a library is the least tested path; the slice 0 spike proves it, and the open fallback decision covers a failure.
+* **LibGodot is new:** one instance per process, desktop platforms only. The editor as a library was the least tested path; the slice 0 spike proved it (see above), and plan B remains the fallback.
 
 * **Build and version:** building Godot from source takes tens of minutes without a cache, and moving from 4.x to 4.y becomes a decision with tests.
 
-* **Editor without GDScript:** the editor target must build and open without the module; the spike confirms it.
+* **Editor without GDScript:** the editor target must build and open without the module; the slice 0 spike confirmed it.
 
 * **Module names change between versions:** the module lists are reviewed at every update.
 
@@ -405,4 +422,4 @@ If an editor tool needs Godot’s physics or navigation (scattering vegetation c
 | 2 | New project from the project manager | A small patch in Godot’s project manager, or a plugin that initializes an empty project | The plugin first; the patch only if the experience asks for it |
 | 3 | Client animation | (A) the Runic evaluator with poses sent to RenderingServer skeletons, no nodes; (B) Godot’s AnimationTree driven by the animation intent | A keeps “no nodes” and controls crowd cost; B brings a visual blend editor |
 | 4 | MusicDirector | Runic logic with a Godot backend, or code on the Godot side | Runic logic: generic, testable and independent of rendering |
-| 5 | Fallback if the editor cannot run as a library | The RunicEditor becomes a Godot editor built by Runic that loads the Runic tools as a GDExtension | Approve now as plan B: the same code, only the owner of the process changes |
+| 5 | Fallback if the editor cannot run as a library | The RunicEditor becomes a Godot editor built by Runic that loads the Runic tools as a GDExtension | Approve now as plan B: the same code, only the owner of the process changes. The slice 0 spike passed (plan A holds), so plan B is only a fallback |

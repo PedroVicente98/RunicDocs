@@ -5,14 +5,14 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 | Area | Decision |
 | :---- | :---- |
 | Ownership | Engine provides generic mechanisms, Game provides rules, content and executables, Platform provides shared services, SDK and infrastructure |
 | Mechanism and policy | An Engine API must let a game come close to another game’s system; anything that fixes one game’s rule is Game: attributes such as Health and Stamina, status stacking and immunity, crowd control, factions, PvP visibility, flight zones (12 November 2026) |
-| Executables | GameClient and GameServer belong to RunicGame; the Engine owns the entry point, the ApplicationHost (Run and RunFrame), the RunicEditor and the RunicBot |
+| Executables | GameClient and GameServer belong to RunicGame; the Engine owns the entry point, the ApplicationHost (Run and RunFrame), the RunicEditor, the RunicBot and its own game-agnostic RunicServer and RunicClient, where Engine slices show their results (12 November 2026) |
 | Application | Layers with events top-down and updates bottom-up; changes at safe points; loop policy per executable |
 | Authority | The C++ simulation is authoritative; Go services own durable and distributed state |
 | Scale | 5,000 players per world; 100 vs 100 must feel perfect; 500 in one region supported |
@@ -24,7 +24,7 @@ modified: "2026-11-12"
 | Networking stack | Engine transport interface; Platform GameNetworkingSockets transport; gRPC with answers; Protobuf service contracts; Engine-encoded realtime messages; NATS publish/subscribe; Go services; Agones and Kubernetes |
 | Hit timing | ServerTime by default; CappedRewind per skill; full rewind not offered |
 | Responsiveness | Prediction runs shared game code; predicted skill starts; input queue |
-| Gameplay split | Engine GameplayAPI group (Gameplay, Combat, GameplayFlow and Quest modules): ability toolkit, input buffer, target slots, tags, attribute API and pools, lifecycle, relation hook, status storage with Game policies, rule pipeline, impact pipeline, control primitives, threat table, registries, restrictions, sequences, quest runtime; Game: every attribute and policy — skills, resolver, statuses, crowd control, damage, defense, threat rules, factions |
+| Gameplay split | Engine GameplayAPI group (Gameplay, Combat, GameplayFlow and Quest modules): ability toolkit, input buffer, target slots, tags, attribute API and pools, lifecycle, relation hook, status storage with Game policies, rule pipeline, hit resolution, control primitives, threat table, registries, restrictions, sequences, quest runtime; Game: every attribute and policy — skills, resolver, statuses, crowd control, damage, defense, threat rules, factions |
 | Light and perception | Engine API with game values; warn and detect radii; concealment; detection at zero light |
 | PvP visibility | Engine: visibility tiers as data, picked by a Game function; RunicGame: Full, Silhouette and Hidden with reveal on contact |
 | Custom logic | Data first; custom behaviors in C++ through registries; no scripting language in the game; GDScript only for editor tools |
@@ -74,7 +74,17 @@ modified: "2026-11-12"
 | GDScript | Off until slices 20–21, then only in the editor, with locks in every layer; the client is built without it and the export refuses scripts |
 | Code workflow | C++ and Go in an external IDE; the editor generates IDE files and runs assistants; the Run button compiles, cooks, keeps the local stack and starts server and clients |
 | Type rule | WorldPosition and WorldDelta are 64-bit; directions, velocities, sizes, rotations, local offsets and shapes are 32-bit; going down only through ToLocal; float-conversion warnings are errors |
-| Open in v4 | Data file format, the New project flow, client animation, MusicDirector placement, the fallback if the editor cannot run as a library (see [[Godot integration (Engine)\|Godot integration]]) |
+| Documentation | RunicDocs is the single source of all development documentation: the repositories keep no copy of it, only code-adjacent documents (CLAUDE.md, each module’s README.md and ARCHITECTURE.md, the build helpers' README) and later generated API documentation; RunicGame’s docs folder keeps its content-creation vault (lore, maps, quests) (12 November 2026) |
+| Folder layout | Every group, module and subsystem folder exists from the start with a README that names the package that fills it, so the layout never moves; PascalCase for what the architecture defines, lowercase for repository plumbing, never two folders that differ only by case; Go packages keep Go’s lowercase convention (9, 12 and 13 November 2026) |
+| Includes | A module’s headers are included by their path under Public/ (for example RenderData/RenderFrame.hpp); a check fails when two modules of the three repositories export the same path (12 November 2026) |
+| Program write scope | A work package may also edit the Engine program that shows its result: APP-1 creates RunicServer, GDB-1 creates RunicClient and moves the RunicEditor onto the entry point (12 November 2026) |
+| Debug drawing early | CORE-3 (DebugGeometry, the debug-draw API in Core, the RenderFrame) moves to slice 2 with GDB-2, so the debug-draw API is written once, in Core (12 November 2026) |
+| World-space types | WorldPosition and WorldDelta live in Core (Core/Public/WorldSpace.hpp) and arrive with CORE-1, because every spatial operation needs them (12 November 2026) |
+| World identity | A WorldId is one seamless world (every place reachable without a loading screen) and an InstanceId one copy of it; both are plain ID types in Core (CORE-1) whose values the Game defines; World’s registry (WORLD-1) says what each WorldId is (13 November 2026) |
+| Core memory and configuration | Fixed-capacity containers in CORE-1 (slice 1, for allocation-free events), per-tick arenas and per-worker buffers in CORE-2, process configuration in CORE-8 (both slice 3) (13 November 2026) |
+| Editor UI | Runic tools add UI through the editor’s extension points and the editor theme and scale, never inside containers they do not own; player UI uses the project’s Theme resources (13 November 2026) |
+| Hit detection and hit resolution | Two Engine mechanisms. Hit detection: volumes, sweeps, ordered hits with deterministic tie-breaking, filters and per-ability hit limits as data (who is hit, in what order). Hit resolution: the Game-registered stages each hit runs through (what the hit does). Damage is a Game rule (12 and 13 November 2026) |
+| Open in v4 | Data file format, the New project flow, client animation, MusicDirector placement (see [[Godot integration (Engine)\|Godot integration]]); the editor-as-library fallback is only a fallback since the slice 0 spike passed. Questions packages and the owner still have to settle are in [[Open questions]] |
 
 ---
 

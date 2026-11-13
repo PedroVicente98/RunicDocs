@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/169"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 25 · **Status:** Not started · **Packages done:** 0 of 5 · **Owners:** Engine, Game · **Issue:** [RunicEngine#169](https://github.com/PedroVicente98/RunicEngine/issues/169)
@@ -40,7 +40,7 @@ modified: "2026-11-12"
     - Interest: candidates by cell, priority and budgets, visibility tiers applied, detail levels per component and the client’s focus hint
     - **Done when:** Only relevant entities arrive and per-client budgets hold; a focused entity arrives with its full detail level
     - **Needs:** [[Slice 13 · Replication|NET-2]], [[Slice 11 · Spatial index|WORLD-2]], PRC-2
-- [ ] **GSRV-10** · Visibility tiers: Full, Silhouette and Hidden with reveal on contact, registered as the Engine’s visibility function · no issue · not started
+- [ ] **GSRV-10** · Visibility tiers · [RunicGame#51](https://github.com/PedroVicente98/RunicGame/issues/51) · not started
     - Visibility tiers: Full, Silhouette and Hidden with reveal on contact, registered as the Engine’s visibility function
     - **Done when:** Tiers change at RunicGame’s distances and light levels; contact reveals for a few seconds
     - **Needs:** PRC-2

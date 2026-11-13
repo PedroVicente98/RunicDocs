@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/170"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-13"
 ---
 
 **Slice:** 25a · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#170](https://github.com/PedroVicente98/RunicEngine/issues/170)
@@ -29,7 +29,7 @@ modified: "2026-11-03"
 - [ ] **CORE-5** · RenderData world-state kinds · [RunicEngine#83](https://github.com/PedroVicente98/RunicEngine/issues/83) · not started
     - RenderData world-state kinds: lights, environment frame, volumes
     - **Done when:** Every kind round-trips through a frame packet in tests
-    - **Needs:** [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **CLI-7** · Light, environment and volume extractors from Perception and Environment · [RunicEngine#82](https://github.com/PedroVicente98/RunicEngine/issues/82) · not started
     - Light, environment and volume extractors from Perception and Environment
     - **Done when:** Darkness and torches on screen match the server’s light values

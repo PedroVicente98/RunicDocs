@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/159"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 16 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine, Game · **Issue:** [RunicEngine#159](https://github.com/PedroVicente98/RunicEngine/issues/159)
@@ -28,15 +28,15 @@ modified: "2026-11-12"
     - Ability toolkit: timelines of named phases from data, phase lengths set by a Game hook when the ability starts, phase events, cancel requests and phase-time adjustment, a release input routed to the active ability; hit timing per skill (ServerTime, CappedRewind)
     - **Done when:** Timeline phases fire on exact ticks; a Game hook lengthens a phase
     - **Needs:** [[Slice 15 · Character state|GPL-2]], [[Slice 9 · First cooker proof|CNT-1]]
-- [ ] **CMB-2** · Targeting modes · [RunicEngine#46](https://github.com/PedroVicente98/RunicEngine/issues/46) · not started
-    - Targeting: target slots the Game names, selection helpers (under the aim ray, nearest in a cone, cycling a filtered list), targets in the command payload checked for range, line of sight and relation, aim-assist and homing hooks; combat volumes and hit detection over Physics queries, with each hit target’s relation
+- [ ] **CMB-2** · Targeting, combat volumes and hit detection · [RunicEngine#46](https://github.com/PedroVicente98/RunicEngine/issues/46) · not started
+    - Targeting: target slots the Game names, selection helpers (under the aim ray, nearest in a cone, cycling a filtered list), targets in the command payload checked for range, line of sight and relation, aim-assist and homing hooks; combat volumes and hit detection over Physics queries: every hit ordered along the hit timeline with deterministic tie-breaking, filters, and per-ability hit limits the Game sets (stop at the first hit, the third or never), with each hit target’s relation
     - **Done when:** A melee arc and a projectile each hit a dummy exactly once; a target out of range or out of sight is rejected
     - **Needs:** CMB-1, [[Slice 15 · Character state|PHYS-5]]
 - [ ] **GSH-2** · First skills on the ability toolkit · [RunicGame#9](https://github.com/PedroVicente98/RunicGame/issues/9) · not started
     - First skills on the ability toolkit: one melee, one projectile
     - **Done when:** Both hit a dummy with Game timings
     - **Needs:** CMB-2, [[Slice 15 · Character state|GSH-8]], GSH-9
-- [ ] **GSH-9** · Relations: the function the Engine asks (hostile, friendly or neutral), built from factions, PvE mode, Outlaw, pirates and groups · no issue · not started
+- [ ] **GSH-9** · Relations · [RunicGame#50](https://github.com/PedroVicente98/RunicGame/issues/50) · not started
     - Relations: the function the Engine asks (hostile, friendly or neutral), built from factions, PvE mode, Outlaw, pirates and groups
     - **Done when:** A dummy is hostile and a party member friendly; changing a test character’s faction flips the result
     - **Needs:** [[Slice 15 · Character state|GPL-2]]

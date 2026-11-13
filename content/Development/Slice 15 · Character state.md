@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/158"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 15 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine, Game · **Issue:** [RunicEngine#158](https://github.com/PedroVicente98/RunicEngine/issues/158)
@@ -32,7 +32,7 @@ modified: "2026-11-12"
     - Gameplay queries: ray, shape cast, overlap, per-worker query queues
     - **Done when:** Results are identical for a fixed scene with any worker count
     - **Needs:** [[Slice 7 · Physics|PHYS-1]], [[Slice 10 · Worker pool|SIM-3]]
-- [ ] **GSH-8** · Character attributes and pools: Health, Stamina and Mana declared on the Engine attribute API, their regeneration rules, and the death rule (Health at zero calls Kill) · no issue · not started
+- [ ] **GSH-8** · Character attributes and pools · [RunicGame#49](https://github.com/PedroVicente98/RunicGame/issues/49) · not started
     - Character attributes and pools: Health, Stamina and Mana declared on the Engine attribute API, their regeneration rules, and the death rule (Health at zero calls Kill)
     - **Done when:** A dummy loses Health, dies through Kill and emits one kill fact; pools regenerate by RunicGame’s rule
     - **Needs:** GPL-2

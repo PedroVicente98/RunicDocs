@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 Oct 14, 2026 · Pedro
@@ -216,3 +216,4 @@ Oct 14, 2026 · Pedro
   - [[World authoring and cooking (Engine, Game)#Project layout and schemas|Project layout and schemas]]
 - [[Vertical-slice roadmap]]
 - [[Decisions log]]
+- [[Open questions]]

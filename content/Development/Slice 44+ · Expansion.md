@@ -11,7 +11,7 @@ status: "Not started"
 owners: "All"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/190"
 created: "2026-11-03"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 **Slice:** 44+ · **Status:** Not started · **Packages done:** 0 of 29 · **Owners:** All · **Issue:** [RunicEngine#190](https://github.com/PedroVicente98/RunicEngine/issues/190)
@@ -45,7 +45,7 @@ modified: "2026-11-12"
 - [ ] **CORE-7** · RenderData effect kinds · [RunicEngine#136](https://github.com/PedroVicente98/RunicEngine/issues/136) · not started
     - RenderData effect kinds: particles, decals, trails
     - **Done when:** Defined when the production look is planned
-    - **Needs:** [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **COOK-8** · Incremental cooking at scale · [RunicEngine#135](https://github.com/PedroVicente98/RunicEngine/issues/135) · not started
     - Incremental cooking at scale
     - **Done when:** Only changed inputs cook again across a continent

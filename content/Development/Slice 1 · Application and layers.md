@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine, Game"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/144"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-13"
 ---
 
 **Slice:** 1 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine, Game · **Issue:** [RunicEngine#144](https://github.com/PedroVicente98/RunicEngine/issues/144)
@@ -20,23 +20,23 @@ modified: "2026-11-03"
 
 **Runnable result:** A Godot window opens from the client; layers push, pop and replace at safe points; events stop when handled
 
-**Proves:** Entry point, ApplicationHost with RunFrame, LayerStack, GodotLayer
+**Proves:** Entry point, ApplicationHost with RunFrame, LayerStack, GodotLayer, the Engine’s RunicServer and RunicClient
 
 **Godot:** GodotLayer on top of the client stack; the window comes from Godot
 
 ### Packages
 
 - [ ] **CORE-1** · Plain ID types · [RunicEngine#9](https://github.com/PedroVicente98/RunicEngine/issues/9) · ready to start
-    - Plain ID types (GlobalEntityId, GlobalPlayerId, SimulationId, WorldId, TickId, AuthorityEpoch, and value types other modules give meaning to, such as AssetId, WaterBodyId, FieldId and WidgetId), Result, asserts, logging hooks, time types, GLM math
-    - **Done when:** Unit tests cover IDs, Result and time conversions
+    - Plain ID types (GlobalEntityId, GlobalPlayerId, SimulationId, WorldId, InstanceId, TickId, AuthorityEpoch, and value types other modules give meaning to, such as AssetId, WaterBodyId, FieldId and WidgetId; Core defines the types, the Game’s data gives the values), Result, asserts, logging hooks, time types, GLM math, the world-space types every spatial operation uses (WorldPosition and WorldDelta in Core/Public/WorldSpace.hpp, ToLocal to 32-bit), and fixed-capacity containers for allocation-free paths (ring buffers, small vectors)
+    - **Done when:** Unit tests cover IDs, Result, time conversions and world-space arithmetic; adding two WorldPositions or converting one to a float vector does not compile; fixed-capacity containers never allocate after construction
     - **Needs:** [[Slice 0 · Build skeleton|BUILD-1]]
 - [ ] **APP-1** · Entry point, Application, ApplicationHost, Layer, LayerStack with… · [RunicEngine#8](https://github.com/PedroVicente98/RunicEngine/issues/8) · ready to start
-    - Entry point, Application, ApplicationHost, Layer, LayerStack with queued changes at safe points, application events, loop policies, RunFrame so a host can drive one frame at a time
-    - **Done when:** Layer order, events top-down until handled, updates bottom-up, safe-point push and pop, no allocation per event
+    - Entry point, Application, ApplicationHost, Layer, LayerStack with queued changes at safe points, application events, loop policies, RunFrame so a host can drive one frame at a time; the Engine’s RunicServer program on the entry point (fixed 60 Hz loop)
+    - **Done when:** Layer order, events top-down until handled, updates bottom-up, safe-point push and pop, no allocation per event; RunicServer starts and stops cleanly
     - **Needs:** CORE-1
 - [ ] **GDB-1** · GodotLayer · [RunicEngine#10](https://github.com/PedroVicente98/RunicEngine/issues/10) · ready to start
-    - GodotLayer: the LibGodot instance (create, start, iteration, stop) at the top of the client LayerStack; window from the DisplayServer; input forwarded as AppEvents after Godot’s UI; headless mode
-    - **Done when:** The client starts Godot windowed and headless and exits cleanly; UI clicks never reach the stack
+    - GodotLayer: the LibGodot instance (create, start, iteration, stop) at the top of the client LayerStack; window from the DisplayServer; input forwarded as AppEvents after Godot’s UI; headless mode; the Engine’s RunicClient program with the GodotLayer on top, and the RunicEditor moved onto the entry point
+    - **Done when:** RunicClient starts Godot windowed and headless and exits cleanly; the RunicEditor still opens and exits cleanly; UI clicks never reach the stack
     - **Needs:** APP-1, [[Slice 0 · Build skeleton|BUILD-1]]
 - [ ] **GAME-0** · GameClient and GameServer executables on the Engine entry point,… · [RunicGame#6](https://github.com/PedroVicente98/RunicGame/issues/6) · ready to start
     - GameClient and GameServer executables on the Engine entry point, composing their first layers; the client’s GodotLayer on top

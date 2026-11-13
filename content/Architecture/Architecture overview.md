@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 The Engine supplies generic mechanisms, the Game composes them into its two executables and its own services, and the Platform runs the shared services and infrastructure both depend on.
@@ -32,8 +32,8 @@ Read it as build dependencies: each band links only the bands below it, and noth
 | :---- | :---- | :---- | :---- |
 | Executables | Entry point, Application, ApplicationHost, reusable layers; the RunicEditor (the Godot editor through LibGodot) with the Cooker inside; the RunicBot | GameClient and GameServer compose the layers | Services-bridge and lifecycle layers (C++ server bindings) |
 | Simulation | Scheduler, threads, Flecs, Jolt, world space | Which systems run and their rules | — |
-| Skills and combat | GameplayAPI group (Gameplay and Combat modules): ability toolkit, input buffer, targeting, hit timing, tags, attribute API and pools, lifecycle, relation hook, status storage, rule pipeline, impact pipeline, control primitives | Skill definitions, attributes (Health, Stamina, Mana…) and the death rule, status policies, crowd control, Stagger, Resolve and Tolerance, damage types and formula, resolver order, relations and factions | — |
-| Defense and threat | Invulnerability restrictions, impact-pipeline stages, threat table | Evasion charges, Guard modes, armor effects, taunt, Challenge | — |
+| Skills and combat | GameplayAPI group (Gameplay and Combat modules): ability toolkit, input buffer, targeting, hit timing, tags, attribute API and pools, lifecycle, relation hook, status storage, rule pipeline, hit resolution, control primitives | Skill definitions, attributes (Health, Stamina, Mana…) and the death rule, status policies, crowd control, Stagger, Resolve and Tolerance, damage types and formula, resolver order, relations and factions | — |
+| Defense and threat | Invulnerability restrictions, hit-resolution stages, threat table | Evasion charges, Guard modes, armor effects, taunt, Challenge | — |
 | Custom code | Behavior registries, hooks, context and output buffers | The behaviors | — |
 | Movement | CharacterVirtual, movement modes (walk, sprint, glide, flight, climbing, mount), mode permission, prediction, validation | Speeds, dashes, mount, glider and wing stats; flight zones and the altitude ceiling | — |
 | Light, perception, AI | The APIs, computation, behavior-tree framework and editor | Values, mob profiles, trees, custom nodes | — |

@@ -7,7 +7,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-05"
+modified: "2026-11-13"
 ---
 
 The world is assembled in the RunicEditor (Godot) as one low-detail world scene plus detailed region scenes, Blender makes the assets, and the Cooker turns those scenes into Runic-native server and client packages; the shipping client and server never read an editor scene or a Blender file.
@@ -366,7 +366,7 @@ RunicGame/                          (a RunicEngine project)
     Volumes/DeepCaves.tscn
     SharedAssets/Buildings/  Rocks/  Vegetation/  Materials/
     UI/                             player UI scenes and themes
-  SkyWorld/World.tscn               (a separate WorldId)
+    SkyWorld/World.tscn             the sky world’s scene (a separate WorldId)
   Data/                             skills, items, AI, quests, spawn rules
   Build/Cooked/MainWorld/           (cooked output)
     MainWorld.runicworld

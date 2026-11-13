@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/151"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-13"
 ---
 
 **Slice:** 8 · **Status:** Not started · **Packages done:** 0 of 3 · **Owners:** Engine · **Issue:** [RunicEngine#151](https://github.com/PedroVicente98/RunicEngine/issues/151)
@@ -29,7 +29,7 @@ modified: "2026-11-03"
 - [ ] **PHYS-3** · Debug-geometry extraction · [RunicEngine#27](https://github.com/PedroVicente98/RunicEngine/issues/27) · not started
     - Debug-geometry extraction: Jolt’s debug interface implemented inside Physics, written into Core DebugGeometry buffers
     - **Done when:** Bodies and shapes come out as plain lines and triangles; Physics links no GodotBridge
-    - **Needs:** [[Slice 7 · Physics|PHYS-1]], [[Slice 5 · Moving entities|CORE-3]]
+    - **Needs:** [[Slice 7 · Physics|PHYS-1]], [[Slice 2 · Debug drawing|CORE-3]]
 - [ ] **GDB-4** · Physics geometry layer · [RunicEngine#25](https://github.com/PedroVicente98/RunicEngine/issues/25) · not started
     - Physics geometry layer: DebugGeometry from PHYS-3 with cached debug meshes for large shapes; the “see what the server sees” overlay
     - **Done when:** Collision shapes line up with gameplay shapes and the layer toggles

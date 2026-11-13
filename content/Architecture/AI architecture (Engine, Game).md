@@ -7,7 +7,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-13"
 ---
 
 AI is reasoning, not authority. The Engine’s AI module reads permitted facts, keeps bounded working memory, ticks behavior trees and emits intents; the simulation validates and executes those intents exactly like player commands. RunicGame supplies the trees, personalities, perception values and game-specific nodes.
@@ -99,6 +99,8 @@ AI is reasoning, not authority. The Engine’s AI module reads permitted facts, 
 
 ### Module boundaries
 
+The code in this note is illustrative and calls Flecs directly for brevity. The real Runic::AI registers its components, systems and queries through the Runic API over Flecs (Runic::ECS, see [[Simulation core Flecs and Jolt (Engine)#The Runic API over Flecs and Jolt|The Runic API over Flecs and Jolt]]); native Flecs is reachable only through the opt-in Runic::ECSNative target, which is discouraged.
+
 ```cpp
 class AIModule {
 public:
@@ -122,7 +124,7 @@ Runic::AI is a Flecs-integrated module, not a second simulation engine: the Simu
 
 | Module | May depend on | Must not depend on |
 | :---- | :---- | :---- |
-| Runic::AI | Core and runtime contracts, Flecs, gameplay command and event contracts, Perception, Navigation, BehaviorTree.CPP | Godot, editor docks, client presentation |
+| Runic::AI | Core and runtime contracts, the Runic API over Flecs (Runic::ECS), gameplay command and event contracts, Perception, Navigation, BehaviorTree.CPP | Godot, editor docks, client presentation, native Flecs except through Runic::ECSNative |
 | Runic::GodotTools (AI docks) | Runic::AI definitions and contracts, GodotTools, Godot’s GraphEdit | Authoritative simulation ownership; direct mutation of live combat state |
 | RunicGame AI content | The public Runic AI extension API, game ability and content registries | Internal BehaviorTreeRuntime details where avoidable |
 
@@ -679,6 +681,9 @@ RunicEngine/
         BehaviorTree/   Conditions.cpp  Actions.cpp  UtilityDecision.cpp
         Systems/        AggroSystem.cpp  AIPerceptionSystem.cpp  AIThinkSystem.cpp
                         AITargetSystem.cpp  AISleepSystem.cpp
+        Commands/       intents to movement and combat commands (AI-2)
+        TreeAssets/     tree loading, AIDefinition registry, profiles (AI-2)
+        Debugging/      per-brain traces and diagnostics (AI-5)
       Tests/
     Tools/GodotTools/
       Source/AI/  AIDocks.cpp  BehaviorTreeGraph.cpp  NodePalette.cpp  TreeInspector.cpp
@@ -687,7 +692,7 @@ RunicEngine/
 RunicGame/
   Data/AI/
     basic_melee.xml  basic_archer.xml  personalities/  perception/  bosses/
-  Source/Server/AI/
+  Source/Server/Source/GameAI/
     GameSpecificAINodes.cpp
 ```
 

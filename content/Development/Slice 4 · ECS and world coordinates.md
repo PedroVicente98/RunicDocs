@@ -11,7 +11,7 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/147"
 created: "2026-11-03"
-modified: "2026-11-10"
+modified: "2026-11-13"
 ---
 
 **Slice:** 4 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#147](https://github.com/PedroVicente98/RunicEngine/issues/147)
@@ -32,9 +32,9 @@ modified: "2026-11-10"
     - State declarations: one declaration per state, whose category picks its Flecs storage (hot flag as a toggle, fact with a target as a relationship with DontFragment for high-cardinality targets, content flag as a bit in a compact per-entity container, value as a container field, derived as a computed condition), with owner, observable, visibility and lifetime fields; a benchmark harness for tag, toggle, container and DontFragment
     - **Done when:** A state of each category is set, read and cleared through the API, and hot and content flags never move the entity to another table; observable states emit StateEntered and StateExited facts; the benchmark reports nanoseconds per operation and milliseconds per tick for 2,000 entities, recorded in the package docs
     - **Needs:** ECS-1, EVT-1
-- [ ] **WORLD-1** · 64-bit double coordinates · [RunicEngine#16](https://github.com/PedroVicente98/RunicEngine/issues/16) · not started
-    - 64-bit double coordinates (real Y, 1 cm minimum unit), WorldId, region-local origins, Region, Sector and sparse 3D Cell keys
-    - **Done when:** Conversions round-trip exactly far from the origin; a cell key round-trips at any altitude or depth
+- [ ] **WORLD-1** · World registry, region origins and cell keys · [RunicEngine#16](https://github.com/PedroVicente98/RunicEngine/issues/16) · not started
+    - Region-local origins and conversions over Core’s 64-bit world-space types (real Y, 1 cm minimum unit); the world registry that gives each WorldId (one seamless world) its coordinate space, origin and partition, with instances as InstanceIds of a world; Region, Sector and sparse 3D Cell keys
+    - **Done when:** Conversions round-trip exactly far from the origin; a cell key round-trips at any altitude or depth; a WorldId the registry does not know is rejected
     - **Needs:** ECS-1
 - [ ] **EVT-1** · Typed tick-safe event buffers and readers, multi-consumer delivery,… · [RunicEngine#15](https://github.com/PedroVicente98/RunicEngine/issues/15) · not started
     - Typed tick-safe event buffers and readers, multi-consumer delivery, stable event IDs (SimulationId plus sequence)
