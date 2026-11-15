@@ -67,6 +67,8 @@ Group folders are Foundation, SimulationCore, GameplayAPI, WorldSystems, Network
 
 * **Explicit names.** Public files say what they hold (PhysicsWorld.hpp, never Types.hpp), and the namespace matches the module (Runic::Physics).
 
+* **Named values.** Production code (modules, programs and services) writes no bare string or number. Every value with a meaning (a name, flag, key, path, size, rate, time, count, threshold, coordinate, exit code) is a named constant (constexpr with a k prefix in C++, const in Go), defined once in the narrowest scope its users share, and every use refers to it, so a change reaches every use. 0 and 1, true and false, are values too: the name says what the choice affects (RequestStop(kCleanExit), maxFrames = kRunUntilStopped); a field or setter named for the value counts as its name (bool pressed = false), and loop counters and a formula’s own arithmetic stay bare (i = 0, n + 1). A log or error message used once keeps its wording where it is used, with its values taken from the constants. Tests may write their values directly, since they vary them.
+
 * **Tests live inside the module** and register with CTest. One C++ test framework, GoogleTest, is used in all three repositories (decided in slice 0); Go uses its standard testing package.
 
 * **No Game content in public repositories.** Game rules, names and numbers never appear in Engine or Platform code, tests included; tests use neutral IDs such as engine:test\_ability.
