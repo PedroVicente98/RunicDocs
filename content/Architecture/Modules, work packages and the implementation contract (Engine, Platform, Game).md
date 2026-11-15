@@ -422,7 +422,9 @@ Claude Code builds the roadmap one slice at a time, and each slice one package a
 
    3. **Verify and fix.** The tests of the three repositories, a review of the diff, the module’s ARCHITECTURE.md and README.md, and the issue’s checklist. The package is done when you say so: its issue closes and its code stays on the slice branch.
 
-3. **Slice check** (once per slice). The runnable result is shown (by you, when it needs a window); pull requests from the slice branches run CI with both compilers; the branches merge into main in Needs order; the slice issue closes and the Development notes are regenerated. What later slices need to know goes into their packages’ issues and, when it changes the plan, into this vault.
+3. **Slice walkthrough** (once per slice, decided 14 November 2026). After the last package's verify, Claude Code publishes a walkthrough of the slice's code: the order to read it in, what each part is and where it lives, one frame or tick traced through the code, the tests and what each proves, what is finished and what is set up for later slices, and anything noticed while writing it. You read it until you understand every part, ask about what is unclear, and approve the code before the slice check: passing tests are not enough, because the code is directed by you.
+
+4. **Slice check** (once per slice). The runnable result is shown (by you, when it needs a window); pull requests from the slice branches run CI with both compilers; the branches merge into main in Needs order; the slice issue closes and the Development notes are regenerated. What later slices need to know goes into their packages’ issues and, when it changes the plan, into this vault.
 
 Small packages, with a few hundred lines and no new public types, may combine the contract and implementation sessions.
 
@@ -430,7 +432,7 @@ When a slice’s packages share one subsystem closely (networking, for example),
 
 #### Sessions
 
-* A fresh session for each step: the kickoff, each contract session, each implementation session with its verify and fix, and the slice check. The slice brief, the plans and the contracts carry the slice’s context from one session to the next, not a long conversation: every prompt sends the whole conversation again, so a long session costs more per prompt and ends in lossy summaries. Each step ends by recording in the slice brief what it decided and why.
+* A fresh session for each step: the kickoff, each contract session, each implementation session with its verify and fix, the slice walkthrough, and the slice check. The slice brief, the plans and the contracts carry the slice’s context from one session to the next, not a long conversation: every prompt sends the whole conversation again, so a long session costs more per prompt and ends in lossy summaries. Each step ends by recording in the slice brief what it decided and why.
 
 * Each session starts by reading the slice brief, the package’s issue, the module’s README.md and ARCHITECTURE.md, the public headers of the packages before it, and the notes its README lists.
 
