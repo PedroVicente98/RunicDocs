@@ -4,7 +4,7 @@ tags:
   - "architecture"
 source: "RunicEngine — Technical Architecture"
 created: "2026-11-13"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 Questions the architecture leaves open, in one place. Each one names where it gets decided: a work package’s contract session, or the owner. When a question is decided, write the answer into the note it belongs to (and the [[Decisions log]] when it is a decision of its own), then delete it here. Questions about the game’s design itself stay in the [[RunicGame — Complete MMORPG Vision|Vision]], which marks its proposals.
@@ -20,6 +20,8 @@ These questions were collected on 13 November 2026 from the repositories' former
 | The MoveTo and MoveGoal contract between Navigation and AI | NAV-1 contract session, with AI-2 |
 | How development builds turn on Jolt’s debug renderer, which the build configures off | PHYS-3 contract session (slice 8) |
 | The shape of the override operation ENV-5 receives through the service port’s inbox | PBND-4 (slice 30) and PCS-3 (slice 43) |
+| Lua 5.4 or 5.5 for the scripting runtime, and the C++ binding (a library such as sol2, if it supports the chosen version, or bindings written on the Lua C API) | SCR-1 contract session (slice 37a) |
+| Whether a predicted script hook may also run on the client (the same bytecode on both sides, kept simple, corrected by the server), or scripts stay server-only | SCR-4, when the expansion slices are planned |
 
 ### Platform
 

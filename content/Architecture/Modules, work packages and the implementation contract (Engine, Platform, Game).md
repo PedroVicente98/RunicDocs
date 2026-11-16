@@ -8,7 +8,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 The code is organized at two working sizes. A **module** is a build target with one owner, a public interface and its own tests; the dependency rules are written between modules. A **work package** is one subsystem of one module, with its tests, built in the slice pipeline (section Building with Claude Code): a contract session, an implementation session and a verify step, with its commits on the slice branch. Modules keep the architecture honest; packages keep each piece of work small enough to be built well.
@@ -121,6 +121,8 @@ The layered view in the Architecture overview shows the groups from bottom to to
 | Simulation → feature modules or Game code | Gameplay modules and the Game register systems into the Simulation, which stays reusable |
 | AI → direct combat, physics or persistence mutation | AI emits intents that become validated commands |
 | GameplayFlow or Quest → Combat or AI internals | Sequences act through Simulation commands and Gameplay APIs, the same doors players use |
+| Gameplay, GameplayFlow or Quest → Scripting | Scripting registers Lua entries into their registries; they never know which language implements an entry |
+| Lua scripts → Flecs, Jolt or a module’s internals | A script reaches only what Scripting binds over the public Runic API, no more than Game C++ can |
 | Platform → Game rules | The Platform stays reusable: mechanisms, never policy |
 | Game client → server-only rules or content | The client gets presentation data and request contracts only |
 | Region, Sector or Cell → simulation process identity | The world partition is stable; which simulation owns what is an operational decision |
@@ -146,7 +148,7 @@ A package ID is the module prefix plus its build order inside the module: CMB-3 
 
 Big modules carry several packages; small ones one or two. The tables cover every package through the current roadmap; expansion packages (slice 44 onward) get their full definition when those slices are planned.
 
-**Prefixes.** Engine: BUILD build skeleton, CORE Core, APP Application, EVT Events, CNT Content, ASSET Assets, ECS, WORLD World, PHYS Physics, SIM Simulation, GPL Gameplay, CMB Combat, FLOW GameplayFlow, QST Quest, PRC Perception, NAV Navigation, AI, ENV Environment, WATER Water, NET Network, DSIM DistributedSimulation, CLI Client, GDB GodotBridge, ANIM Animation, AUD Audio, GDT GodotTools, COOK Cooker. Platform: PCT Contracts, PTR Transport, PSDK Go SDK, PBND Server bindings, PCS Core services, PBB Building blocks, PINF Infrastructure. Game: GAME executables, GSH Shared rules, GSRV Server module, GCL Client module, GCNT content, GSVC Go game services, GNAV naval rules, GWTH weather rules.
+**Prefixes.** Engine: BUILD build skeleton, CORE Core, APP Application, EVT Events, CNT Content, ASSET Assets, ECS, WORLD World, PHYS Physics, SIM Simulation, GPL Gameplay, CMB Combat, FLOW GameplayFlow, QST Quest, SCR Scripting, PRC Perception, NAV Navigation, AI, ENV Environment, WATER Water, NET Network, DSIM DistributedSimulation, CLI Client, GDB GodotBridge, ANIM Animation, AUD Audio, GDT GodotTools, COOK Cooker. Platform: PCT Contracts, PTR Transport, PSDK Go SDK, PBND Server bindings, PCS Core services, PBB Building blocks, PINF Infrastructure. Game: GAME executables, GSH Shared rules, GSRV Server module, GCL Client module, GCNT content, GSVC Go game services, GNAV naval rules, GWTH weather rules.
 
 #### Engine: foundation
 
@@ -219,6 +221,15 @@ Big modules carry several packages; small ones one or two. The tables cover ever
 | QST-1 | Quest runtime and quest-creation API: definitions, objectives, triggers from facts, instances | A quest defined only in data advances from kill and interaction facts | FLOW-1 | 30 |
 | QST-2 | Durable bridge: outgoing quest facts with stable IDs through the service port; accepted results applied at safe ticks | A replayed fact never doubles progress; no service callback touches Flecs | QST-1, SIM-5 | 30 |
 | QST-3 | Quest instances registered as a transfer-snapshot contributor | A quest in progress crosses a simulation border with its objectives and timers intact | QST-1, DSIM-3 | 37 |
+
+#### Engine: scripting
+
+| ID | Package | Done when | Needs | Slice |
+| :---- | :---- | :---- | :---- | :---- |
+| SCR-1 | Lua runtime: one Lua VM per simulation, run on the simulation thread; the Lua version pinned with the build; a sandboxed environment (no io, os, load, debug or package); a memory cap per VM through its allocator; an instruction budget per call through the count hook; errors isolated per entry and logged with the script, line and entity | A runaway loop is stopped within its budget and logged while the tick completes; a script cannot reach io, os or load; a script error fails only its own entry | SIM-2, CNT-1 | 37a |
+| SCR-2 | Bindings and the registry adapter: Entity, GlobalEntity and WorldPosition as opaque handles that keep their C++ type rules (a Lua integer never stands in for them); read-only contexts of GameplayFlow, Quest and interactions; a Lua function registered under an ID as an action, condition or trigger, behind the same registries as C++ entries; the ScriptBinding component (script and parameters) that an interactable calls on OnInteract; structural changes queued as commands; state between calls only in components | A boss phase and a quest condition written in Lua pass the same tests as their C++ versions; the slice 37 handoff test passes with Lua entries; data that names an entry stays the same when its implementation moves between C++ and Lua | SCR-1, GPL-5, FLOW-3, QST-3 | 37a |
+| SCR-3 | Script pipeline: the Cooker compiles scripts to bytecode for the pinned Lua version; hot reload swaps a changed script at the next safe tick and keeps simulation state; a lua-language-server annotation file generated from the bindings | A syntax error fails the cook with the file and line; a script edited while RunicServer runs changes the behavior at the next tick, with no restart; the annotation file lists every bound function | SCR-2, CNT-2, COOK-2 | 37a |
+| SCR-4 | Script ECS views: components declared from Lua (typed data fields, storage chosen by ECS-2 from the declared usage), observers on add, set and remove, low-rate script systems with an interval, a time budget and a warning on large matches; predicted script hooks on the client if the open question allows them | Defined when the expansion slices are planned | SCR-3, ECS-2 | 44+ |
 
 #### Engine: world systems
 
@@ -319,6 +330,7 @@ Big modules carry several packages; small ones one or two. The tables cover ever
 | GDT-14 | GDScript for editor tools: the module in the editor target, the export lock, the development-client check, Run-scene interception, script templates and the problems dock | A scripted node in a content scene fails export with a teaching message; an @tool script in Tools/ runs in the editor | GDT-7 | 21 |
 | GDT-15 | Water and field authoring: RunicWaterBody3D on Path3D, flow profiles, current and wind map painting | A river drawn in a region cooks into fragments and its flow arrows match the cooked data | GDT-7, WATER-2 | 40 |
 | GDT-16 | Plugin compatibility: published extension API per build, install validator, runic.plugin.json, Cooker adapters for plugin formats | Defined when the expansion slices are planned | GDT-14 | 44+ |
+| GDT-17 | Scripts in the editor: the RunicScript resource and its import, a script property with the parameters the script declares on RunicInteractable3D and marker nodes, an inspector for those parameters, the New Lua action or condition assistant | A script assigned in the inspector cooks into a ScriptBinding component; the assistant writes a script that registers and opens in the IDE | GDT-7, GDT-10, SCR-3 | 37a |
 | COOK-1 | First cooker proof: geometry read from a scene Godot imported (no second glTF importer) into Jolt collision and a cell visual list | A Blender mesh renders through Godot and is walkable | ASSET-1, PHYS-1, GDT-1 | 9 |
 | COOK-2 | Validation of data-driven definitions | Invalid definitions fail the cook with clear errors | CNT-2 | 20 |
 | COOK-3 | World cooking from scenes: regions, sectors, sparse 3D cells, authored volumes, spawn areas, manifests, packages, Zstandard; client cell visual lists | Two region scenes and a cave volume cook into random-access packages | COOK-1, WORLD-2 | 21 |

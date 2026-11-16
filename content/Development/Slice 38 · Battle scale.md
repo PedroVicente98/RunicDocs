@@ -11,12 +11,12 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/181"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
 **Slice:** 38 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#181](https://github.com/PedroVicente98/RunicEngine/issues/181)
 
-← [[Slice 37 · Cross-border combat]] · [[RunicGame — Development|All slices]] · [[Slice 39 · Operations]] →
+← [[Slice 37a · Lua scripting]] · [[RunicGame — Development|All slices]] · [[Slice 39 · Operations]] →
 
 **Runnable result:** 200, then 500 bots fighting in one region; nameplates fall back to the batched path
 
