@@ -3,10 +3,11 @@ title: "Simulation core: clock and threads (Engine)"
 tags:
   - "architecture"
   - "repo/engine"
+  - "appendix/ping-resolution"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
 The simulation advances in fixed steps on a 60 Hz master clock with 30, 20 and 10 Hz domains, and every step runs its work across a pool of worker threads.

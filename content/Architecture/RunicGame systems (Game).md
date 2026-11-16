@@ -3,10 +3,12 @@ title: "RunicGame systems (Game)"
 tags:
   - "architecture"
   - "repo/game"
+  - "appendix/rendering-lighting-visibility"
+  - "appendix/design-compile"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 RunicGame turns the Engine APIs into this game’s rules. Shared rules compile into both executables, so client prediction runs the same code as the server.
@@ -52,7 +54,7 @@ The Engine stores, times and calls hooks; every rule below is RunicGame code or 
 | Hit resolution | Stages in order: Guard, armor, shields, damage to Health; the dodge’s iframes are an invulnerability restriction | GSH-4 |
 | Targeting | Free aim, FriendlyLock and the aim-assist strength | GSH-5 |
 | Input buffer | One slot, the queue window, Dodge and Guard as priority inputs | GSH-5 |
-| Visibility levels | Full, Silhouette and Hidden with reveal on contact | GSRV-10 |
+| Visibility levels | Full or Hidden by range and light; anonymous contact silhouettes | GSRV-10 |
 | Movement permission | Flight zones and the altitude ceiling | GSH-7 |
 
 ### Resolver

@@ -7,7 +7,7 @@ tags:
 cssclasses:
   - "home-dashboard"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
 The RunicGame and RunicEngine design documentation, kept as Markdown. It started on 2026-11-03 as an export of
@@ -53,13 +53,21 @@ the documents in the [RunicMMOEngine Drive folder](https://drive.google.com/driv
 > - [[RunicGame — Quest Design|Quest Design]]
 
 > [!quote] Archive
-> The original appendices, unchanged.
+> The original appendices, unchanged, all merged into the Vision and the Architecture. The second link lists the notes that hold each one's content.
 >
-> - [[RunicGame — Appendix Nodes, Economy and Exploration|Nodes, Economy and Exploration]]
-> - [[RunicGame — Appendix Content Pipeline and Art Direction|Content Pipeline and Art Direction]]
-> - [[RunicGame — Appendix Ping Resolution|Ping Resolution]]
-> - [[RunicEngine — Appendix Security|Security]]
-> - [[RunicEngine — Appendix Database Layout|Database Layout]]
+> - [[RunicGame — Appendix Nodes, Economy and Exploration|Nodes, Economy and Exploration]] · [notes](tags/appendix/nodes-economy-exploration)
+> - [[RunicGame — Appendix Ping Resolution|Ping Resolution]] · [notes](tags/appendix/ping-resolution)
+> - [[RunicEngine — Appendix Security|Security]] · [notes](tags/appendix/security)
+> - [[RunicEngine — Appendix Database Layout|Database Layout]] · [notes](tags/appendix/database-layout)
+> - [[RunicGame — Appendix Content Pipeline and Art Direction|Content Pipeline and Art Direction]] · [notes](tags/appendix/content-pipeline)
+> - [[RunicGame — Design Compile, 5 to 9 November 2026|Design Compile, 5 to 9 November]] · [notes](tags/appendix/design-compile)
+> - [[RunicGame — Appendix Rendering, Lighting and Visibility|Rendering, Lighting and Visibility]] · [notes](tags/appendix/rendering-lighting-visibility)
+> - [[RunicGame — Combat Systems Review|Combat Systems Review]] · [notes](tags/appendix/combat-review)
+
+> [!example] Updates
+> What changed in the notes, newest first.
+>
+> - [[Update timeline]]
 
 **How the vault is organized.** A folder is a document (its H1), a note is a section (an H2), and the headings inside a
 note are its subsections (H3 and below). Every note name is unique, so a link like `[[Combat]]` always finds the same

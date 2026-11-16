@@ -5,10 +5,13 @@ tags:
   - "repo/engine"
   - "repo/platform"
   - "repo/game"
+  - "appendix/rendering-lighting-visibility"
+  - "appendix/security"
+  - "appendix/ping-resolution"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 The code is organized at two working sizes. A **module** is a build target with one owner, a public interface and its own tests; the dependency rules are written between modules. A **work package** is one subsystem of one module, with its tests, built in the slice pipeline (section Building with Claude Code): a contract session, an implementation session and a verify step, with its commits on the slice branch. Modules keep the architecture honest; packages keep each piece of work small enough to be built well.
@@ -402,7 +405,7 @@ The server bindings implement the Engine’s Layer interface and the Simulation�
 | GSRV-7 | Gathering, crafting, farming and trade-pack production | Defined when the expansion slices are planned | GSVC-2, GSVC-7 | 44+ |
 | GSRV-8 | Castles (neutral continent only): one per region in a designated zone, built by the ruling guild, fixed once placed, an indivisible volume | Defined when the expansion slices are planned | GSVC-4, WORLD-2 | 44+ |
 | GSRV-9 | Reports and in-world sanctions: a report command that attaches the last 60 seconds (example) of facts and positions around the reported player; mute, trade lock and kick enforced in the simulation from moderation decisions. | A report reaches the moderation service with its evidence, and a trade lock stops a trade at once | GSVC-12, PBND-1 | 44+ |
-| GSRV-10 | Visibility tiers: Full, Silhouette and Hidden with reveal on contact, registered as the Engine’s visibility function | Tiers change at RunicGame’s distances and light levels; contact reveals for a few seconds | PRC-2 | 25 |
+| GSRV-10 | Visibility: Full or Hidden from class range, ambient light, target emission and weather (1 m to 1 km, with hysteresis), registered as the Engine’s visibility function; anonymous contact events drawn as frozen silhouettes | The range follows light and emission; an entity at the edge doesn’t blink; contact events never carry identity | PRC-2 | 25 |
 | GSRV-3 | First quests built with the Quest API | A kill-and-interact quest completes and persists | QST-1 | 30 |
 | GSRV-4 | Mob profiles, light values, behavior trees and custom nodes | Mobs warn, detect and leash at night with Game values | AI-3, PRC-3 | 33 |
 | GNAV-1 | Ship classes, sails and naval rules | A ship class sails with its Game stats | WATER-6 | 42 |

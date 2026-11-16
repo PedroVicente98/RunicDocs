@@ -2,10 +2,14 @@
 title: "Real exploration"
 tags:
   - "vision"
+  - "appendix/rendering-lighting-visibility"
+  - "appendix/design-compile"
+  - "appendix/combat-review"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 Exploring is risky and knowledge is worth money: maps are merchandise, even the most basic mob needs attention, night is truly dark and death sends you to the nearest Altar.
@@ -48,6 +52,8 @@ Night is truly dark: without light you can barely see the terrain and the enemie
 * **Lantern:** leaves the hands free, burns oil and lights less. *Proposal: an inventory item you toggle on, since there is no belt slot.*  
 * **Skills with the Lighting component:** radius, duration and intensity of light, like any component. Since it is a tag, passives, item effects and interactions can read it (e.g. light-sensitive creatures back off).  
 * **Light has a price:** some creatures are drawn to it, and in PvP it gives away your position.  
+* **Seeing and being seen** (decided on 9 November): entities are visible up to 1 km at most. The range is shortened by ambient light (time of day, weather, node, the Underground, dense forests) and lengthened by the target's own light: lanterns, torches and fires make a target visible further, so sailing dark is possible. Complete darkness and blindness bring it to about 1 m, the character and the space around it. Height has no effect. Effects and projectiles are judged by their own position and light, never the caster's: a fireball or flaming arrow is visible when the shooter is not; a plain arrow in darkness is not.  
+* **The client knows only what the player knows.** An unseen attacker leaves a generic silhouette (humanoid, large creature or ship) frozen where the attack came from, so gear never reveals identity; hitting an unseen target leaves one too. Colors by relation: red for enemies, white for neutrals, green for allies, blue for the party. Damage over time and auras don't create a silhouette on every tick. When blindness ends, entities fade in over about 0.3 s, like eyes adjusting. *Proposal: one silhouette per unseen entity, removed when it becomes visible, when combat ends or above about 20; colors decided by the server at the moment of the hit, from the viewer's side; a color-blind option with a second cue.* Details: [[Rendering, lighting and visibility (Engine, Game)#Entity visibility|Entity visibility]].  
 * The same system applies to the Underground.
 
 ### Altars, death, respawn and teleports
@@ -63,7 +69,7 @@ Night is truly dark: without light you can barely see the terrain and the enemie
 
 ### Exploration XP
 
-Exploring gives its own exploration XP, separate from the level. It is spent in an exploration shop on adventurer abilities (e.g. moving objects, traversal), on resources and on maximum stamina, and it never buys combat skills or cosmetics. Items found on summits are one source of the shop's currency. The advantage this gives veterans is acceptable: it grants reach, not power.
+Exploring gives base XP, the same XP as everything else except professions (decided on 12 November; it replaces the separate exploration XP). The exploration shop sells exploration equipment, items and consumables, in the style of ArcheAge's Blue Salt Brotherhood, and never stamina, combat skills or cosmetics. Items found on summits are one source of the shop's currency. A profession version, one to one with ArcheAge's Blue Salt Brotherhood, exists separately. The advantage this gives veterans is acceptable: it grants reach, not power.
 
 ### Professions
 
@@ -84,4 +90,6 @@ Labor and proficiencies work almost one to one like ArcheAge's, but nobody can b
 * **Dismantling** returns part of the materials, more in a node with that profession's specialty, never more than a cap (e.g. 60% of the materials used).  
 * **Recipes are unique:** there is no rule that a recipe uses the previous tier's item, although one line of equipment may. Crafted equipment carries its crafter's name.  
 * **Profession quest lines** give extra profession XP, cosmetics and a profession currency, and help define the specialization; they are quest lines, never dailies.  
+* **Max level and MAX:** professions have a max level, then a continued XP grind for small improvements. Unlocking every recipe and becoming a master takes a grind, but it is viable in two or three professions. Reaching MAX needs a huge grind like RuneScape's and gives a title, a mantle, a maker's mark and a small, capped efficiency in labor, time and resource cost, plus milestone rewards. The curve numbers are temporary (in RuneScape, level 85 needs a quarter of level 99's XP).  
+* **Machining** makes ship stations, with Metalwork and Carpentry as secondary professions.  
 * Details: RunicGame — Appendix: Nodes, Economy and Exploration (Professions) and [[RunicGame — Ideias|Ideias]] ([[PROF-02 Professions and Masteries|PROF-02]]).

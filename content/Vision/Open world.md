@@ -2,10 +2,11 @@
 title: "Open world"
 tags:
   - "vision"
+  - "appendix/rendering-lighting-visibility"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
 The map is very large and dense, and everything in it is interactable: ruins, magical places, floating islands, desolate places and hard mobs. The inspiration comes from Tales of Demons and Gods (without separate dimensions as a theme) and from Crimson Desert's feeling of exploration and nature. Sailing and exploring are the central activities.
@@ -28,6 +29,7 @@ The main world is one continuous map: the surface, with at least three continent
 * **Flight** exists only in flight zones: special regions of the neutral continent, not the whole continent, and the Sky Island. For now the neutral continent has one, the region of the floating islands; more may be added later. It is a first taste of the full flight of the Sky Island. Inside a flight zone flight is unlimited, with an altitude ceiling above which you can only glide *(proposal: a soft ceiling)*. There is aerial PvP in the neutral continent's flight zone; everywhere else on the surface you can only glide.  
 * **Ocean.** Over the ocean you can only glide, using the wind current, which has a direction (any angle) and a speed. Speed 0 has no effect; a negative speed suddenly reverses the direction without changing the angle. Gliding against the current is impossible, and the character is thrown back. Sailing is still necessary.  
 * **Sea and wind currents** follow a cyclic, mappable base routine. Admins create events in a panel that change them for a while; then the base routine returns.  
+* **Distant cities and ports** show their NPCs: the routine is a function of seed and time, so the client computes the same positions as the server without network traffic; inside 1 km the real entities replace them with a short fade.  
 * **Living world.** Escorts, trade routes, ships and mob routines follow schedules mapped to world time, without simulating empty areas: the NPC appears at the right point when a player arrives. The routine drifts slowly (a cycle that doesn't match the clock, plus a small deterministic variation). Exceptions caused by players, such as a delayed escort, are stored in a service and return to the routine over time.  
 * **Weather and hazards.** Snow, rain and wet ground, floods, slides, storms and sea events change travel; their rules are in [[RunicGame — Ideias|Ideias]] ([[HAZARD-01 Environmental Hazards|HAZARD-01]], [[SHIP-01 Naval Combat Flooding, Repair and Sea Events|SHIP-01]], [[SEA-01 Ship Handling and Sea Balance|SEA-01]]) and in the Architecture. Hazards go through Resolve and Tolerance unless their own rule says otherwise.  
 * **Castles** exist only on the neutral continent: the guild that rules a region there builds its castle in one of the region's designated zones (e.g. 3). Only one per region, fixed once placed. On the faction continents the ruling guild uses the city itself and an exclusive guild building (see [[Economy, housing and land|Economy]]).  

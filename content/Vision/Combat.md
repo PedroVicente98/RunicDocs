@@ -2,19 +2,21 @@
 title: "Combat"
 tags:
   - "vision"
+  - "appendix/combat-review"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
-Combat is spatial action with an authoritative server: execution and positioning as in TERA, skill interactions as in ArcheAge and a slower rhythm inspired by Crimson Desert, with long cooldowns and skills that matter. The base is a configurable skill bar, with basic attacks on the mouse buttons; key-sequence combos (Black Desert) or a chain key (TERA) are optional client upgrades that call the same skills.
+Combat is spatial action with an authoritative server: execution and positioning as in TERA, skill interactions as in ArcheAge and a slower rhythm inspired by Crimson Desert, with long cooldowns and skills that matter. Players place their skills on a command board, with Black Desert-style combos (a direction or Shift plus a key), or on an ArcheAge-style skill bar; both are layouts of the same skills. Basic attacks, Guard and the weapon's alt action are on the mouse (see [[Controls, targeting and skill delivery]]).
 
 | Mechanic | Rule |
 | :---- | :---- |
 | Offensive aim | Free aim with light aim assist; offensive projectiles don't home |
-| Support aim | Heals and buffs use FriendlyLock and can home in on the ally |
-| Dodge | Universal, with iframes; spends Evasion charges (see [[Defense Evasion, Guard and armor\|Defense]]) |
+| Support aim | Heals and buffs snap to an ally in a generous cone (FriendlyLock) or go to the Ward (see [[Controls, targeting and skill delivery#Targeting\|Targeting]]) |
+| Dodge | Universal, with iframes; spends Evasion charges (see [[Defense Evasion, Guard and armor\|Defense]]). Skills have no iframes: iframes exist only on the dodge |
 | Guard | One resource; the shield gives free, directional blocking, and the other weapons use Guard in limited ways (see [[Defense Evasion, Guard and armor\|Defense]]) |
 | Weapon swap | None in combat; the loadout changes only at the Altar reset |
 | Combat state | Starts on the first hostile action and ends 30 s after the last one |
@@ -26,7 +28,7 @@ Combat is spatial action with an authoritative server: execution and positioning
 | Tank in PvP | Challenge protects nearby allies by redirecting part of the damage to the Tank, without controlling the enemy |
 | Naval | Boarding uses normal combat; the ship gives a slight range bonus to eligible skills |
 
-**How the loadouts enter combat.** Each loadout brings a signature mechanic: the Spear builds Stagger, the Sword counters, the Greatsword breaks Guard, the Quarterstaff chains staff strikes, punches and magic, the Bow charges its shots and the Instrument builds chords. The layers talk through states: Frozen (the Chill peak) makes the Spear's Stagger become a Knockdown, and a Shock mark is read by combos.
+**How the loadouts enter combat.** Each loadout brings a signature mechanic: the Spear builds Stagger, the Greatsword breaks Guard, the Quarterstaff chains staff strikes, punches and magic, the Bow charges its shots and the Instrument builds chords. *Open: the Sword + Shield's signature, now that Riposte is a Discipline skill (it looks more like a passive, such as a very fast counter with no cast and no recovery), and how charged shots and strikes work with press-only input.* The layers talk through states: Frozen (the Chill peak) makes the Spear's Stagger become a Knockdown, and a Shock mark is read by combos.
 
 **Scale.** The same rules apply from a duel to a 100 vs 100 war. In small fights you defend by reacting; in big ones, with formation, terrain and line of sight. Nobody has to dodge a whole army.
 
@@ -36,16 +38,30 @@ Combat is spatial action with an authoritative server: execution and positioning
 
 Resolve is the CC immunity buff, so control never chains forever. Hard CC (Stun, Knockdown, Trip, Root and Stagger) is applied directly by the skill that declares it, with no build-up.
 
-* **Full CC:** the first hard CC lands in full.  
+* **Full CC:** the first hard CC lands in full. Stagger is a hard CC, never a build-up or a condition.  
 * **Resolve T1:** when that CC ends, the target gets Resolve T1 for about 2 s. A CC that lands during T1 drops one level (e.g. a Stun lands as a Stagger).  
 * **Resolve T2:** when the lowered CC ends, Resolve resets to Resolve T2 for about 2 s, and the target is immune to every CC. If no CC lands during T1, Resolve simply expires.  
 * **Light CC:** a target can be slowed for at most about 10 s, then is immune to slows for about 5 s. This is the Resolve of light CC.  
+* **Skill-granted CC immunity** (Super Armor, working name) is a separate buff: it blocks CC and never starts or advances the natural Resolve chain. *Open: whether the T1/T2 chain with about 2 s of full immunity and no cooldown stays viable.* *Proposal: it blocks CC only (damage, conditions and Concussion still land), starts on a set tick and ends if the skill is cancelled, so starting and cancelling never gives free immunity; a PvP uptime cap (e.g. 20 to 25%) is checked when skills are cooked.*  
+* **Grabs** never ignore Resolve or Super Armor (e.g. the spear's skewer-and-throw is blocked by them). *Proposal: against Resolve, a grab becomes Stagger build-up, so the skill still does something.*  
 * A condition peak whose extra effect is a hard CC (Frozen, Electrocute, Panic) also goes through Resolve.  
 * Environment hazards go through Resolve and Tolerance too, unless their own rule says they ignore them (e.g. slips on wet ground).  
 * **Effect gates:** a skill's effect can be gated by the skill's cooldown, an effect cooldown, an effect cost, or both.  
 * **Guard:** no effect zeroes the Guard and takes away blocking at the same time; it is one or the other. A zeroed Guard regenerates normally.  
 * *Proposal: bosses don't take hard CC; every CC adds to a Break bar, and a full Break knocks the boss down for a damage window.*  
 * The durations (2 s, 10 s, 5 s) are examples for tuning.
+
+### Resources
+
+Six resources: Health, Mana, Stamina, Evasion (charges), Guard and Shield. Health, mana and stamina come mostly from items, plus Discipline and mastery passives.
+
+* **One stamina bar,** Dark Souls style, for attacks, sprinting, climbing, swimming and heavy objects. Costs are flat, the same in and out of combat; consumption and regeneration are fast. Maximum stamina and stamina regeneration are separate stats.  
+* **Costs by skill type:** martial skills cost stamina, spells and innate skills cost mana, and infused skills cost half of each (10 + 10 instead of 20). Basic attacks cost stamina on every loadout; the alt action and the weapon's ranged strike can cost mana (e.g. the sword's ranged strike, the instrument's secondaries). Every class spends mana.  
+* **Other resources:** Fury stays a passive and is never paid with life. Skills paid with life are out for now; they can come back or change.  
+* **Evasion and Guard** keep their own charges and pool, never stamina.  
+* **Climbing:** a hit while climbing costs normal damage plus a share of max stamina; climbing skill and gear lower that share and the climbing drain.  
+* **Shields** sit on the health bar, temporary or until broken; passive shields rebuild after a cooldown. Shields stack up to 50% of max health without merging: damage takes the newest first (a passive shield of 50 plus a new one of 60: a hit of 50 leaves the passive's untouched, a hit of 51 takes 1 from it). "Breaks Shields" deals double damage to shields instead of erasing them; "ignores Shields" goes straight to health. Each condition defines its relation to shields (Bleed goes to health, Burn hits the shield first). Skill shields scale with the caster's Healing Power.  
+* *Proposal (numbers): base 100 stamina and 100 mana; stamina regenerates 40/s after a 0.4 s pause, mana 20/s after 0.5 s; light attack 8, heavy 15, martial skill 20 to 30, sprint 10/s; spells 15 to 35.*
 
 ### Conditions, build-up and Tolerance
 

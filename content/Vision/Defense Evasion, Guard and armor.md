@@ -2,10 +2,12 @@
 title: "Defense: Evasion, Guard and armor"
 tags:
   - "vision"
+  - "appendix/combat-review"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
 Everyone defends with two resources: Evasion charges to dodge and Guard to block. The class role, the Discipline, the weapons and the armor change how each one works, but the resources are the same for all.
@@ -31,7 +33,7 @@ Evasion charges recharge over time; each charge pays a dodge with iframes. The r
 | Defense | To define | To define |
 | Vitality | Rescue Step | Dodging toward an ally with FriendlyLock gives them a small shield |
 | Arcane | Blink *(proposal, from Elementalismo)* | A short teleport that spends a charge plus mana and leaves a trail of the active element |
-| Occultism | Blood Escape and Shadow Step *(proposal, Shadow Step from Sombra)* | With the charges at zero, dodge by paying life, once per recharge cycle; Shadow Step extends the iframe and passes through enemies |
+| Occultism | Blood Escape and Shadow Step *(proposal, Shadow Step from Sombra)* | With the charges at zero, dodge by paying life, once per recharge cycle (on hold while life costs are out); Shadow Step extends the iframe and passes through enemies |
 
 ### Guard
 
@@ -42,9 +44,9 @@ Guard is a single resource, modified by the weapons and the Disciplines. Only th
 | Shield | Free, directional blocking while there is Guard; Tanks have much more Guard |
 | Quarterstaff | Holds Guard for a limited time, then goes on cooldown |
 | Greatsword | A side dash with frontal Guard during the dash |
-| Spear | A sprint with frontal Guard, as its own skill; this skill costs no stamina |
+| Spear | A sprint with frontal Guard, as its alt action (Shift+RMB); its cost under the stamina model is open |
 | Mages without a shield (Wand \+ Focus, Staff, Instrument) | Magic Guard: effective against magical damage, reduced against ranged, much reduced against melee; with Defense they tank with magic shields |
-| Other loadouts | Each kit defines its form (e.g. the Sword riposte) during development |
+| Other loadouts | Each loadout's Guard form is in the basic kit table (see [[Weapon Class System#Weapon mastery\|Weapon mastery]]) |
 
 Magic Guard reads the damage components of the hit (domain and delivery), so it uses the same logic as the defenses in Skills by components.
 
@@ -54,4 +56,5 @@ Magic Guard reads the damage components of the hit (domain and delivery), so it 
 * **Iframe:** the iframe duration blends by the armor type of each piece, each piece counting 1/5. *Proposal: cloth has the longest iframe and plate the shortest.*  
 * **Guard:** the Guard is the sum of every piece's Guard stat, which grows with quality; cloth gives little but still adds.  
 * **Two armor pools**, physical and magical, each blended per piece: plate is the best against physical damage and great against magical; leather is good against both, below plate on both; cloth is great against magical damage and low against physical.  
+* **Stats:** armor can carry any stat; each armor type has more affinity with some (leather with stamina regeneration, plate with health). Trading defense for damage (a glass cannon) is a valid build. Every armor piece gives some armor.  
 * **Reduction:** total armor reduces damage through a curve that never reaches 100%. *Proposal: reduction \= A ÷ (A \+ K); with K \= 1,000, 500 armor gives 33%, 1,000 gives 50%, 2,000 gives 67% and 4,000 gives 80%.*

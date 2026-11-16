@@ -4,10 +4,11 @@ tags:
   - "architecture"
   - "repo/engine"
   - "repo/game"
+  - "appendix/design-compile"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 The world is assembled in the RunicEditor (Godot) as one low-detail world scene plus detailed region scenes, Blender makes the assets, and the Cooker turns those scenes into Runic-native server and client packages; the shipping client and server never read an editor scene or a Blender file.

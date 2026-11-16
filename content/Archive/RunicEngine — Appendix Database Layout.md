@@ -3,6 +3,7 @@ title: "RunicEngine — Appendix: Database Layout"
 tags:
   - "archive"
   - "appendix"
+  - "appendix/database-layout"
 source: "RunicEngine — Appendix: Database Layout"
 source_url: "https://docs.google.com/document/d/1ex3n2TbxelB7QQnSZYIyQJxl0-Wj1WjmkRuolwk8tY8/edit"
 created: "2026-10-26"

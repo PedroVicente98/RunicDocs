@@ -2,10 +2,12 @@
 title: "Factions, PvP and crime"
 tags:
   - "vision"
+  - "appendix/design-compile"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
 There are three factions: Faction 1 (Continent 1), Faction 2 (Continent 2\) and the Pirates. Every character starts in a continental faction and, through their own actions, can move to the other or become a pirate. Working names and lore: [[RunicGame — Lore]].
@@ -19,7 +21,8 @@ There are three factions: Faction 1 (Continent 1), Faction 2 (Continent 2\) and 
 * **Crime.** Only an Outlaw can attack their own faction. Killing someone of your own faction is a crime and generates Infamy when the victim reports it; enough Infamy turns the character into a pirate (see [[Factions, PvP and crime#Outlaw and Infamy|Outlaw and Infamy]]).  
 * **Changing continental faction** needs raising reputation with the other faction and also committing a crime against the current one: the break must be a visible choice. *Proposal: it also needs the Language profession.*  
 * **Group PvE.** Continental factions do dungeons and raids only among themselves, with PvE and PvP mode characters together. World bosses are PvPvE and accept only PvP mode. Pirates can do PvE with both factions: that is the advantage of playing the hardest faction. In the boss region, also PvPvE, every PvP mode character competes for contribution in the same space.  
-* **Sources of PvP.** Faction wars, intercepting trade packs, node wars, disputes on the wild continent, stealing contribution in the boss region and Outlaws against their own faction.
+* **Sources of PvP.** Faction wars, intercepting trade packs, node wars, disputes on the wild continent, stealing contribution in the boss region and Outlaws against their own faction.  
+* **PvP on the same scale** (decided on 9 November): PvP numbers can differ from PvE, since each is balanced separately, and PvP must work for 1v1 and for 100v100 on the same number scale. At the current scale, characters deal too much damage in PvP relative to other characters' health; PvE is fine. *Proposals: health stays one pool, since in PvPvE a character is hit by mobs and players at once; a PvP damage coefficient on hits against players sets the 1v1 time to kill (open: ×0.25 fits the slow, long-cooldown combat best, ×0.4 gives sharper PvP); focus-fire pressure, PvP only, where each extra attacker on the same target within a few seconds adds less (×0.85 per attacker, capped at about 6.7 times a single attacker); healing on a player hit by another player in the last 10 s uses the PvP value.*
 
 ### Participation modes
 

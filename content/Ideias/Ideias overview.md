@@ -3,7 +3,7 @@ title: "Ideias overview"
 tags:
   - "ideias"
 created: "2026-11-03"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 Every idea of [[RunicGame — Ideias]], shown in full in its own box, in the document's order. Each box ends with a link
@@ -114,6 +114,7 @@ to the idea's own note; the status and the game vision section are in each idea'
 - ![[HOUSE-01 Houses and Home Functions]]
   - ![[HOUSE-02 Basements and Cellars]]
 - ![[NODE-01 Enemy Activity Tied to Nodes]]
+- ![[GFX-02 Far Entity Tier]]
 
 **Lore**
 

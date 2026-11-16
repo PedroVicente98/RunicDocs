@@ -3,10 +3,11 @@ title: "Godot integration (Engine)"
 tags:
   - "architecture"
   - "repo/engine"
+  - "appendix/rendering-lighting-visibility"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 Godot enters the Engine as a library (LibGodot) in two roles: renderer, window, input, audio and player UI inside the client, and the authoring editor inside the RunicEditor. The simulation, networking, world, Platform and services of v3 do not change, the server never links Godot, and the RenderFrame is the only door from the Runic client into Godot.
@@ -24,7 +25,7 @@ Godot enters the Engine as a library (LibGodot) in two roles: renderer, window, 
 | 7 | Godot built from source with modules removed | No fork; small documented patches only if something requires one |
 | 8 | The Engine is not a plugin | Runic code talks to Godot through the GDExtension API (godot-cpp) compiled into Runic executables; only the game’s own editor code is a loaded library |
 | 9 | The Engine is game-agnostic | The RunicEditor opens with no project and offers New project (from a template) and Open |
-| 10 | Runic nodes are representation only | Spawn areas, volumes, interactables, water and colliders exist in the editor; the Cooker writes placements and the Engine creates everything by its own rules |
+| 10 | Runic nodes are representation only | Spawn areas, volumes, interactables, water and colliders exist in the editor; the Cooker writes placements and the Engine creates everything by its own rules. One exception, for rendering only: Terrain3D runs as a Godot node on the client, and the server’s Jolt heightfield comes from the same cooked heightmap (see [[Rendering, lighting and visibility (Engine, Game)#Far rendering\|Far rendering]]) |
 | 11 | One source, two outputs | The Cooker writes server and client packages from the same scenes; the client’s visual assets come from Godot’s importer and export |
 | 12 | Player UI in Godot | Godot UI scenes (Control), including diegetic panels; nameplates and damage numbers on the batched path |
 | 13 | Code in an external IDE, assistants in the editor | No embedded code editor; New Flecs system, New Go service and similar assistants generate the files |

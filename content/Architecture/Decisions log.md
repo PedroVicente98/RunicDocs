@@ -2,10 +2,11 @@
 title: "Decisions log"
 tags:
   - "architecture"
+  - "appendix/rendering-lighting-visibility"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 | Area | Decision |
@@ -26,7 +27,7 @@ modified: "2026-11-13"
 | Responsiveness | Prediction runs shared game code; predicted skill starts; input queue |
 | Gameplay split | Engine GameplayAPI group (Gameplay, Combat, GameplayFlow and Quest modules): ability toolkit, input buffer, target slots, tags, attribute API and pools, lifecycle, relation hook, status storage with Game policies, rule pipeline, hit resolution, control primitives, threat table, registries, restrictions, sequences, quest runtime; Game: every attribute and policy — skills, resolver, statuses, crowd control, damage, defense, threat rules, factions |
 | Light and perception | Engine API with game values; warn and detect radii; concealment; detection at zero light |
-| PvP visibility | Engine: visibility tiers as data, picked by a Game function; RunicGame: Full, Silhouette and Hidden with reveal on contact |
+| PvP visibility | Engine: visibility tiers as data, picked by a Game function; RunicGame: Full or Hidden by range, light, emission and weather (1 m to 1 km); the client knows only what the player knows, and contact with a hidden entity leaves an anonymous silhouette |
 | Custom logic | Data first; custom behaviors in C++ through registries; no scripting language in the game; GDScript only for editor tools |
 | Cold content | The quest runtime runs in the simulation; quests are made through the Engine quest API from data plus registered Game C++; the Go Quest service stores progress; dialogue is data; physical interactions in C++ |
 | Services split | Platform: core services (accounts, World Coordinator, instances, directives, chat and party groups), Go SDK, item ledger and wallets as mechanisms; Game: character, inventory rules, economy, trade, guild, mail, housing, rankings, quest progress |
