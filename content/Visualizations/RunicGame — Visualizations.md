@@ -3,7 +3,7 @@ title: "RunicGame — Visualizations"
 tags:
   - "visualization"
 created: "2026-11-04"
-modified: "2026-11-12"
+modified: "2026-11-18"
 ---
 
 Interactive pages that show how parts of RunicGame and RunicEngine work. Each note shows its page in a frame and links to it on its own page. On the site, the frame follows the light and dark toggle. In Obsidian, if the frame stays empty, open the link.
@@ -12,5 +12,6 @@ Interactive pages that show how parts of RunicGame and RunicEngine work. Each no
 - [[Latency Feel Lab]]: what ping does to action combat, one lab at a time.
 - [[Runic Database Map]]: every database schema and table, and the only path the simulation has to them.
 - [[Targeting Lab]]: the action target and the Ward, tried on a small skirmish with every setting adjustable.
+- [[Knowledge Workbench]]: the knowledge system for NPC conversations, with entries, NPC profiles, trust gates and a simulator.
 
 The README's Visualizations section explains how to add a page made in a Claude chat.

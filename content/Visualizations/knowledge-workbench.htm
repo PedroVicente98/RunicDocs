@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral+SC:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: an archive ledger. The sidebar holds the knowledge strata (Common at the top, Lost at the bottom); the working pane is on the right. */
+  --paper:#eceee9; --sheet:#f8f9f6; --ink:#1d2433; --muted:#5b6474; --rule:#d2d6ce; --accent:#24466e; --accent-ink:#ffffff; --field:#ffffff;
+  --c:#a8956a; --d:#bf7a22; --e:#2a8073; --h:#4b50a6; --l:#7d2637;
+  --ok:#2c7a4c; --warn:#a1650f; --bad:#b3263a;
+  --f-display:"Spectral SC","Iowan Old Style",Georgia,serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161d; --sheet:#1a2029; --ink:#e3e6ec; --muted:#9aa3b2; --rule:#2d3541; --accent:#8fb3e0; --accent-ink:#0e1520; --field:#141922;
+    --c:#c9b689; --d:#e09a42; --e:#4fb3a6; --h:#8f94f2; --l:#d6566d;
+    --ok:#5cc18a; --warn:#e0a548; --bad:#ef6b7f;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161d; --sheet:#1a2029; --ink:#e3e6ec; --muted:#9aa3b2; --rule:#2d3541; --accent:#8fb3e0; --accent-ink:#0e1520; --field:#141922;
+  --c:#c9b689; --d:#e09a42; --e:#4fb3a6; --h:#8f94f2; --l:#d6566d;
+  --ok:#5cc18a; --warn:#e0a548; --bad:#ef6b7f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font:14px/1.45 var(--f-body)}
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);height:100%}
+.side{border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:18px;padding:18px 14px;overflow:auto}
+.brand-title{font:600 22px/1.05 var(--f-display);letter-spacing:.01em}
+.brand-sub{color:var(--muted);font-size:12px;margin-top:4px}
+nav{display:flex;flex-direction:column;gap:2px}
+nav button{all:unset;cursor:pointer;padding:7px 10px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+nav button:hover{background:var(--sheet)}
+nav button[aria-current="page"]{background:var(--sheet);box-shadow:inset 3px 0 0 var(--accent);font-weight:600}
+nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font:12px var(--f-mono);color:var(--muted)}
+.lbl,.fld>label{font:600 11px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.strata{display:flex;flex-direction:column;gap:3px}
+.band{display:grid;grid-template-columns:18px 1fr auto;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;border-left:4px solid var(--dc);background:color-mix(in srgb,var(--dc) 13%,transparent);font-size:12.5px}
+.band b{font:600 12px var(--f-mono);color:var(--dc)}
+.store{font-size:12px;color:var(--muted);margin-top:auto}
+.store .warn{color:var(--warn)}
+main{overflow:auto;padding:18px 22px 40px;min-width:0}
+h1{font:600 26px/1.1 var(--f-display);margin:0 0 4px;text-wrap:balance}
+h2{font:600 18px/1.2 var(--f-display);margin:18px 0 8px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 14px;max-width:72ch}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:14px;min-width:0}
+.split{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(340px,1.25fr);gap:16px;align-items:start}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar .grow{flex:1 1 180px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;min-width:0;width:100%}
+select{width:auto;max-width:100%}
+.toolbar input,.toolbar select{width:auto}
+textarea{font-family:var(--f-mono);font-size:12.5px;line-height:1.5;resize:vertical}
+#e-text,#e-gm,#n-notes{font-family:var(--f-body);font-size:14px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type="checkbox"]{width:auto}
+.btn{cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:6px;padding:6px 12px;font:500 13px var(--f-body);white-space:nowrap}
+.btn.q{background:transparent;color:var(--accent)}
+.btn.danger{border-color:var(--bad);background:transparent;color:var(--bad)}
+.btn.small{padding:3px 9px;font-size:12px}
+.btn:focus-visible,.chip:focus-visible,.row:focus-visible,.link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:default}
+.rows{display:flex;flex-direction:column;max-height:calc(100vh - 230px);overflow:auto;min-height:120px}
+.row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 6px;border:0;border-bottom:1px solid var(--rule);cursor:pointer;text-align:left;background:none;color:inherit;font:inherit;width:100%}
+.row:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.row[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.row .t{font-weight:500;overflow-wrap:anywhere}
+.id{font:12px var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.dz{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:4px;font:600 12px var(--f-mono);color:#fff;background:var(--dc);flex:none}
+.dz-C{--dc:var(--c)} .dz-D{--dc:var(--d)} .dz-E{--dc:var(--e)} .dz-H{--dc:var(--h)} .dz-L{--dc:var(--l)}
+.tag{display:inline-block;font-size:11.5px;color:var(--muted);border:1px solid var(--rule);border-radius:999px;padding:0 7px;margin:2px 4px 0 0;white-space:nowrap}
+.tag.status-decided{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.tag.status-proposal{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{cursor:pointer;border:1px solid var(--rule);background:var(--field);color:var(--ink);border-radius:999px;padding:2px 9px;font:12px var(--f-body)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip.d.on{background:var(--dc);border-color:var(--dc);color:#fff}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.form .full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.hint{font-size:12px;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.stat{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--rule);border-radius:999px;padding:2px 10px;font-size:12.5px;background:var(--sheet)}
+.stat b{font:600 12.5px var(--f-mono);font-variant-numeric:tabular-nums}
+.pill{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.06em;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.pill.tell{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.pill.trust{background:color-mix(in srgb,var(--h) 16%,transparent);color:var(--h)}
+.pill.req{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.pill.refused{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.pill.known{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.res{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 4px;border-bottom:1px solid var(--rule)}
+.res .why{font-size:12.5px;color:var(--muted);margin-top:2px}
+.res .txt{margin-top:3px;max-width:75ch}
+.group-h{display:flex;align-items:center;gap:8px;font:600 16px var(--f-display);margin:16px 0 4px}
+.issue{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--rule)}
+.sev{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.06em;border-radius:4px;padding:2px 6px}
+.sev.error{background:color-mix(in srgb,var(--bad) 15%,transparent);color:var(--bad)}
+.sev.warn{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.fblock{border:1px dashed var(--rule);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.fblock-h{display:flex;gap:8px;align-items:center}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chain .node{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--rule);border-radius:6px;padding:2px 8px 2px 2px;background:var(--field);cursor:pointer;color:inherit;font:inherit}
+.chain .node.self{border-color:var(--accent)}
+.chain .arrow{color:var(--muted)}
+.link{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.banner{border:1px solid var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 8%,transparent);padding:6px 10px;border-radius:6px;font-size:12.5px;margin-bottom:12px}
+.empty{color:var(--muted);padding:22px 6px}
+details{border-top:1px solid var(--rule);padding-top:10px;margin-top:12px}
+details summary{cursor:pointer;font-weight:600}
+.guide p,.guide li{max-width:70ch}
+.guide code,.mono{font:12.5px var(--f-mono)}
+.card{border:1px solid var(--rule);border-radius:8px;padding:10px;display:grid;grid-template-columns:auto 24px minmax(0,1fr);gap:10px;align-items:start;background:var(--field)}
+.card + .card{margin-top:8px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(10,14,20,.5);display:grid;place-items:center;padding:16px;z-index:10}
+.modal[hidden]{display:none}
+.modal-card{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;max-width:880px;width:100%;max-height:92%;overflow:auto;padding:16px}
+#toast{position:fixed;bottom:16px;right:16px;background:var(--ink);color:var(--paper);padding:8px 12px;border-radius:6px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:420px;z-index:20}
+#toast.show{opacity:1}
+.depthkey{display:grid;grid-template-columns:24px 110px minmax(0,1fr);gap:6px 10px;align-items:start;font-size:13px}
+@media (max-width: 980px){
+  .app{grid-template-columns:1fr;height:auto}
+  .side{border-right:0;border-bottom:1px solid var(--rule)}
+  .split,.twocol{grid-template-columns:1fr}
+  .rows{max-height:none}
+}
+@media (max-width: 560px){ .form{grid-template-columns:1fr} main{padding:14px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div>
+      <div class="brand-title">Knowledge Workbench</div>
+      <div class="brand-sub">RunicGame lore · server-only knowledge</div>
+    </div>
+    <nav id="nav" aria-label="Sections"></nav>
+    <div>
+      <div class="lbl" style="margin-bottom:6px">Strata</div>
+      <div class="strata" id="strata"></div>
+    </div>
+    <div class="store" id="store-status">Connecting to saved knowledge…</div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div class="modal" id="modal" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<datalist id="dl-entries"></datalist>
+<datalist id="dl-scopes"></datalist>
+<datalist id="dl-npcs"></datalist>
+<datalist id="dl-langs"></datalist>
+
+<script>
+"use strict";
+/* ---------- Schema ---------- */
+const DEPTHS = ["C","D","E","H","L"];
+const DORD = {C:0,D:1,E:2,H:3,L:4};
+const DEPTH_INFO = {
+  C:{name:"Common", who:"Anyone in its scope.", how:"Spreads by talk. Anyone tells it, to anyone."},
+  D:{name:"Doctrine", who:"Members of a faith, faction or group.", how:"What the group believes and tells openly. It carries the group's perspective and can be partial or wrong."},
+  E:{name:"Expertise", who:"Specialists, by role and skill.", how:"What experts know to be true by study or craft. Usually needs groundwork from the player first."},
+  H:{name:"Hidden", who:"A handful of NPCs, or specific places.", how:"Kept on purpose. The teller has to trust the player."},
+  L:{name:"Lost", who:"Nobody alive.", how:"Only from ruins, inscriptions, objects, Echoes or the gods."}
+};
+const DEFAULT_TAX = {
+  types:["person","deity","people","organization","faction","place","creature","object","event","era","principle","practice","custom","text"],
+  domains:["cosmos","runes-and-magic","gods-and-faith","history","peoples","factions-and-politics","organizations","places","the-anchored","threats","crafts-and-trade","nature-and-creatures","law-and-customs","technology"],
+  spheres:["mundane","arcane","divine","cosmic","void"],
+  concepts:["existence","space","time","chaos","life","death","sea","sky","stone","fire","flora","fauna","history","trade","hearth","art","invention","war","void"],
+  reliability:["true","partial","belief","rumor","lie"],
+  perspectives:["neutral","faction-1","faction-2","pirates","altar-keepers"],
+  factions:["faction-1","faction-2","pirates","neutral"],
+  languages:["faction-1-tongue","faction-2-tongue","wake-cant","runic"],
+  sources:["dialogue","overhear","book","inscription","item","discovery","observation","quest","event"],
+  statuses:["decided","proposal","draft"],
+  refusals:["outlaw","infamy","enemy-faction","pirate"],
+  tiers:{npc:["Stranger","Acquaintance","Trusted","Confidant"], org:["Neutral","Friendly","Honored","Revered","Exalted"], region:["Outsider","Known","Respected","Local hero"]},
+  sectionMap:{C:["common","rumor","rumors","everyone knows"], D:["doctrine","taught","teaching","teachings","faith","what they believe"], E:["expertise","scholarly","scholar","specialist","experts know"], H:["hidden","secret","secrets"], L:["lost","forgotten"]}
+};
+const LIST_FIELDS = ["domains","spheres","concepts","requires","requires_any","conditions","gate","next","related","contradicts","about","unlocks","sources"];
+const ENTRY_ORDER = ["id","title","text","gm","type","subtype","domains","spheres","concepts","depth","reliability","perspective","scope","era","status","requires","requires_any","conditions","gate","next","related","contradicts","about","unlocks","sources"];
+const TABS = [["library","Library"],["npcs","NPCs"],["simulate","Simulate"],["notes","Notes to entries"],["check","Check"],["taxonomy","Taxonomy"]];
+
+const EXAMPLE_NOTE = `---
+about: [altars]
+scope: world
+domains: [the-anchored]
+spheres: [divine, arcane]
+concepts: [life, time, space]
+type: principle
+chain: true
+---
+# Altars (example note)
+
+GM notes: every city has one. Use the circle as a safe stop between hard areas.
+Nothing outside a knowledge callout ever reaches a player.
+
+## Common
+> [!knowledge] Resting at an Altar
+> Travellers rest at Altars between journeys, and the Anchored travel from one Altar to another.
+
+## Doctrine
+> [!knowledge] Holy ground
+> perspective:: altar-keepers
+> reliability:: partial
+> The Altar Keepers teach that an Altar's circle belongs to every god at once, so no blood may be spilled there.
+
+## Expertise
+> [!knowledge] Runes in the stone
+> The stone of an Altar is a rune derived from the World Runes. Nobody alive can carve a new one.
+
+## Secrets
+> [!knowledge] Older than the Keepers
+> gate:: npc>=Confidant
+> The Keepers did not build the Altars. Their oldest record only says the Altars were already there.
+`;
+
+const clone = x => JSON.parse(JSON.stringify(x));
+const S = {
+  tax: clone(DEFAULT_TAX), entries:new Map(), npcs:new Map(), players:new Map(),
+  mode:"loading", note:"", sample:null, sampleChecked:false,
+  ui:{ tab:"library", selEntry:null, entryDraft:null, selNpc:null, npcDraft:null, simNpc:"", simPlayer:"", simTopic:"", playerDraft:null,
+       f:{q:"",depth:[],domain:"",concept:"",sphere:"",type:"",status:""},
+       noteText:EXAMPLE_NOTE, extracted:[], extractedNpc:"", marked:"", aiBusy:false, delArm:null, aiError:"" }
+};
+
+/* ---------- Utilities ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function slug(s){ return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/['’]/g,"").replace(/[^a-z0-9._:]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80); }
+function list(s){ if(Array.isArray(s)) return s.map(x=>String(x).trim()).filter(Boolean); return String(s||"").split(/[,\n]/).map(x=>x.trim()).filter(Boolean); }
+function lines(s){ return String(s||"").split("\n").map(x=>x.trim()).filter(Boolean); }
+function uniq(a){ return [...new Set(a)]; }
+function overlap(a,b){ return (a||[]).some(x=>(b||[]).includes(x)); }
+function normScope(s){ let v=String(s||"world").trim().toLowerCase().replace(/\s+/g,"-").replace(/^\/+|\/+$/g,""); if(!v) return "world"; if(v!=="world" && !v.startsWith("world/")) v="world/"+v; return v; }
+function scopeRelated(a,b){ a=normScope(a); b=normScope(b); return a===b || a.startsWith(b+"/") || b.startsWith(a+"/"); }
+function byDepthTitle(a,b){ return (DORD[a.depth]??9)-(DORD[b.depth]??9) || String(a.title||a.id).localeCompare(String(b.title||b.id)); }
+function dz(d){ return `<span class="dz dz-${esc(d||"C")}" title="${esc((DEPTH_INFO[d]||{}).name||"")}">${esc(d||"?")}</span>`; }
+function titleOf(id){ const e=S.entries.get(id); return e ? (e.title||id) : id; }
+function npcName(id){ const n=S.npcs.get(id); return n ? (n.name||id) : id; }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),3200); }
+function tierList(kind){ return (S.tax.tiers||{})[kind] || []; }
+function tierVal(kind,v){ const s=String(v??"").trim(); if(/^-?\d+$/.test(s)) return Number(s); const i=tierList(kind).findIndex(t=>t.toLowerCase()===s.toLowerCase()); return i; }
+function tierName(kind,n){ const t=tierList(kind)[n]; return t ?? String(n); }
+function cleanEntry(e){
+  const o={};
+  for(const k of ENTRY_ORDER){
+    let v=e[k];
+    if(LIST_FIELDS.includes(k)) v=uniq(list(v||[]));
+    else if(typeof v==="string") v=v.trim();
+    if(v===undefined || v===null) v = LIST_FIELDS.includes(k)?[]:"";
+    o[k]=v;
+  }
+  o.depth = DEPTHS.includes(o.depth)?o.depth:"C";
+  o.scope = normScope(o.scope);
+  o.perspective = o.perspective || "neutral";
+  o.reliability = o.reliability || "true";
+  o.status = o.status || "draft";
+  o.id = slug(o.id || o.title);
+  return o;
+}
+
+/* ---------- Conditions (a small text language) ----------
+   npc>=Trusted · level>=20 · org:tide-temple>=Friendly · region:world/continent-1>=Known · prof:language>=20
+   lang:runic · quest:found-the-bell · item:old-key · faction:faction-1 · race:elf */
+function parseCond(raw){
+  const s=String(raw||"").trim(); let m;
+  if((m=s.match(/^(npc|level)\s*>=\s*(.+)$/i))) return {kind:m[1].toLowerCase(), min:m[2].trim(), raw:s};
+  if((m=s.match(/^(org|region|prof)\s*:\s*([^\s>]+)\s*>=\s*(.+)$/i))) return {kind:m[1].toLowerCase(), key:m[2].trim(), min:m[3].trim(), raw:s};
+  if((m=s.match(/^(lang|quest|item|faction|race)\s*:\s*(.+)$/i))) return {kind:m[1].toLowerCase(), key:m[2].trim(), raw:s};
+  return {error:true, raw:s};
+}
+function condMet(c,p,npc){
+  if(c.error) return false;
+  switch(c.kind){
+    case "npc": { const have=Number((p.npc_trust||{})[npc?.id] ?? 0); const need=tierVal("npc",c.min); return need>=0 && have>=need; }
+    case "level": return Number(p.level||0) >= Number(c.min);
+    case "org": { const have=Number((p.orgs||{})[c.key] ?? 0); const need=tierVal("org",c.min); return need>=0 && have>=need; }
+    case "region": { const need=tierVal("region",c.min); if(need<0) return false; const key=normScope(c.key); let best=-1; for(const [path,v] of Object.entries(p.regions||{})){ const pth=normScope(path); if(key===pth || key.startsWith(pth+"/")) best=Math.max(best,Number(v)); } return best>=need; }
+    case "prof": return Number((p.professions||{})[c.key] ?? 0) >= Number(c.min);
+    case "lang": return (p.languages||[]).includes(c.key);
+    case "quest": return (p.quests||[]).includes(c.key);
+    case "item": return (p.items||[]).includes(c.key);
+    case "faction": return p.faction===c.key;
+    case "race": return p.race===c.key;
+  }
+  return false;
+}
+function condLabel(raw){
+  const c=typeof raw==="string"?parseCond(raw):raw;
+  if(c.error) return `Unreadable condition "${c.raw}"`;
+  switch(c.kind){
+    case "npc": return `Trust with this NPC: ${c.min}`;
+    case "level": return `Level ${c.min}`;
+    case "org": return `${c.key} reputation: ${c.min}`;
+    case "region": return `Standing in ${c.key}: ${c.min}`;
+    case "prof": return `${c.key} ${c.min}`;
+    case "lang": return `Speaks or reads ${c.key}`;
+    case "quest": return `Quest state ${c.key}`;
+    case "item": return `Has ${c.key}`;
+    case "faction": return `Faction ${c.key}`;
+    case "race": return `Race ${c.key}`;
+  }
+  return c.raw;
+}
+
+/* ---------- Knowledge resolution ---------- */
+function npcKnows(npc,e){
+  if(!npc||!e) return null;
+  if((npc.personal||[]).includes(e.id)) return {via:"personal", label:"Personal knowledge"};
+  const persp=e.perspective||"neutral";
+  for(const f of (npc.knows||[])){
+    if((DORD[e.depth]??0) > (DORD[f.max_depth||"C"]??0)) continue;
+    if(f.domains?.length && !overlap(f.domains,e.domains)) continue;
+    if(f.concepts?.length && !overlap(f.concepts,e.concepts)) continue;
+    if(f.spheres?.length && !overlap(f.spheres,e.spheres)) continue;
+    if(f.types?.length && !f.types.includes(e.type)) continue;
+    if(f.scope && !scopeRelated(e.scope,f.scope)) continue;
+    if(persp!=="neutral"){ const ps=f.perspectives?.length?f.perspectives:[npc.perspective||"neutral"]; if(!ps.includes(persp)) continue; }
+    return {via:"filter", label:f.label||"Filter"};
+  }
+  return null;
+}
+function anyCond(conds,p,npc){ return conds.some(c=>condMet(parseCond(c),p,npc)); }
+function evaluate(npc,p,e){
+  const kn=npcKnows(npc,e);
+  if(!kn) return {status:"unknown"};
+  const known=p.known||[];
+  if(known.includes(e.id)) return {status:"known",kn,why:[]};
+  if(npc.language && !(p.languages||[]).includes(npc.language)) return {status:"refused",kn,why:[`Speaks ${npc.language}, which this character doesn't`]};
+  if(e.depth!=="C"){
+    const rf=npc.refuse||[], why=[];
+    if(rf.includes("outlaw") && p.outlaw) why.push("Won't talk past common knowledge to Outlaws");
+    if(rf.includes("infamy") && Number(p.infamy||0)>0) why.push("Won't talk past common knowledge to anyone with Infamy");
+    if(rf.includes("pirate") && p.faction==="pirates") why.push("Won't talk past common knowledge to pirates");
+    if(rf.includes("enemy-faction") && npc.faction && npc.faction!=="neutral" && p.faction && p.faction!==npc.faction) why.push("Won't talk past common knowledge to the enemy faction");
+    if(why.length) return {status:"refused",kn,why};
+  }
+  const missing=[];
+  for(const id of (e.requires||[])) if(!known.includes(id)) missing.push(`Knows "${titleOf(id)}"`);
+  if((e.requires_any||[]).length && !e.requires_any.some(id=>known.includes(id))) missing.push(`Knows one of: ${e.requires_any.map(titleOf).join(", ")}`);
+  for(const c of (e.conditions||[])){ const pc=parseCond(c); if(!condMet(pc,p,npc)) missing.push(condLabel(pc)); }
+  const trust=[];
+  const gate=((npc.gates||{})[e.depth])||[];
+  if(gate.length && !anyCond(gate,p,npc)) trust.push(`${DEPTH_INFO[e.depth].name} from this NPC needs any of: ${gate.map(condLabel).join(" · ")}`);
+  if((e.gate||[]).length && !anyCond(e.gate,p,npc)) trust.push(`This entry also needs any of: ${e.gate.map(condLabel).join(" · ")}`);
+  if(missing.length) return {status:"req",kn,why:missing.concat(trust)};
+  if(trust.length) return {status:"trust",kn,why:trust};
+  return {status:"tell",kn,why:[]};
+}
+function simulate(npc,p,topic){
+  const g={tell:[],trust:[],req:[],refused:[],known:[]};
+  if(!npc||!p) return g;
+  for(const e of S.entries.values()){
+    if(topic){ const [k,v]=topic.split(":"); if(k==="d" && !(e.domains||[]).includes(v)) continue; if(k==="c" && !(e.concepts||[]).includes(v)) continue; }
+    const r=evaluate(npc,p,e);
+    if(r.status==="unknown") continue;
+    g[r.status].push({e,r});
+  }
+  for(const k in g) g[k].sort((a,b)=>byDepthTitle(a.e,b.e));
+  return g;
+}
+
+/* ---------- Checks ---------- */
+function checkAll(){
+  const issues=[]; const ids=new Set(S.entries.keys());
+  const add=(sev,msg,target)=>issues.push({sev,msg,target});
+  for(const e of S.entries.values()){
+    const tgt={kind:"entry",id:e.id};
+    if(!e.title) add("warn",`"${e.id}" has no title`,tgt);
+    if(!e.text) add("warn",`"${e.title||e.id}" has no player-facing text`,tgt);
+    for(const f of ["requires","requires_any","next","related","contradicts"]) for(const r of (e[f]||[])) if(!ids.has(r)) add("error",`"${e.title||e.id}" ${f.replace("_"," ")} a missing entry: ${r}`,tgt);
+    for(const n of (e.next||[])){ const ne=S.entries.get(n); if(ne && DORD[ne.depth]<DORD[e.depth]) add("warn",`"${e.title||e.id}" leads to a shallower step: ${ne.title||n} (${ne.depth})`,tgt); }
+    for(const c of (e.conditions||[]).concat(e.gate||[])) if(parseCond(c).error) add("error",`"${e.title||e.id}" has an unreadable condition: ${c}`,tgt);
+    const tellers=[...S.npcs.values()].filter(n=>npcKnows(n,e));
+    const other=(e.sources||[]).filter(s=>s!=="dialogue");
+    if(!tellers.length && !other.length) add("warn",`Nobody can tell "${e.title||e.id}", and it has no other source`,tgt);
+    if(e.depth==="L") for(const n of tellers){ if(npcKnows(n,e).via==="filter") add("warn",`Lost entry "${e.title||e.id}" is told by ${n.name||n.id} through a filter; Lost should come only from objects, places or personal knowledge`,{kind:"npc",id:n.id}); }
+    if(e.perspective!=="neutral" && e.reliability==="true" && e.depth==="D") add("warn",`"${e.title||e.id}" is a faction or faith version marked fully true`,tgt);
+  }
+  // cycles in requires
+  const state=new Map();
+  const visit=(id,path)=>{ if(state.get(id)===1){ add("error",`Requirement loop: ${path.concat(id).map(titleOf).join(" → ")}`,{kind:"entry",id}); return; } if(state.get(id)===2) return; state.set(id,1); const e=S.entries.get(id); for(const r of (e?.requires||[])) if(S.entries.has(r)) visit(r,path.concat(id)); state.set(id,2); };
+  for(const id of ids) visit(id,[]);
+  for(const n of S.npcs.values()){
+    const tgt={kind:"npc",id:n.id};
+    for(const id of (n.personal||[])) if(!ids.has(id)) add("error",`${n.name||n.id} has missing personal knowledge: ${id}`,tgt);
+    (n.knows||[]).forEach((f,i)=>{ const hits=[...S.entries.values()].filter(e=>npcKnows({...n,personal:[],knows:[f]},e)).length; if(!hits) add("warn",`${n.name||n.id}: filter "${f.label||i+1}" matches no entries`,tgt); });
+    for(const [d,conds] of Object.entries(n.gates||{})) for(const c of conds) if(parseCond(c).error) add("error",`${n.name||n.id} has an unreadable ${d} gate: ${c}`,tgt);
+  }
+  return issues.sort((a,b)=>(a.sev==="error"?0:1)-(b.sev==="error"?0:1));
+}
+
+/* ---------- Storage ---------- */
+const LOCAL_KEY="runic-knowledge-workbench-v1";
+const store = {
+  db:null, confirmed:{}, pending:new Map(),
+  async start(){
+    let db=null;
+    try{ db = (window.claude && typeof window.claude.use==="function") ? await window.claude.use("db") : null; }catch(_){ db=null; }
+    if(!db){ this.useLocal(); return; }
+    this.db=db; S.mode="db"; renderSide();
+    const timer=setTimeout(()=>{ if(Object.keys(this.confirmed).length<3){ S.note="Saved knowledge can't be reached yet. What you see may be out of date."; renderSide(); } },10000);
+    const onErr=(e)=>{ S.note = e && e.code==="revoked" ? "This view can no longer read the saved knowledge." : "The saved knowledge stopped updating. Reload the page to reconnect."; renderSide(); };
+    const sub=(coll)=> db.collection(coll).onSnapshot(snap=>{
+        const m=new Map(); for(const d of snap.docs){ const v=d.data(); if(v) m.set(d.id, coll==="entries" ? {...cleanEntry({...v,id:d.id}), updated:v.updated} : {...v,id:d.id}); }
+        S[coll]=m;
+        if(!snap.metadata.fromCache){ this.confirmed[coll]=true; if(Object.keys(this.confirmed).length>=3){ clearTimeout(timer); S.note=""; } }
+        onData();
+      }, onErr);
+    sub("entries"); sub("npcs"); sub("players");
+    db.doc("config/taxonomy").onSnapshot(d=>{ if(d.exists){ S.tax=mergeTax(d.data()); } onData(); }, onErr);
+  },
+  useLocal(){
+    S.mode="local";
+    try{ const raw=localStorage.getItem(LOCAL_KEY); if(raw){ const o=JSON.parse(raw); S.entries=new Map((o.entries||[]).map(e=>[e.id,cleanEntry(e)])); S.npcs=new Map((o.npcs||[]).map(e=>[e.id,e])); S.players=new Map((o.players||[]).map(e=>[e.id,e])); if(o.taxonomy) S.tax=mergeTax(o.taxonomy); } }catch(_){}
+    onData();
+  },
+  saveLocal(){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(exportData())); }catch(_){ S.note="This browser won't keep changes; export them before you leave."; renderSide(); } },
+  queued(path,fn){ const prev=this.pending.get(path)||Promise.resolve(); const next=prev.then(fn,fn); this.pending.set(path,next.catch(()=>{})); return next; },
+  async put(coll,id,data){
+    S[coll].set(id,{...data,id});
+    if(this.db){
+      try{ await this.queued(`${coll}/${id}`,()=>this.db.collection(coll).doc(id).set({...data,id})); }
+      catch(e){ this.fail(e); throw e; }
+    } else this.saveLocal();
+    onData();
+  },
+  async remove(coll,id){
+    S[coll].delete(id);
+    if(this.db){ try{ await this.queued(`${coll}/${id}`,()=>this.db.collection(coll).doc(id).delete()); }catch(e){ this.fail(e); throw e; } }
+    else this.saveLocal();
+    onData();
+  },
+  async putTax(tax){
+    S.tax=mergeTax(tax);
+    if(this.db){ try{ await this.queued("config/taxonomy",()=>this.db.doc("config/taxonomy").set(tax)); }catch(e){ this.fail(e); throw e; } }
+    else this.saveLocal();
+    onData();
+  },
+  fail(e){
+    if(e && e.code==="invalid_argument"){ S.mode="readonly"; S.note="You can read this knowledge but not change it here."; }
+    else if(e && e.code==="quota_exceeded"){ toast("The knowledge store is full. Delete entries you no longer need, then try again."); }
+    else toast("That change didn't save. Try again in a moment.");
+    renderSide();
+  }
+};
+function mergeTax(d){ const t={...clone(DEFAULT_TAX),...(d||{})}; t.tiers={...DEFAULT_TAX.tiers,...((d||{}).tiers||{})}; t.sectionMap={...DEFAULT_TAX.sectionMap,...((d||{}).sectionMap||{})}; return t; }
+function exportData(){ return {taxonomy:S.tax, entries:[...S.entries.values()], npcs:[...S.npcs.values()], players:[...S.players.values()]}; }
+
+/* ---------- Rendering: shell ---------- */
+function renderNav(){
+  const issues=checkAll();
+  const counts={library:S.entries.size, npcs:S.npcs.size, check:issues.filter(i=>i.sev==="error").length+issues.filter(i=>i.sev==="warn").length};
+  $("#nav").innerHTML=TABS.map(([k,label])=>`<button type="button" data-action="tab" data-tab="${k}" ${S.ui.tab===k?'aria-current="page"':""}><span>${label}</span>${counts[k]!==undefined?`<span class="count">${counts[k]}</span>`:""}</button>`).join("");
+}
+function renderSide(){
+  renderNav();
+  const by={}; for(const d of DEPTHS) by[d]=0; for(const e of S.entries.values()) by[e.depth]=(by[e.depth]||0)+1;
+  $("#strata").innerHTML=DEPTHS.map(d=>`<div class="band dz-${d}"><b>${d}</b><span>${DEPTH_INFO[d].name}</span><span class="count">${by[d]}</span></div>`).join("");
+  const label={loading:"Connecting to saved knowledge…", db:"Saved in this artifact. Readable only by you and editors.", local:"Saved only in this browser. Export to keep a copy.", readonly:"Read-only here."}[S.mode];
+  $("#store-status").innerHTML=`${esc(label)}${S.note?`<div class="warn">${esc(S.note)}</div>`:""}`;
+  const dl=(id,vals)=>{ $(id).innerHTML=vals.map(v=>`<option value="${esc(v)}"></option>`).join(""); };
+  dl("#dl-entries",[...S.entries.keys()].sort());
+  dl("#dl-scopes",uniq(["world",...[...S.entries.values()].map(e=>e.scope),...[...S.npcs.values()].map(n=>n.location)].filter(Boolean)).sort());
+  dl("#dl-npcs",[...S.npcs.keys()].sort());
+  dl("#dl-langs",S.tax.languages||[]);
+}
+function onData(){
+  renderSide();
+  const t=S.ui.tab;
+  if(t==="library"){ renderLibList(); if(!S.ui.entryDraft) renderEntryEditor(); }
+  else if(t==="npcs"){ renderNpcList(); if(!S.ui.npcDraft) renderNpcEditor(); }
+  else if(t==="simulate"){ renderSimControls(); renderSimResults(); if(!S.ui.playerDraft) renderPlayerForm(); }
+  else if(t==="check") renderCheck();
+  else if(t==="notes") renderNotesOut();
+}
+function setTab(t){
+  if(!TABS.some(([k])=>k===t)) t="library";
+  S.ui.tab=t; S.ui.entryDraft=null; S.ui.npcDraft=null; S.ui.playerDraft=null;
+  renderNav();
+  ({library:renderLibrary,npcs:renderNpcs,simulate:renderSimulate,notes:renderNotes,check:renderCheckTab,taxonomy:renderTaxonomy})[t]();
+  $("#main").scrollTop=0;
+}
+
+/* ---------- Small builders ---------- */
+function chipGroup(field,options,selected,{single=false,depth=false}={}){
+  selected=selected||[];
+  return `<div class="chips" data-field="${esc(field)}" ${single?"data-single":""}>${options.map(o=>`<button type="button" class="chip ${depth?`d dz-${esc(o)}`:""} ${selected.includes(o)?"on":""}" data-val="${esc(o)}" aria-pressed="${selected.includes(o)}">${depth?`${esc(o)} ${esc(DEPTH_INFO[o].name)}`:esc(o)}</button>`).join("")}</div>`;
+}
+function readChips(root,field){ const g=root.querySelector(`.chips[data-field="${field}"]`); return g?[...g.querySelectorAll(".chip.on")].map(b=>b.dataset.val):[]; }
+function opts(vals,sel,blank){ return (blank!==undefined?`<option value="">${esc(blank)}</option>`:"")+vals.map(v=>`<option value="${esc(v)}" ${v===sel?"selected":""}>${esc(v)}</option>`).join(""); }
+function fld(label,inner,{full=false,id=""}={}){ return `<div class="fld ${full?"full":""}">${id?`<label for="${id}">${esc(label)}</label>`:`<span class="lbl">${esc(label)}</span>`}${inner}</div>`; }
+function statusTag(s){ return s?`<span class="tag status-${esc(s)}">${esc(s)}</span>`:""; }
+
+/* ---------- Library ---------- */
+function renderLibrary(){
+  const issues=checkAll();
+  $("#main").innerHTML=`
+  <h1>Knowledge library</h1>
+  <p class="lede">Every piece of knowledge a player can learn. Each entry is one answerable question, tagged on every facet an NPC can filter by.</p>
+  <div class="stats"><span class="stat"><b>${S.entries.size}</b> entries</span><span class="stat"><b>${S.npcs.size}</b> NPCs</span><span class="stat"><b>${S.players.size}</b> test players</span><span class="stat"><b>${issues.length}</b> things to check</span></div>
+  <div class="split">
+    <section class="panel">
+      <div class="toolbar">
+        <input class="grow" id="f-q" type="search" placeholder="Search titles, ids and text" value="${esc(S.ui.f.q)}" aria-label="Search entries">
+        <button class="btn" type="button" data-action="new-entry">New entry</button>
+      </div>
+      <div class="toolbar">${chipGroup("f-depth",DEPTHS,S.ui.f.depth,{depth:true})}</div>
+      <div class="toolbar">
+        <select id="f-domain" aria-label="Domain">${opts(S.tax.domains,S.ui.f.domain,"Any domain")}</select>
+        <select id="f-concept" aria-label="Concept">${opts(S.tax.concepts,S.ui.f.concept,"Any concept")}</select>
+        <select id="f-sphere" aria-label="Sphere">${opts(S.tax.spheres,S.ui.f.sphere,"Any sphere")}</select>
+        <select id="f-type" aria-label="Type">${opts(S.tax.types,S.ui.f.type,"Any type")}</select>
+        <select id="f-status" aria-label="Status">${opts(S.tax.statuses,S.ui.f.status,"Any status")}</select>
+      </div>
+      <div class="rows" id="lib-list"></div>
+      <div class="actions"><button class="btn q small" type="button" data-action="export">Export</button><button class="btn q small" type="button" data-action="import">Import</button></div>
+    </section>
+    <section class="panel" id="lib-editor"></section>
+  </div>`;
+  renderLibList(); renderEntryEditor();
+}
+function filteredEntries(){
+  const f=S.ui.f, q=f.q.trim().toLowerCase();
+  return [...S.entries.values()].filter(e=>{
+    if(q && !`${e.id} ${e.title} ${e.text}`.toLowerCase().includes(q)) return false;
+    if(f.depth.length && !f.depth.includes(e.depth)) return false;
+    if(f.domain && !(e.domains||[]).includes(f.domain)) return false;
+    if(f.concept && !(e.concepts||[]).includes(f.concept)) return false;
+    if(f.sphere && !(e.spheres||[]).includes(f.sphere)) return false;
+    if(f.type && e.type!==f.type) return false;
+    if(f.status && e.status!==f.status) return false;
+    return true;
+  }).sort(byDepthTitle);
+}
+function renderLibList(){
+  const el=$("#lib-list"); if(!el) return;
+  if(S.mode==="loading"){ el.innerHTML=`<div class="empty">Loading saved knowledge…</div>`; return; }
+  const rows=filteredEntries();
+  if(!S.entries.size){ el.innerHTML=`<div class="empty">The library is empty. Add an entry, turn a marked note into entries in Notes to entries, or use Import with a JSON export from another copy of this tool.</div>`; return; }
+  if(!rows.length){ el.innerHTML=`<div class="empty">No entries match these filters.</div>`; return; }
+  el.innerHTML=rows.map(e=>`<button type="button" class="row" data-action="sel-entry" data-id="${esc(e.id)}" aria-selected="${S.ui.selEntry===e.id}">${dz(e.depth)}<span><span class="t">${esc(e.title||e.id)}</span><br><span class="id">${esc(e.id)}</span></span><span>${statusTag(e.status)}</span></button>`).join("");
+}
+function blankEntry(){ return cleanEntry({id:"",title:"",depth:"C",scope:"world",status:"draft",type:"principle"}); }
+function renderEntryEditor(){
+  const el=$("#lib-editor"); if(!el) return;
+  const sel=S.ui.selEntry;
+  const e = S.ui.entryDraft || (sel==="__new" ? blankEntry() : S.entries.get(sel));
+  if(!e){ el.innerHTML=`<h2 style="margin-top:0">How depth works</h2>${depthKey()}<p class="hint" style="margin-top:12px">Pick an entry on the left to edit it, or start a new one.</p>`; return; }
+  const tellers=[...S.npcs.values()].map(n=>({n,k:npcKnows(n,e)})).filter(x=>x.k);
+  const into=[...S.entries.values()].filter(x=>x.id!==e.id && ((x.next||[]).includes(e.id)));
+  const reqBy=[...S.entries.values()].filter(x=>x.id!==e.id && ((x.requires||[]).includes(e.id)));
+  const before=uniq([...(e.requires||[]), ...into.map(x=>x.id)]).filter(id=>S.entries.has(id));
+  const after=uniq([...(e.next||[]), ...reqBy.map(x=>x.id)]).filter(id=>S.entries.has(id));
+  const node=(id,self)=>{ const x=S.entries.get(id)||e; return `<button type="button" class="node ${self?"self":""}" data-action="sel-entry" data-id="${esc(id)}">${dz(x.depth)}<span>${esc(x.title||id)}</span></button>`; };
+  el.innerHTML=`
+  <h2 style="margin-top:0">${sel==="__new"?"New entry":esc(e.title||e.id)}</h2>
+  ${sel!=="__new"?`<div class="chain" style="margin-bottom:12px">${before.map(id=>node(id)).join("")}${before.length?'<span class="arrow">→</span>':""}${node(e.id,true)}${after.length?'<span class="arrow">→</span>':""}${after.map(id=>node(id)).join("")}</div>`:""}
+  <form class="form" id="entry-form" onsubmit="return false">
+    ${fld("Title",`<input id="e-title" value="${esc(e.title)}">`,{id:"e-title"})}
+    ${fld("Id",`<input id="e-id" class="mono" value="${esc(e.id)}" placeholder="from the title">`,{id:"e-id"})}
+    ${fld("What the player learns",`<textarea id="e-text" rows="4">${esc(e.text)}</textarea>`,{full:true,id:"e-text"})}
+    ${fld("Depth",chipGroup("depth",DEPTHS,[e.depth],{single:true,depth:true}),{full:true})}
+    ${fld("Type",`<select id="e-type">${opts(S.tax.types,e.type)}</select>`,{id:"e-type"})}
+    ${fld("Subtype",`<input id="e-subtype" value="${esc(e.subtype)}" placeholder="region, ruin, legend, machine…">`,{id:"e-subtype"})}
+    ${fld("Domains",chipGroup("domains",S.tax.domains,e.domains),{full:true})}
+    ${fld("Spheres",chipGroup("spheres",S.tax.spheres,e.spheres),{full:true})}
+    ${fld("Concepts (master runes)",chipGroup("concepts",S.tax.concepts,e.concepts),{full:true})}
+    ${fld("Reliability",`<select id="e-reliability">${opts(S.tax.reliability,e.reliability)}</select>`,{id:"e-reliability"})}
+    ${fld("Perspective",`<select id="e-perspective">${opts(S.tax.perspectives,e.perspective)}</select>`,{id:"e-perspective"})}
+    ${fld("Scope",`<input id="e-scope" list="dl-scopes" class="mono" value="${esc(e.scope)}">`,{id:"e-scope"})}
+    ${fld("Era",`<input id="e-era" value="${esc(e.era)}" placeholder="1–9, present, timeless">`,{id:"e-era"})}
+    ${fld("Requires (all)",`<input id="e-requires" list="dl-entries" class="mono" value="${esc((e.requires||[]).join(", "))}">`,{id:"e-requires"})}
+    ${fld("Requires (any one)",`<input id="e-requires_any" list="dl-entries" class="mono" value="${esc((e.requires_any||[]).join(", "))}">`,{id:"e-requires_any"})}
+    ${fld("Other conditions, one per line",`<textarea id="e-conditions" rows="2" placeholder="lang:runic&#10;prof:language>=20">${esc((e.conditions||[]).join("\n"))}</textarea>`,{id:"e-conditions"})}
+    ${fld("Extra trust, any one, one per line",`<textarea id="e-gate" rows="2" placeholder="npc>=Confidant">${esc((e.gate||[]).join("\n"))}</textarea>`,{id:"e-gate"})}
+    ${fld("Next steps",`<input id="e-next" list="dl-entries" class="mono" value="${esc((e.next||[]).join(", "))}">`,{id:"e-next"})}
+    ${fld("Contradicts",`<input id="e-contradicts" list="dl-entries" class="mono" value="${esc((e.contradicts||[]).join(", "))}">`,{id:"e-contradicts"})}
+    ${fld("Related",`<input id="e-related" list="dl-entries" class="mono" value="${esc((e.related||[]).join(", "))}">`,{id:"e-related"})}
+    ${fld("About (people, places, things)",`<input id="e-about" class="mono" value="${esc((e.about||[]).join(", "))}">`,{id:"e-about"})}
+    ${fld("Unlocks (quests, scenarios, markers)",`<input id="e-unlocks" class="mono" value="${esc((e.unlocks||[]).join(", "))}">`,{id:"e-unlocks"})}
+    ${fld("Status",`<select id="e-status">${opts(S.tax.statuses,e.status)}</select>`,{id:"e-status"})}
+    ${fld("Other sources",chipGroup("sources",S.tax.sources,e.sources),{full:true})}
+    ${fld("Your notes (never shown to players)",`<textarea id="e-gm" rows="2">${esc(e.gm)}</textarea>`,{full:true,id:"e-gm"})}
+  </form>
+  <div class="actions">
+    <button class="btn" type="button" data-action="save-entry" ${S.mode==="readonly"?"disabled":""}>Save entry</button>
+    ${sel!=="__new"?`<button class="btn q" type="button" data-action="dup-entry">Duplicate</button><button class="btn danger" type="button" data-action="del-entry">Delete</button>`:""}
+  </div>
+  <h2>Who can tell this</h2>
+  ${tellers.length?`<div>${tellers.map(({n,k})=>`<div class="hint" style="margin:3px 0"><button type="button" class="link" data-action="open-npc" data-id="${esc(n.id)}">${esc(n.name||n.id)}</button> · ${esc(k.label)}</div>`).join("")}</div>`:`<p class="hint">No NPC profile matches this entry yet.</p>`}`;
+}
+function collectEntry(){
+  const f=$("#entry-form");
+  const v=id=>($("#"+id)?.value||"");
+  return cleanEntry({
+    id:v("e-id")||slug(v("e-title")), title:v("e-title"), text:v("e-text"), gm:v("e-gm"),
+    type:v("e-type"), subtype:v("e-subtype"),
+    domains:readChips(f,"domains"), spheres:readChips(f,"spheres"), concepts:readChips(f,"concepts"),
+    depth:readChips(f,"depth")[0]||"C", reliability:v("e-reliability"), perspective:v("e-perspective"),
+    scope:v("e-scope"), era:v("e-era"), status:v("e-status"),
+    requires:list(v("e-requires")), requires_any:list(v("e-requires_any")), conditions:lines(v("e-conditions")), gate:lines(v("e-gate")),
+    next:list(v("e-next")), related:list(v("e-related")), contradicts:list(v("e-contradicts")), about:list(v("e-about")), unlocks:list(v("e-unlocks")),
+    sources:readChips(f,"sources")
+  });
+}
+async function saveEntry(){
+  const d=collectEntry(), orig=S.ui.selEntry;
+  if(!d.id){ toast("Give the entry a title or an id."); return; }
+  if(orig==="__new" && S.entries.has(d.id)){ toast(`"${d.id}" already exists. Change the id.`); return; }
+  for(const c of d.conditions.concat(d.gate)) if(parseCond(c).error){ toast(`Can't read "${c}". Examples: npc>=Trusted, org:tide-temple>=Friendly, lang:runic.`); return; }
+  d.updated=new Date().toISOString();
+  try{
+    await store.put("entries",d.id,d);
+    if(orig && orig!=="__new" && orig!==d.id){ await store.remove("entries",orig); toast("Renamed. Links that used the old id are listed in Check."); } else toast("Saved.");
+  }catch(_){ return; }
+  S.ui.selEntry=d.id; S.ui.entryDraft=null; renderEntryEditor(); renderLibList();
+}
+
+/* ---------- NPCs ---------- */
+function renderNpcs(){
+  $("#main").innerHTML=`
+  <h1>NPC knowledge</h1>
+  <p class="lede">What each NPC knows, as filters over the facets, plus their own personal knowledge. Gates say how much the NPC has to trust a player before telling each depth.</p>
+  <div class="split">
+    <section class="panel">
+      <div class="toolbar"><span class="grow lbl">NPCs</span><button class="btn" type="button" data-action="new-npc">New NPC</button></div>
+      <div class="rows" id="npc-list"></div>
+    </section>
+    <section class="panel" id="npc-editor"></section>
+  </div>`;
+  renderNpcList(); renderNpcEditor();
+}
+function npcCount(n){ return [...S.entries.values()].filter(e=>npcKnows(n,e)).length; }
+function renderNpcList(){
+  const el=$("#npc-list"); if(!el) return;
+  if(S.mode==="loading"){ el.innerHTML=`<div class="empty">Loading…</div>`; return; }
+  const rows=[...S.npcs.values()].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id)));
+  if(!rows.length){ el.innerHTML=`<div class="empty">No NPC profiles yet.</div>`; return; }
+  el.innerHTML=rows.map(n=>`<button type="button" class="row" data-action="sel-npc" data-id="${esc(n.id)}" aria-selected="${S.ui.selNpc===n.id}"><span class="dz dz-E" style="--dc:var(--accent)">${esc((n.name||n.id)[0]?.toUpperCase()||"?")}</span><span><span class="t">${esc(n.name||n.id)}</span><br><span class="id">${esc(n.role||"")} · ${esc(n.location||"world")}</span></span><span class="count">${npcCount(n)} known</span></button>`).join("");
+}
+function blankNpc(){ return {id:"",name:"",role:"",location:"world",faction:"neutral",perspective:"neutral",language:"",refuse:[],personal:[],knows:[{label:"Common talk",max_depth:"C",domains:[],concepts:[],spheres:[],types:[],scope:"",perspectives:[]}],gates:{},notes:""}; }
+function renderNpcEditor(){
+  const el=$("#npc-editor"); if(!el) return;
+  const sel=S.ui.selNpc;
+  const n=S.ui.npcDraft || (sel==="__new"?blankNpc():S.npcs.get(sel));
+  if(!n){ el.innerHTML=`<h2 style="margin-top:0">How an NPC decides</h2>
+    <ol class="hint" style="font-size:13px;line-height:1.6;max-width:70ch">
+      <li>It knows an entry if the entry is in its personal knowledge, or matches one of its filters (every facet the filter sets must overlap, depth at or below the filter's maximum, scope inside or above the filter's scope, and a non-neutral perspective it holds).</li>
+      <li>It won't speak at all if the player lacks its language, and won't go past Common for the groups it refuses.</li>
+      <li>The player needs the entry's groundwork: the entries it requires and its other conditions.</li>
+      <li>The NPC's gate for that depth (any one condition) and the entry's own extra trust must both pass.</li>
+    </ol><p class="hint">Pick an NPC on the left, or start a new one.</p>`; return; }
+  const g=n.gates||{};
+  el.innerHTML=`
+  <h2 style="margin-top:0">${sel==="__new"?"New NPC":esc(n.name||n.id)}</h2>
+  <form class="form" id="npc-form" onsubmit="return false">
+    ${fld("Name",`<input id="n-name" value="${esc(n.name)}">`,{id:"n-name"})}
+    ${fld("Id",`<input id="n-id" class="mono" value="${esc(n.id)}" placeholder="from the name">`,{id:"n-id"})}
+    ${fld("Role",`<input id="n-role" value="${esc(n.role)}" placeholder="priest, smith, scholar…">`,{id:"n-role"})}
+    ${fld("Location (scope)",`<input id="n-location" list="dl-scopes" class="mono" value="${esc(n.location)}">`,{id:"n-location"})}
+    ${fld("Faction",`<select id="n-faction">${opts(S.tax.factions,n.faction)}</select>`,{id:"n-faction"})}
+    ${fld("Perspective held",`<select id="n-perspective">${opts(S.tax.perspectives,n.perspective)}</select>`,{id:"n-perspective"})}
+    ${fld("Speaks only",`<input id="n-language" list="dl-langs" class="mono" value="${esc(n.language)}" placeholder="empty: anyone understands">`,{id:"n-language"})}
+    ${fld("Personal knowledge (entry ids)",`<input id="n-personal" list="dl-entries" class="mono" value="${esc((n.personal||[]).join(", "))}">`,{id:"n-personal"})}
+    ${fld("Won't go past Common for",chipGroup("refuse",S.tax.refusals,n.refuse),{full:true})}
+  </form>
+  <h2>Filters</h2>
+  <div id="filters" style="display:flex;flex-direction:column;gap:10px">${(n.knows||[]).map((f,i)=>filterBlock(f,i)).join("")}</div>
+  <div class="actions"><button class="btn q small" type="button" data-action="add-filter">Add filter</button></div>
+  <h2>Trust gates</h2>
+  <p class="hint">One condition per line; any one is enough. Leave a depth empty to tell it to anyone who meets the entry's groundwork. Conditions: <span class="mono">npc&gt;=Trusted</span>, <span class="mono">org:tide-temple&gt;=Friendly</span>, <span class="mono">region:world/continent-1&gt;=Known</span>, <span class="mono">prof:language&gt;=20</span>, <span class="mono">lang:runic</span>, <span class="mono">quest:found-the-bell</span>, <span class="mono">level&gt;=30</span>.</p>
+  <div class="form">${DEPTHS.map(d=>fld(`${d} · ${DEPTH_INFO[d].name}`,`<textarea id="n-gate-${d}" rows="2">${esc((g[d]||[]).join("\n"))}</textarea>`,{id:`n-gate-${d}`})).join("")}
+    ${fld("Your notes",`<textarea id="n-notes" rows="2">${esc(n.notes)}</textarea>`,{id:"n-notes"})}</div>
+  <div class="actions">
+    <button class="btn" type="button" data-action="save-npc" ${S.mode==="readonly"?"disabled":""}>Save NPC</button>
+    ${sel!=="__new"?`<button class="btn q" type="button" data-action="sim-npc">Simulate this NPC</button><button class="btn danger" type="button" data-action="del-npc">Delete</button>`:""}
+  </div>
+  ${sel!=="__new"?`<p class="hint" style="margin-top:10px">Knows ${npcCount(n)} entries right now.</p>`:""}`;
+}
+function filterBlock(f,i){
+  return `<div class="fblock" data-fidx="${i}">
+    <div class="fblock-h"><input class="f-label" value="${esc(f.label||"")}" placeholder="Filter name" aria-label="Filter name"><button class="btn danger small" type="button" data-action="rm-filter" data-idx="${i}">Remove</button></div>
+    <div><span class="lbl">Deepest it knows</span>${chipGroup("max_depth",DEPTHS,[f.max_depth||"C"],{single:true,depth:true})}</div>
+    <div><span class="lbl">Domains</span>${chipGroup("domains",S.tax.domains,f.domains)}</div>
+    <div><span class="lbl">Concepts</span>${chipGroup("concepts",S.tax.concepts,f.concepts)}</div>
+    <div><span class="lbl">Spheres</span>${chipGroup("spheres",S.tax.spheres,f.spheres)}</div>
+    <div><span class="lbl">Types</span>${chipGroup("types",S.tax.types,f.types)}</div>
+    <div class="form"><div class="fld"><span class="lbl">Scope</span><input class="f-scope mono" list="dl-scopes" value="${esc(f.scope||"")}" placeholder="empty: anywhere"></div>
+    <div class="fld"><span class="lbl">Perspectives (empty: its own)</span>${chipGroup("perspectives",S.tax.perspectives,f.perspectives)}</div></div>
+  </div>`;
+}
+function collectNpc(){
+  const v=id=>($("#"+id)?.value||"");
+  const form=$("#npc-form");
+  const knows=$$(".fblock").map(b=>({label:$(".f-label",b).value.trim(), max_depth:readChips(b,"max_depth")[0]||"C", domains:readChips(b,"domains"), concepts:readChips(b,"concepts"), spheres:readChips(b,"spheres"), types:readChips(b,"types"), scope:$(".f-scope",b).value.trim()?normScope($(".f-scope",b).value):"", perspectives:readChips(b,"perspectives")}));
+  const gates={}; for(const d of DEPTHS){ const l=lines(v(`n-gate-${d}`)); if(l.length) gates[d]=l; }
+  return {id:slug(v("n-id")||v("n-name")), name:v("n-name").trim(), role:v("n-role").trim(), location:normScope(v("n-location")), faction:v("n-faction"), perspective:v("n-perspective"), language:v("n-language").trim(), personal:uniq(list(v("n-personal"))), refuse:readChips(form,"refuse"), knows, gates, notes:v("n-notes").trim()};
+}
+async function saveNpc(){
+  const d=collectNpc(), orig=S.ui.selNpc;
+  if(!d.id){ toast("Give the NPC a name or an id."); return; }
+  if(orig==="__new" && S.npcs.has(d.id)){ toast(`"${d.id}" already exists. Change the id.`); return; }
+  for(const conds of Object.values(d.gates)) for(const c of conds) if(parseCond(c).error){ toast(`Can't read "${c}".`); return; }
+  d.updated=new Date().toISOString();
+  try{ await store.put("npcs",d.id,d); if(orig && orig!=="__new" && orig!==d.id) await store.remove("npcs",orig); toast("Saved."); }catch(_){ return; }
+  S.ui.selNpc=d.id; S.ui.npcDraft=null; renderNpcEditor(); renderNpcList();
+}
+
+/* ---------- Simulate ---------- */
+function renderSimulate(){
+  if(!S.ui.simNpc || !S.npcs.has(S.ui.simNpc)) S.ui.simNpc=[...S.npcs.keys()][0]||"";
+  if(!S.ui.simPlayer || !S.players.has(S.ui.simPlayer)) S.ui.simPlayer=[...S.players.keys()][0]||"";
+  $("#main").innerHTML=`
+  <h1>Simulate a conversation</h1>
+  <p class="lede">Pick an NPC and a test character to see exactly what the NPC would tell them now, what needs more trust, and what needs groundwork first. Mark entries as learned to walk a chain.</p>
+  <div class="panel"><div class="toolbar" id="sim-controls"></div><div class="stats" id="sim-summary" style="margin:0"></div></div>
+  <div id="sim-results"></div>
+  <details id="sim-player" open><summary>Test character</summary><div id="sim-player-form" style="margin-top:10px"></div></details>`;
+  renderSimControls(); renderSimResults(); renderPlayerForm();
+}
+function renderSimControls(){
+  const el=$("#sim-controls"); if(!el) return;
+  const npcs=[...S.npcs.values()].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id)));
+  const pls=[...S.players.values()].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id)));
+  const topics=[...S.tax.domains.map(d=>["d:"+d,"Domain · "+d]),...S.tax.concepts.map(c=>["c:"+c,"Concept · "+c])];
+  el.innerHTML=`
+    <label class="lbl" for="sim-npc">NPC</label><select id="sim-npc">${npcs.map(n=>`<option value="${esc(n.id)}" ${n.id===S.ui.simNpc?"selected":""}>${esc(n.name||n.id)}</option>`).join("")||'<option value="">No NPCs yet</option>'}</select>
+    <label class="lbl" for="sim-player-sel">Character</label><select id="sim-player-sel">${pls.map(p=>`<option value="${esc(p.id)}" ${p.id===S.ui.simPlayer?"selected":""}>${esc(p.name||p.id)}</option>`).join("")||'<option value="">No test characters yet</option>'}</select>
+    <label class="lbl" for="sim-topic">Asking about</label><select id="sim-topic"><option value="">Anything</option>${topics.map(([v,l])=>`<option value="${esc(v)}" ${v===S.ui.simTopic?"selected":""}>${esc(l)}</option>`).join("")}</select>
+    <button class="btn q small" type="button" data-action="new-player">New character</button>`;
+}
+function renderSimResults(){
+  const el=$("#sim-results"); if(!el) return;
+  const npc=S.npcs.get(S.ui.simNpc), p=S.players.get(S.ui.simPlayer);
+  if(!npc||!p){ $("#sim-summary").innerHTML=""; el.innerHTML=`<div class="empty">Add at least one NPC and one test character to simulate.</div>`; return; }
+  const g=simulate(npc,p,S.ui.simTopic);
+  const label={tell:"Tells now",trust:"Needs more trust",req:"Needs groundwork",refused:"Refuses",known:"Already known"};
+  $("#sim-summary").innerHTML=Object.keys(label).map(k=>`<span class="stat"><span class="pill ${k}">${label[k]}</span><b>${g[k].length}</b></span>`).join("");
+  const row=({e,r},k)=>`<div class="res">${dz(e.depth)}<div><div><b>${esc(e.title||e.id)}</b> <span class="id">${esc(e.id)}</span> <span class="tag">${esc(r.kn.label)}</span>${e.perspective!=="neutral"?`<span class="tag">${esc(e.perspective)} · ${esc(e.reliability)}</span>`:""}</div>
+    ${k==="tell"||k==="known"?`<div class="txt">${esc(e.text)}</div>`:""}
+    ${r.why?.length?`<div class="why">${r.why.map(esc).join("<br>")}</div>`:""}
+    ${k==="known"&&(e.next||[]).length?`<div class="why">Next: ${(e.next||[]).map(id=>{ const ne=S.entries.get(id); const st=ne?evaluate(npc,p,ne).status:"missing"; return `${esc(titleOf(id))} (${esc({tell:"tells now",trust:"needs trust",req:"needs groundwork",refused:"refuses",known:"known",unknown:"this NPC doesn't know it",missing:"missing entry"}[st])})`; }).join(" · ")}</div>`:""}
+    </div><div>${k==="tell"?`<button class="btn small" type="button" data-action="learn" data-id="${esc(e.id)}">Learn</button>`:k==="known"?`<button class="btn q small" type="button" data-action="forget" data-id="${esc(e.id)}">Forget</button>`:""}</div></div>`;
+  el.innerHTML=Object.keys(label).map(k=>g[k].length?`<div class="group-h"><span class="pill ${k}">${label[k]}</span><span class="count">${g[k].length}</span></div><div class="panel" style="padding:4px 12px">${g[k].map(x=>row(x,k)).join("")}</div>`:"").join("") || `<div class="empty">${esc(npc.name||npc.id)} knows nothing on this topic.</div>`;
+}
+function blankPlayer(){ return {id:"",name:"",faction:"faction-1",race:"human",level:1,outlaw:false,infamy:0,languages:[],professions:{},orgs:{},regions:{},npc_trust:{},quests:[],items:[],known:[]}; }
+function mapLines(obj,kind){ return Object.entries(obj||{}).map(([k,v])=>`${k} ${kind?tierName(kind,v):v}`).join("\n"); }
+function parseMap(text,kind){ const o={}; for(const l of lines(text)){ const m=l.match(/^(\S+)\s+(.+)$/); if(!m) continue; const val=kind?tierVal(kind,m[2]):Number(m[2]); if(val>=0 || (!kind && !isNaN(val))) o[m[1]]=val; } return o; }
+function renderPlayerForm(){
+  const el=$("#sim-player-form"); if(!el) return;
+  const p=S.ui.playerDraft || S.players.get(S.ui.simPlayer);
+  if(!p){ el.innerHTML=`<p class="hint">No test character selected. Use New character.</p>`; return; }
+  const isNew=!S.players.has(p.id);
+  el.innerHTML=`<div class="panel"><form class="form" id="player-form" onsubmit="return false">
+    ${fld("Name",`<input id="p-name" value="${esc(p.name)}">`,{id:"p-name"})}
+    ${fld("Id",`<input id="p-id" class="mono" value="${esc(p.id)}" placeholder="from the name">`,{id:"p-id"})}
+    ${fld("Faction",`<select id="p-faction">${opts(S.tax.factions,p.faction)}</select>`,{id:"p-faction"})}
+    ${fld("Race",`<input id="p-race" value="${esc(p.race)}">`,{id:"p-race"})}
+    ${fld("Level",`<input id="p-level" type="number" min="1" value="${esc(p.level)}">`,{id:"p-level"})}
+    ${fld("Infamy",`<input id="p-infamy" type="number" min="0" value="${esc(p.infamy||0)}">`,{id:"p-infamy"})}
+    <div class="fld"><label for="p-outlaw"><input type="checkbox" id="p-outlaw" ${p.outlaw?"checked":""}> Outlaw mode on</label></div>
+    ${fld("Languages",`<input id="p-languages" list="dl-langs" class="mono" value="${esc((p.languages||[]).join(", "))}">`,{id:"p-languages"})}
+    ${fld(`Trust with NPCs (id tier: ${tierList("npc").join(", ")})`,`<textarea id="p-npc_trust" rows="3" class="mono">${esc(mapLines(p.npc_trust,"npc"))}</textarea>`,{id:"p-npc_trust"})}
+    ${fld(`Organization reputation (id tier: ${tierList("org").join(", ")})`,`<textarea id="p-orgs" rows="3">${esc(mapLines(p.orgs,"org"))}</textarea>`,{id:"p-orgs"})}
+    ${fld(`Region standing (path tier: ${tierList("region").join(", ")})`,`<textarea id="p-regions" rows="2">${esc(mapLines(p.regions,"region"))}</textarea>`,{id:"p-regions"})}
+    ${fld("Professions (name level)",`<textarea id="p-professions" rows="2">${esc(mapLines(p.professions))}</textarea>`,{id:"p-professions"})}
+    ${fld("Quest states",`<input id="p-quests" class="mono" value="${esc((p.quests||[]).join(", "))}">`,{id:"p-quests"})}
+    ${fld("Items",`<input id="p-items" class="mono" value="${esc((p.items||[]).join(", "))}">`,{id:"p-items"})}
+    ${fld("Already knows (entry ids)",`<textarea id="p-known" rows="3" class="mono">${esc((p.known||[]).join(", "))}</textarea>`,{full:true,id:"p-known"})}
+  </form>
+  <div class="actions"><button class="btn" type="button" data-action="save-player" ${S.mode==="readonly"?"disabled":""}>Save character</button>${!isNew?`<button class="btn danger" type="button" data-action="del-player">Delete</button>`:""}</div></div>`;
+}
+function collectPlayer(){
+  const v=id=>($("#"+id)?.value||"");
+  return {id:slug(v("p-id")||v("p-name")), name:v("p-name").trim(), faction:v("p-faction"), race:v("p-race").trim(), level:Number(v("p-level")||1), infamy:Number(v("p-infamy")||0), outlaw:$("#p-outlaw").checked,
+    languages:uniq(list(v("p-languages"))), npc_trust:parseMap(v("p-npc_trust"),"npc"), orgs:parseMap(v("p-orgs"),"org"), regions:Object.fromEntries(Object.entries(parseMap(v("p-regions"),"region")).map(([k,x])=>[normScope(k),x])), professions:parseMap(v("p-professions")),
+    quests:uniq(list(v("p-quests"))), items:uniq(list(v("p-items"))), known:uniq(list(v("p-known")))};
+}
+async function savePlayer(){
+  const d=collectPlayer(); if(!d.id){ toast("Give the character a name or an id."); return; }
+  const orig=S.ui.playerDraft?S.ui.playerDraft._orig:S.ui.simPlayer;
+  d.updated=new Date().toISOString();
+  try{ await store.put("players",d.id,d); if(orig && orig!==d.id && S.players.has(orig)) await store.remove("players",orig); toast("Saved."); }catch(_){ return; }
+  S.ui.simPlayer=d.id; S.ui.playerDraft=null; renderSimControls(); renderSimResults(); renderPlayerForm();
+}
+async function setKnown(id,on){
+  const p=S.players.get(S.ui.simPlayer); if(!p) return;
+  const q=clone(p); q.known=on?uniq([...(q.known||[]),id]):(q.known||[]).filter(x=>x!==id);
+  try{ await store.put("players",q.id,q); }catch(_){ return; }
+  renderSimResults(); if(!S.ui.playerDraft) renderPlayerForm();
+}
+
+/* ---------- Notes to entries ---------- */
+function sectionDepth(txt){
+  const t=String(txt).toLowerCase();
+  for(const d of DEPTHS){ for(const s of (S.tax.sectionMap[d]||[])){ const re=new RegExp(`(^|[^a-z])${s.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}([^a-z]|$)`); if(re.test(t)) return d; } }
+  return null;
+}
+function normDepth(v){
+  if(!v) return null; const s=String(v).trim();
+  if(DEPTHS.includes(s.toUpperCase())) return s.toUpperCase();
+  for(const d of DEPTHS) if(DEPTH_INFO[d].name.toLowerCase()===s.toLowerCase()) return d;
+  return sectionDepth(s);
+}
+function parseFrontmatter(text){
+  const m=text.match(/^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(\r?\n|$)/);
+  if(!m) return {data:{},body:text};
+  const data={}; let last=null;
+  const unq=s=>s.trim().replace(/^["']|["']$/g,"");
+  for(const raw of m[1].split(/\r?\n/)){
+    if(!raw.trim()||raw.trim().startsWith("#")) continue;
+    const li=raw.match(/^\s*-\s+(.*)$/);
+    if(li && last){ if(!Array.isArray(data[last])) data[last]=[]; data[last].push(unq(li[1])); continue; }
+    const kv=raw.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+    if(kv){ last=kv[1].toLowerCase(); const v=kv[2].trim();
+      if(v==="") data[last]=[]; else if(/^\[.*\]$/.test(v)) data[last]=v.slice(1,-1).split(",").map(unq).filter(Boolean); else if(v==="true"||v==="false") data[last]=(v==="true"); else data[last]=unq(v); }
+  }
+  return {data,body:text.slice(m[0].length)};
+}
+function parseNote(text){
+  const {data:fm,body}=parseFrontmatter(text);
+  const out=[]; const stack=[]; let cur=null; let h1="";
+  const curDepth=()=>{ for(let i=stack.length-1;i>=0;i--) if(stack[i].depth) return stack[i].depth; return null; };
+  const finish=()=>{
+    if(!cur) return;
+    const P=cur.props;
+    const pick=(k)=> P[k]!==undefined ? P[k] : fm[k];
+    const e={
+      title:cur.title, id:P.id||"", text:cur.body.join("\n").replace(/\n{3,}/g,"\n\n").trim(),
+      depth: normDepth(P.depth) || normDepth(cur.pipe) || cur.depth || normDepth(fm.depth) || "C",
+      type:pick("type")||"principle", subtype:pick("subtype")||"",
+      domains:list(pick("domains")), spheres:list(pick("spheres")), concepts:list(pick("concepts")),
+      reliability:pick("reliability")||"true", perspective:pick("perspective")||"neutral", scope:pick("scope")||"world", era:pick("era")||"", status:pick("status")||"draft",
+      requires:list(P.requires), requires_any:list(P.requires_any), conditions:list(P.conditions), gate:list(P.gate),
+      next:list(P.next), related:list(pick("related")), contradicts:list(P.contradicts),
+      about: list(pick("about")).length?list(pick("about")):(h1?[slug(h1)]:[]), unlocks:list(P.unlocks), sources:list(pick("sources")), gm:""
+    };
+    out.push(cleanEntry(e)); cur=null;
+  };
+  for(const line of body.split(/\r?\n/)){
+    const co=line.match(/^>\s*\[!knowledge(?:\|([A-Za-z]+))?\][+-]?\s*(.*)$/i);
+    if(cur){
+      if(co){ finish(); }
+      else if(/^>/.test(line)){ const c=line.replace(/^>\s?/,""); const p=c.match(/^([A-Za-z_-]+)::\s*(.*)$/); if(p) cur.props[p[1].toLowerCase()]=p[2].trim(); else cur.body.push(c); continue; }
+      else finish();
+    }
+    if(co){ cur={pipe:co[1]||"", title:co[2].trim(), props:{}, body:[], depth:curDepth()}; continue; }
+    const h=line.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ const lvl=h[1].length, txt=h[2].trim(); if(lvl===1 && !h1) h1=txt; while(stack.length && stack[stack.length-1].level>=lvl) stack.pop(); stack.push({level:lvl, depth:lvl>1?sectionDepth(txt):null}); }
+  }
+  finish();
+  out.forEach(e=>{ if(!e.id) e.id=slug(e.title); });
+  if(fm.chain===true){ for(let i=1;i<out.length;i++){ out[i].requires=uniq([...out[i].requires,out[i-1].id]); out[i-1].next=uniq([...out[i-1].next,out[i].id]); } }
+  return {entries:out, npc: typeof fm.npc==="string"?slug(fm.npc):""};
+}
+function entriesToNote(entries){
+  let md=`# Exported knowledge\n`;
+  for(const d of DEPTHS){
+    const es=entries.filter(e=>e.depth===d); if(!es.length) continue;
+    md+=`\n## ${DEPTH_INFO[d].name}\n`;
+    for(const e of es){
+      md+=`\n> [!knowledge|${d}] ${e.title||e.id}\n> id:: ${e.id}\n`;
+      for(const k of ["type","domains","spheres","concepts","reliability","perspective","scope","era","status","requires","requires_any","conditions","gate","next","related","contradicts","about","unlocks","sources"]){
+        const v=e[k]; if(v===undefined||v===""||(Array.isArray(v)&&!v.length)) continue;
+        if(k==="reliability"&&v==="true") continue; if(k==="perspective"&&v==="neutral") continue; if(k==="scope"&&v==="world") continue;
+        md+=`> ${k}:: ${Array.isArray(v)?v.join(", "):v}\n`;
+      }
+      md+=(e.text||"").split("\n").map(l=>`> ${l}`).join("\n")+"\n";
+    }
+  }
+  return md;
+}
+function renderNotes(){
+  $("#main").innerHTML=`
+  <h1>Notes to entries</h1>
+  <p class="lede">Write your campaign notes the way you normally would. Mark the pieces a player can learn as knowledge callouts, and the rest stays your own notes. Paste a note here to turn it into entries, or let Claude propose the callouts for an unmarked note.</p>
+  <div class="twocol">
+    <section class="panel">
+      <label class="lbl" for="n-text">Note (Markdown, as in Obsidian)</label>
+      <textarea id="n-text" rows="22" style="margin-top:6px">${esc(S.ui.noteText)}</textarea>
+      <div class="actions">
+        <button class="btn" type="button" data-action="extract">Extract marked knowledge</button>
+        <button class="btn q" type="button" data-action="suggest" id="btn-suggest" ${S.sample?"":"hidden"}>Suggest callouts with Claude</button>
+        <button class="btn q small" type="button" data-action="example-note">Load the example</button>
+      </div>
+      <p class="hint" id="suggest-note" ${S.sample?"hidden":""}>Claude suggestions aren't available in this view; marked extraction still works.</p>
+      <details class="guide"><summary>How to mark a note</summary>
+        <ul>
+          <li><b>Frontmatter</b> sets defaults for every piece in the note: <code>about</code>, <code>scope</code>, <code>domains</code>, <code>spheres</code>, <code>concepts</code>, <code>type</code>, <code>era</code>, <code>perspective</code>.</li>
+          <li><b>Headings set the depth</b> for the callouts under them: Common, Doctrine, Expertise, Hidden or Secrets, Lost. The synonyms are in Taxonomy.</li>
+          <li><b>Each piece is a callout</b>: <code>&gt; [!knowledge] Title</code>. Its text is exactly what the player learns. Add <code>|H</code> after <code>knowledge</code> to set a depth directly.</li>
+          <li><b>Overrides</b>: a <code>key:: value</code> line inside a callout sets any field for that piece: <code>id</code>, <code>requires</code>, <code>next</code>, <code>gate</code>, <code>conditions</code>, <code>perspective</code>, <code>reliability</code>.</li>
+          <li><code>chain: true</code> in frontmatter links the pieces in order: each one requires the one before it.</li>
+          <li><code>npc: some-id</code> in an NPC's own note makes every piece that NPC's personal knowledge.</li>
+          <li>Everything outside a callout is yours. It is never extracted and never reaches a player.</li>
+        </ul>
+      </details>
+    </section>
+    <section class="panel" id="n-out"></section>
+  </div>`;
+  renderNotesOut();
+}
+function renderNotesOut(){
+  const el=$("#n-out"); if(!el) return;
+  const x=S.ui.extracted;
+  if(S.ui.aiBusy){ el.innerHTML=`<p class="hint">Claude is reading the note…</p>`; return; }
+  if(!x.length){ el.innerHTML=`<p class="hint">${S.ui.aiError?esc(S.ui.aiError):"Extracted entries appear here for review before anything is saved."}</p>${S.ui.marked?markedBlock():""}`; return; }
+  el.innerHTML=`<div class="toolbar"><span class="grow lbl">${x.length} pieces found${S.ui.extractedNpc?` · personal knowledge of ${esc(npcName(S.ui.extractedNpc))}`:""}</span><button class="btn" type="button" data-action="add-extracted" ${S.mode==="readonly"?"disabled":""}>Add checked to library</button></div>
+  ${x.map((e,i)=>`<label class="card"><input type="checkbox" data-xi="${i}" ${e._skip?"":"checked"} aria-label="Include ${esc(e.title)}">${dz(e.depth)}<span><b>${esc(e.title||e.id)}</b> <span class="id">${esc(e.id)}</span> ${S.entries.has(e.id)?'<span class="tag status-proposal">replaces existing</span>':'<span class="tag">new</span>'}
+    <div class="txt" style="margin-top:3px">${esc(e.text)}</div>
+    <div class="hint">${esc([e.type,...e.domains,...e.concepts,e.perspective!=="neutral"?`${e.perspective} · ${e.reliability}`:"",e.requires.length?`requires ${e.requires.join(", ")}`:"",e.gate.length?`trust ${e.gate.join(" or ")}`:""].filter(Boolean).join(" · "))}</div></span></label>`).join("")}
+  ${S.ui.marked?markedBlock():""}`;
+}
+function markedBlock(){ return `<h2>Your note, with callouts</h2><p class="hint">Claude's marked version, to paste back into your vault.</p><textarea id="marked-out" rows="12" readonly>${esc(S.ui.marked)}</textarea><div class="actions"><button class="btn q small" type="button" data-action="copy-marked">Copy</button></div>`; }
+async function addExtracted(){
+  const picks=S.ui.extracted.filter(e=>!e._skip);
+  if(!picks.length){ toast("Nothing is checked."); return; }
+  try{
+    for(const e of picks){ const d={...e}; delete d._skip; d.updated=new Date().toISOString(); await store.put("entries",d.id,d); }
+    if(S.ui.extractedNpc){ const n=S.npcs.get(S.ui.extractedNpc)||{...blankNpc(),id:S.ui.extractedNpc,name:S.ui.extractedNpc}; const q=clone(n); q.personal=uniq([...(q.personal||[]),...picks.map(e=>e.id)]); await store.put("npcs",q.id,q); }
+  }catch(_){ return; }
+  toast(`Added ${picks.length} entries.`); S.ui.extracted=[]; S.ui.marked=""; renderNotesOut();
+}
+function buildPrompt(note){
+  const existing=[...S.entries.values()].slice(0,250).map(e=>`${e.id} | ${e.depth} | ${e.title}`).join("\n");
+  return `You segment a game designer's campaign notes (written like a tabletop RPG campaign) into knowledge entries for an MMORPG's knowledge system. Work only from the note: never invent facts. Each entry answers one question a player could ask an NPC. GM advice, design notes and anything a player could never learn are not knowledge.
+
+Return ONLY a JSON object, no prose, shaped like:
+{"entries":[...], "marked_note":"the same note, unchanged except that each knowledge piece is rewritten as a callout in the format below"}
+
+Each entry has: id (kebab-case; reuse an existing id below only for the same knowledge), title (short), text (what the player learns, 1-3 sentences, in-world, neutral voice), type, domains[], spheres[], concepts[], depth, reliability, perspective, scope (a path starting with "world"), era (string, may be empty), status ("draft"), requires[] (ids the player must know first), next[] (deeper follow-ups), contradicts[], about[] (ids of people, places or things), gate[] (empty unless the note says the knowledge is kept secret; then ["npc>=Confidant"]).
+
+Depths: C Common = anyone in scope knows it. D Doctrine = what a group believes and tells openly; may be biased, so set perspective and reliability. E Expertise = what specialists know to be true by study or craft. H Hidden = deliberately kept by a few. L Lost = nobody alive knows; only ruins, inscriptions or objects. Headings in the note may name the depth.
+
+Callout format for marked_note:
+> [!knowledge|H] Title
+> id:: some-id
+> requires:: other-id
+> The text the player learns.
+
+Allowed values. types: ${S.tax.types.join(", ")}. domains: ${S.tax.domains.join(", ")}. spheres: ${S.tax.spheres.join(", ")}. concepts: ${S.tax.concepts.join(", ")}. reliability: ${S.tax.reliability.join(", ")}. perspectives: ${S.tax.perspectives.join(", ")}.
+
+Existing entries (id | depth | title):
+${existing||"(none)"}
+
+Note:
+<<<
+${note}
+>>>`;
+}
+function extractJson(text){ const s=String(text||""); const a=s.indexOf("{"), b=s.lastIndexOf("}"); if(a<0||b<a) throw new Error("no json"); return JSON.parse(s.slice(a,b+1)); }
+async function suggest(){
+  const note=$("#n-text").value; S.ui.noteText=note;
+  if(!S.sample){ toast("Claude suggestions aren't available here."); return; }
+  if(!note.trim()){ toast("Paste a note first."); return; }
+  S.ui.aiBusy=true; S.ui.aiError=""; S.ui.extracted=[]; S.ui.marked=""; renderNotesOut();
+  try{
+    const prompt=buildPrompt(note); let val;
+    if(typeof S.sample.json==="function"){ try{ val=await S.sample.json(prompt,{modelTier:"default"}); }catch(e){ if(e && (e.code==="not_granted"||e.code==="rate_limited")) throw e; val=null; } }
+    if(!val){ const r=await S.sample(prompt,{modelTier:"default"}); val=extractJson(r.text); }
+    const allowed=(k,arr)=>list(arr).filter(x=>(S.tax[k]||[]).includes(x));
+    S.ui.extracted=(val.entries||[]).map(raw=>cleanEntry({...raw, domains:allowed("domains",raw.domains), spheres:allowed("spheres",raw.spheres), concepts:allowed("concepts",raw.concepts), type:(S.tax.types.includes(raw.type)?raw.type:"principle"), status:"draft"}));
+    S.ui.extractedNpc=""; S.ui.marked=typeof val.marked_note==="string"?val.marked_note:"";
+    if(!S.ui.extracted.length) S.ui.aiError="Claude found no knowledge in this note.";
+  }catch(e){
+    if(e && e.code==="not_granted"){ S.sample=null; S.ui.aiError="Claude suggestions were not allowed in this view."; $("#btn-suggest")?.setAttribute("hidden",""); }
+    else if(e && e.code==="rate_limited") S.ui.aiError="Too many requests right now. Wait a minute and try again.";
+    else S.ui.aiError="Claude's answer couldn't be read. Try again, or mark the note by hand.";
+  }
+  S.ui.aiBusy=false; renderNotesOut();
+}
+
+/* ---------- Check ---------- */
+function renderCheckTab(){ $("#main").innerHTML=`<h1>Check</h1><p class="lede">Broken links, unreadable conditions, chains that go shallower, knowledge nobody can deliver, and filters that match nothing.</p><div id="check-list" class="panel" style="padding:4px 0"></div>`; renderCheck(); }
+function renderCheck(){
+  const el=$("#check-list"); if(!el) return;
+  const issues=checkAll();
+  if(!issues.length){ el.innerHTML=`<div class="empty" style="padding:16px">Nothing to fix.</div>`; return; }
+  el.innerHTML=issues.map(i=>`<div class="issue"><span class="sev ${i.sev}">${i.sev==="error"?"Fix":"Check"}</span><span>${esc(i.msg)}</span>${i.target?`<button type="button" class="link" data-action="${i.target.kind==="npc"?"open-npc":"open-entry"}" data-id="${esc(i.target.id)}">Open</button>`:"<span></span>"}</div>`).join("");
+}
+
+/* ---------- Taxonomy ---------- */
+function depthKey(){ return `<div class="depthkey">${DEPTHS.map(d=>`${dz(d)}<b>${DEPTH_INFO[d].name}</b><span><span class="hint">${esc(DEPTH_INFO[d].who)}</span> ${esc(DEPTH_INFO[d].how)}</span>`).join("")}</div>`; }
+function renderTaxonomy(){
+  const t=S.tax;
+  const ta=(k,label,rows=4)=>fld(label,`<textarea id="t-${k}" rows="${rows}">${esc((t[k]||[]).join("\n"))}</textarea>`,{id:`t-${k}`});
+  $("#main").innerHTML=`
+  <h1>Taxonomy</h1>
+  <p class="lede">The values every facet can take. One per line. Renaming a value here doesn't rename it inside existing entries.</p>
+  <section class="panel"><h2 style="margin-top:0">Depths</h2>${depthKey()}</section>
+  <section class="panel" style="margin-top:14px"><div class="form">
+    ${ta("types","Types",6)}${ta("domains","Domains",6)}${ta("spheres","Spheres",4)}${ta("concepts","Concepts (master runes)",6)}
+    ${ta("reliability","Reliability",4)}${ta("perspectives","Perspectives",4)}${ta("factions","Factions",4)}${ta("languages","Languages",4)}
+    ${ta("sources","Sources",4)}${ta("statuses","Statuses",3)}${ta("refusals","Refusals",3)}
+    ${["npc","org","region"].map(k=>fld(`${{npc:"NPC trust",org:"Organization reputation",region:"Region standing"}[k]} tiers, lowest first`,`<textarea id="t-tier-${k}" rows="4">${esc((t.tiers[k]||[]).join("\n"))}</textarea>`,{id:`t-tier-${k}`})).join("")}
+    ${DEPTHS.map(d=>fld(`Headings that mean ${DEPTH_INFO[d].name}`,`<input id="t-sec-${d}" value="${esc((t.sectionMap[d]||[]).join(", "))}">`,{id:`t-sec-${d}`})).join("")}
+  </div><div class="actions"><button class="btn" type="button" data-action="save-tax" ${S.mode==="readonly"?"disabled":""}>Save taxonomy</button></div></section>`;
+}
+async function saveTax(){
+  const g=id=>lines($("#"+id).value);
+  const t={};
+  for(const k of ["types","domains","spheres","concepts","reliability","perspectives","factions","languages","sources","statuses","refusals"]) t[k]=uniq(g(`t-${k}`).map(x=>slug(x)||x));
+  t.tiers={}; for(const k of ["npc","org","region"]) t.tiers[k]=g(`t-tier-${k}`);
+  t.sectionMap={}; for(const d of DEPTHS) t.sectionMap[d]=list($(`#t-sec-${d}`).value).map(x=>x.toLowerCase());
+  try{ await store.putTax(t); toast("Taxonomy saved."); }catch(_){}
+}
+
+/* ---------- Import / export ---------- */
+function yq(s){ s=String(s); return (/^[A-Za-z0-9][A-Za-z0-9 _./+-]*$/.test(s) && !/^(true|false|null|yes|no|on|off)$/i.test(s)) ? s : JSON.stringify(s); }
+function toYaml(obj){
+  let out="";
+  for(const k of ENTRY_ORDER){ const v=obj[k]; if(v===undefined||v===null||v===""||(Array.isArray(v)&&!v.length)) continue;
+    out += Array.isArray(v) ? `${k}: [${v.map(yq).join(", ")}]\n` : `${k}: ${yq(v)}\n`; }
+  return out;
+}
+async function offerDownload(filename,data){
+  if(!(window.claude && typeof window.claude.use==="function")){
+    /* Opened on its own (for example from RunicDocs): a plain browser download. */
+    try{ const url=URL.createObjectURL(new Blob([data],{type:"text/plain;charset=utf-8"})); const a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000); }
+    catch(_){ toast("The download didn't happen. Use Copy instead."); }
+    return;
+  }
+  try{ const dl=await window.claude.use("downloads"); if(!dl){ toast("Downloads aren't available in this view. Use Copy."); return; } await dl.save({filename,data}); }
+  catch(_){ toast("The download didn't happen. Use Copy instead."); }
+}
+function openModal(html){ const m=$("#modal"); m.innerHTML=`<div class="modal-card" role="dialog" aria-modal="true">${html}</div>`; m.hidden=false; m.querySelector("textarea,button")?.focus(); }
+function closeModal(){ $("#modal").hidden=true; $("#modal").innerHTML=""; }
+function openExport(){
+  const json=JSON.stringify(exportData(),null,2);
+  const yaml=[...S.entries.values()].sort(byDepthTitle).map(e=>"---\n"+toYaml(e)).join("");
+  const note=entriesToNote([...S.entries.values()].sort(byDepthTitle));
+  S._exports={json,yaml,note};
+  openModal(`<h2 style="margin-top:0">Export</h2>
+    <div class="toolbar"><select id="x-kind" aria-label="Format"><option value="json">Everything, as JSON (to import again)</option><option value="yaml">Entries, as YAML documents</option><option value="note">Entries, as a marked Obsidian note</option></select></div>
+    <textarea id="x-out" rows="18" readonly>${esc(json)}</textarea>
+    <div class="actions"><button class="btn" type="button" data-action="copy-export">Copy</button><button class="btn q" type="button" data-action="download-export">Download</button><button class="btn q" type="button" data-action="close-modal">Close</button></div>`);
+}
+function openImport(){
+  openModal(`<h2 style="margin-top:0">Import</h2><p class="hint">Paste a JSON export. Entries, NPCs and characters with the same id are replaced; nothing else is removed.</p>
+    <textarea id="i-in" rows="16" placeholder='{"entries":[…],"npcs":[…],"players":[…],"taxonomy":{…}}'></textarea>
+    <div class="actions"><button class="btn" type="button" data-action="do-import" ${S.mode==="readonly"?"disabled":""}>Import</button><button class="btn q" type="button" data-action="close-modal">Cancel</button></div>`);
+}
+async function doImport(){
+  let o; try{ o=JSON.parse($("#i-in").value); }catch(_){ toast("That isn't valid JSON."); return; }
+  let n=0;
+  try{
+    if(o.taxonomy) await store.putTax(o.taxonomy);
+    for(const e of (o.entries||[])){ const c=cleanEntry(e); if(!c.id) continue; await store.put("entries",c.id,{...c,updated:e.updated||new Date().toISOString()}); n++; }
+    for(const x of (o.npcs||[])){ if(!x.id) continue; await store.put("npcs",x.id,x); n++; }
+    for(const x of (o.players||[])){ if(!x.id) continue; await store.put("players",x.id,x); n++; }
+  }catch(_){ toast(`Stopped after ${n} items.`); return; }
+  closeModal(); toast(`Imported ${n} items.`);
+}
+async function copyText(text, ta){
+  try{ await navigator.clipboard.writeText(text); toast("Copied."); }
+  catch(_){ if(ta){ ta.focus(); ta.select(); } toast("Copy was blocked. The text is selected; press Ctrl+C or Cmd+C."); }
+}
+
+/* ---------- Events ---------- */
+document.addEventListener("click", async (ev)=>{
+  const chip=ev.target.closest(".chip");
+  if(chip){
+    const grp=chip.closest(".chips");
+    if(grp.hasAttribute("data-single")){ grp.querySelectorAll(".chip").forEach(c=>{ c.classList.toggle("on",c===chip); c.setAttribute("aria-pressed",c===chip); }); }
+    else { chip.classList.toggle("on"); chip.setAttribute("aria-pressed",chip.classList.contains("on")); }
+    if(grp.dataset.field==="f-depth"){ S.ui.f.depth=readChips(grp.parentElement,"f-depth"); renderLibList(); }
+    else if(grp.closest("#lib-editor") && !S.ui.entryDraft) S.ui.entryDraft=collectEntry();
+    else if(grp.closest("#npc-editor") && !S.ui.npcDraft) S.ui.npcDraft=collectNpc();
+    return;
+  }
+  const t=ev.target.closest("[data-action]"); if(!t) return;
+  const a=t.dataset.action, id=t.dataset.id;
+  switch(a){
+    case "tab": location.hash=t.dataset.tab; setTab(t.dataset.tab); break;
+    case "new-entry": S.ui.selEntry="__new"; S.ui.entryDraft=null; renderEntryEditor(); renderLibList(); $("#e-title")?.focus(); break;
+    case "sel-entry": S.ui.selEntry=id; S.ui.entryDraft=null; S.ui.delArm=null; renderEntryEditor(); renderLibList(); break;
+    case "save-entry": await saveEntry(); break;
+    case "dup-entry": { const d=collectEntry(); d.id=d.id+"-copy"; d.title=d.title+" (copy)"; S.ui.selEntry="__new"; S.ui.entryDraft=d; renderEntryEditor(); break; }
+    case "del-entry": if(S.ui.delArm!=="e:"+S.ui.selEntry){ S.ui.delArm="e:"+S.ui.selEntry; t.textContent="Click again to delete"; setTimeout(()=>{ if(S.ui.delArm==="e:"+S.ui.selEntry){ S.ui.delArm=null; t.textContent="Delete"; } },4000); } else { const old=S.ui.selEntry; S.ui.delArm=null; try{ await store.remove("entries",old); toast("Deleted."); }catch(_){ return; } S.ui.selEntry=null; S.ui.entryDraft=null; renderEntryEditor(); renderLibList(); } break;
+    case "open-entry": S.ui.selEntry=id; location.hash="library"; setTab("library"); S.ui.selEntry=id; renderEntryEditor(); renderLibList(); break;
+    case "new-npc": S.ui.selNpc="__new"; S.ui.npcDraft=null; renderNpcEditor(); renderNpcList(); break;
+    case "sel-npc": S.ui.selNpc=id; S.ui.npcDraft=null; S.ui.delArm=null; renderNpcEditor(); renderNpcList(); break;
+    case "open-npc": location.hash="npcs"; setTab("npcs"); S.ui.selNpc=id; renderNpcEditor(); renderNpcList(); break;
+    case "add-filter": { const d=collectNpc(); d.knows.push({label:"",max_depth:"C",domains:[],concepts:[],spheres:[],types:[],scope:"",perspectives:[]}); S.ui.npcDraft=d; renderNpcEditor(); break; }
+    case "rm-filter": { const d=collectNpc(); d.knows.splice(Number(t.dataset.idx),1); S.ui.npcDraft=d; renderNpcEditor(); break; }
+    case "save-npc": await saveNpc(); break;
+    case "del-npc": if(S.ui.delArm!=="n:"+S.ui.selNpc){ S.ui.delArm="n:"+S.ui.selNpc; t.textContent="Click again to delete"; setTimeout(()=>{ if(S.ui.delArm==="n:"+S.ui.selNpc){ S.ui.delArm=null; t.textContent="Delete"; } },4000); } else { const old=S.ui.selNpc; S.ui.delArm=null; try{ await store.remove("npcs",old); toast("Deleted."); }catch(_){ return; } S.ui.selNpc=null; S.ui.npcDraft=null; renderNpcEditor(); renderNpcList(); } break;
+    case "sim-npc": S.ui.simNpc=S.ui.selNpc; location.hash="simulate"; setTab("simulate"); break;
+    case "learn": await setKnown(id,true); break;
+    case "forget": await setKnown(id,false); break;
+    case "new-player": S.ui.playerDraft={...blankPlayer(),_orig:""}; renderPlayerForm(); $("#sim-player").open=true; $("#p-name")?.focus(); break;
+    case "save-player": await savePlayer(); break;
+    case "del-player": if(S.ui.delArm!=="p:"+S.ui.simPlayer){ S.ui.delArm="p:"+S.ui.simPlayer; t.textContent="Click again to delete"; } else { const old=S.ui.simPlayer; S.ui.delArm=null; try{ await store.remove("players",old); }catch(_){ return; } S.ui.simPlayer=[...S.players.keys()][0]||""; renderSimControls(); renderSimResults(); renderPlayerForm(); } break;
+    case "extract": { S.ui.noteText=$("#n-text").value; const r=parseNote(S.ui.noteText); S.ui.extracted=r.entries; S.ui.extractedNpc=r.npc; S.ui.marked=""; S.ui.aiError=r.entries.length?"":"No knowledge callouts found. Mark pieces with > [!knowledge] Title, or ask Claude to suggest them."; renderNotesOut(); break; }
+    case "suggest": await suggest(); break;
+    case "example-note": S.ui.noteText=EXAMPLE_NOTE; $("#n-text").value=EXAMPLE_NOTE; break;
+    case "add-extracted": await addExtracted(); break;
+    case "copy-marked": await copyText(S.ui.marked,$("#marked-out")); break;
+    case "save-tax": await saveTax(); break;
+    case "export": openExport(); break;
+    case "import": openImport(); break;
+    case "do-import": await doImport(); break;
+    case "close-modal": closeModal(); break;
+    case "copy-export": await copyText($("#x-out").value,$("#x-out")); break;
+    case "download-export": { const k=$("#x-kind").value; await offerDownload({json:"runic-knowledge.json",yaml:"runic-knowledge.yaml",note:"runic-knowledge.md"}[k], S._exports[k]); break; }
+  }
+});
+document.addEventListener("input",(ev)=>{
+  const t=ev.target;
+  if(t.id==="f-q"){ S.ui.f.q=t.value; renderLibList(); }
+  else if(t.id==="n-text"){ S.ui.noteText=t.value; }
+  /* Once someone starts typing, live updates stop redrawing that editor. */
+  else if(t.closest && t.closest("#lib-editor") && !S.ui.entryDraft){ S.ui.entryDraft=collectEntry(); }
+  else if(t.closest && t.closest("#npc-editor") && !S.ui.npcDraft){ S.ui.npcDraft=collectNpc(); }
+  else if(t.closest && t.closest("#sim-player-form") && !S.ui.playerDraft){ S.ui.playerDraft={...collectPlayer(),_orig:S.ui.simPlayer}; }
+});
+document.addEventListener("change",(ev)=>{
+  const t=ev.target;
+  const map={"f-domain":"domain","f-concept":"concept","f-sphere":"sphere","f-type":"type","f-status":"status"};
+  if(map[t.id]){ S.ui.f[map[t.id]]=t.value; renderLibList(); return; }
+  if(t.id==="sim-npc"){ S.ui.simNpc=t.value; renderSimResults(); return; }
+  if(t.id==="sim-player-sel"){ S.ui.simPlayer=t.value; S.ui.playerDraft=null; renderSimResults(); renderPlayerForm(); return; }
+  if(t.id==="sim-topic"){ S.ui.simTopic=t.value; renderSimResults(); return; }
+  if(t.id==="x-kind"){ $("#x-out").value=S._exports[t.value]; return; }
+  if(t.dataset && t.dataset.xi!==undefined){ S.ui.extracted[Number(t.dataset.xi)]._skip=!t.checked; return; }
+  if(t.closest && t.closest("#lib-editor") && !S.ui.entryDraft) S.ui.entryDraft=collectEntry();
+  if(t.closest && t.closest("#npc-editor") && !S.ui.npcDraft) S.ui.npcDraft=collectNpc();
+  if(t.closest && t.closest("#sim-player-form") && !S.ui.playerDraft) S.ui.playerDraft={...collectPlayer(),_orig:S.ui.simPlayer};
+});
+document.addEventListener("keydown",(ev)=>{ if(ev.key==="Escape" && !$("#modal").hidden) closeModal(); });
+window.addEventListener("hashchange",()=>{ const h=location.hash.replace("#",""); if(h && h!==S.ui.tab) setTab(h); });
+
+/* ---------- Boot ---------- */
+(async function boot(){
+  const h=location.hash.replace("#","");
+  setTab(TABS.some(([k])=>k===h)?h:"library");
+  renderSide();
+  store.start();
+  try{ const smp=(window.claude && typeof window.claude.use==="function") ? await window.claude.use("sample") : null; S.sample=smp||null; }catch(_){ S.sample=null; }
+  if(S.ui.tab==="notes"){ const b=$("#btn-suggest"), n=$("#suggest-note"); if(b) b.hidden=!S.sample; if(n) n.hidden=!!S.sample; }
+})();
+</script>
+<script>
+/* RunicDocs embed helper, added by tools/add_visualization.py and tools/build_slice_map.py.
+   Inside a RunicDocs note the page sits in an iframe on the same site, so it can follow the site's
+   light/dark toggle (Quartz keeps it in the saved-theme attribute). Opened on its own, or from another
+   origin such as Obsidian, the page keeps the system theme. */
+(function () {
+  try {
+    if (window.parent === window) return;
+    var site = window.parent.document.documentElement;
+    var apply = function () {
+      var t = site.getAttribute("saved-theme");
+      if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+    };
+    apply();
+    new MutationObserver(apply).observe(site, { attributes: true, attributeFilter: ["saved-theme"] });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
