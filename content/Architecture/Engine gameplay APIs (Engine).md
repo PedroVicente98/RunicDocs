@@ -6,7 +6,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 The Engine provides generic, thread-safe building blocks for gameplay, grouped under the GameplayAPI umbrella: Runic::Gameplay (character state, movement, restrictions, interactions, items), Runic::Combat (abilities, targeting, hit detection, statuses, rules, hit resolution, threat), Runic::GameplayFlow (scripted sequences) and Runic::Quest (the quest runtime). Each is its own module with its own boundary and tests. The Engine knows timelines, tags, statuses, rules, threat and perception, but not Health, Stagger, Guard, factions or any other concrete rule.
@@ -64,7 +64,32 @@ Common policies are not Engine code. The new-project assistant in the RunicEdito
 | Behaviors read a context and write an output buffer | Safe in parallel phases; outputs merge in a fixed order |
 | Behaviors are stateless; per-instance state lives in components | Inspection and data reload stay simple |
 | The same registry serves abilities, item effects, AI nodes and interactions | One extension model for any game |
-| Data reloads live; changed C++ needs a restart | A scripting language can be added later behind the same registry |
+| An entry’s signature holds only its context and its output, with no C++ template or Flecs type; the GameplayFlow and Quest registries follow the same contract | A Lua entry registers behind the same ID, and data never knows which language implements it |
+| Data and Lua scripts reload live; changed C++ needs a restart | Content logic iterates in seconds (see [[Engine gameplay APIs (Engine)#Content scripting (Lua)\|Content scripting (Lua)]]) |
+
+### Content scripting (Lua)
+
+Lua (slice 37a) writes content logic: what belongs to one named piece of content and runs when something happens. Systemic logic, what applies to every entity of a kind on every tick, stays in C++ systems configured by data. A Lua script is never compiled to C++: the Cooker turns it into bytecode and the Lua VM, a small C library linked into the simulation, runs it; when a script calls the API, the call enters the same C++ that Game code calls.
+
+| In Lua | In C++ (systems) and data |
+| :---- | :---- |
+| Quest conditions and actions, branching and odd rewards | The quest runtime, objectives, the durable bridge |
+| GameplayFlow steps: escort beats, story scenes, boss phases and arena hazards | The sequence runtime, timers, restrictions, termination |
+| World events: phases, waves, conditions to advance or fail (the drill’s waves, a divine effect) | Event scheduling, spawning from spawn tables, participation, rewards |
+| One-of-a-kind interactables: a door with a condition, a lever puzzle | Seats, doors, housing placement and every interactable that exists many times |
+| Exotic item effects that tags and data cannot express (later: combat hooks run on the worker pool) | The rule pipeline, damage, statuses, threat, movement, perception |
+| Live operations and development commands, scripted test scenarios | Networking, replication, prediction internals, persistence |
+
+**Runtime rules.**
+
+* **One VM per simulation, on the simulation thread.** In this slice Lua entries plug only into the registries that run there (GameplayFlow, Quest, interactions); C++ systems stay on the worker pool.
+* **Event-driven.** A script runs on a fact, on a phase change or at a low rate, never per entity per tick. A script call costs about 0.4 µs over the same logic in C++, about 5 to 12% of a typical interaction whose real work is the C++ it calls (estimate).
+* **Sandboxed and budgeted.** No io, os, load, debug or package; a memory cap per VM; an instruction budget per call. A runaway script is stopped and logged; the tick completes.
+* **Handles, never raw values.** Entity, GlobalEntity and WorldPosition are opaque handles with their C++ type rules; Flecs and Jolt are never reachable.
+* **State lives in components.** The runtime owns the cursor of a sequence and the phase of an event; a script keeps nothing between calls that a handoff or a restart would lose. Time is counted in ticks.
+* **Server first.** Scripts run on the server; whether a predicted hook may also run on the client is an open question (see [[Open questions]]).
+
+**Authoring.** A script is a RunicScript resource in the editor. An interactable or a marker node takes a script and the parameters the script declares; cooking turns them into a ScriptBinding component, and no node exists at run time. Scripts are written in the external IDE with an annotation file generated from the bindings, so the API completes as it is typed. A changed script is cooked and swapped at the next safe tick, keeping the simulation state.
 
 ### Light and perception
 

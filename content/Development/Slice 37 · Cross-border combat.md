@@ -11,12 +11,12 @@ status: "Not started"
 owners: "Engine"
 issue: "https://github.com/PedroVicente98/RunicEngine/issues/180"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
 **Slice:** 37 · **Status:** Not started · **Packages done:** 0 of 4 · **Owners:** Engine · **Issue:** [RunicEngine#180](https://github.com/PedroVicente98/RunicEngine/issues/180)
 
-← [[Slice 36 · Multiple simulations]] · [[RunicGame — Development|All slices]] · [[Slice 38 · Battle scale]] →
+← [[Slice 36 · Multiple simulations]] · [[RunicGame — Development|All slices]] · [[Slice 37a · Lua scripting]] →
 
 **Runnable result:** An attack across the border damages its target once; a sequence and a quest survive handoff
 

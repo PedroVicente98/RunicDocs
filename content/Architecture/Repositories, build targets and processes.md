@@ -5,7 +5,7 @@ tags:
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 Three repositories and one CMake build graph: RunicGame owns the executables, the Engine and Platform are libraries and services it builds on, and the server never links rendering or player UI code.
@@ -37,6 +37,7 @@ RunicGame is the superproject: it pins RunicEngine and RunicPlatform as git subm
 | GameplayAPI | Runic::Combat | Ability toolkit and phase timelines, hit timing per skill, the input buffer, target slots and selection helpers, combat volumes and hit detection, status storage with Game application policies, cooldowns, rule pipeline, behavior registries, hit resolution, invulnerability restrictions, threat table, control primitives, foreign combat | Gameplay, Physics, Environment (projectile wind), DistributedSimulation | yes | CMB-1 to CMB-8 |
 | GameplayAPI | Runic::GameplayFlow | Sequences with trigger, condition and action registries, timers on simulation time, presentation cues, source-owned cleanup, handoff policies | Gameplay, DistributedSimulation (handoff snapshot) | yes | FLOW-1 to FLOW-3 |
 | GameplayAPI | Runic::Quest | Quest runtime and the quest-creation API: definitions, objectives, triggers from facts, instances, durable-fact bridge | GameplayFlow, DistributedSimulation (handoff snapshot) | yes | QST-1 to QST-3 |
+| Scripting | Runic::Scripting | The Lua runtime (one sandboxed VM per simulation, memory and instruction budgets), bindings over the Runic API with opaque handles, Lua entries behind the GameplayFlow, Quest and interaction registries, the ScriptBinding component, hot reload, the bytecode format the Cooker writes | Gameplay, GameplayFlow, Quest, Simulation, Content (Lua private) | yes | SCR-1 to SCR-4 |
 | World systems | Runic::Perception | Light emitters, ambient and skylight, luminosity queries, concealment, warn and detect radii, visibility tiers chosen by a Game function | Gameplay, World, Environment (time of day, weather), Water (underwater light) | yes | PRC-1 to PRC-3 |
 | World systems | Runic::Navigation | Detour and DetourTileCache runtime, nav tiles streamed by cell, path queries behind the MoveGoal contract, 3D flight paths for flying actors | World, Simulation, Assets (Detour private) | yes | NAV-1, NAV-2 |
 | World systems | Runic::AI | BehaviorTree.CPP adapter, working memory, AI scheduling (wake, sleep, leash), intents to commands, reactive combat | Gameplay, Combat, Perception, Navigation (BehaviorTree.CPP private) | yes | AI-1 to AI-6 |
@@ -48,8 +49,8 @@ RunicGame is the superproject: it pins RunicEngine and RunicPlatform as git subm
 | Presentation | Runic::GodotBridge | The GodotLayer (LibGodot instance, window, input), the presenter (RenderFrame to RenderingServer), debug layers, world UI (anchored, diegetic, batched), the view-model binder, the audio backend on the AudioServer; the production look later | Application, Client, Audio, Assets (libgodot and godot-cpp private) | no | GDB-1 to GDB-13 |
 | Presentation | Runic::Animation | Skeletons, clips, animator, blending, poses (scope set by the open animation decision) | Core, Assets | no | ANIM-1 |
 | Presentation | Runic::Audio | Backend interface (implemented by GodotBridge on the AudioServer), buses and mixing, semantic sound events, MusicDirector, albums, soundtrack presets, local profiles | Core, Assets | no | AUD-1, AUD-2 |
-| Tools | Runic::GodotTools | RunicEditor plugins: marker nodes, schema inspectors and Runic file formats in the editor, world and region tools, docks (world, ECS, physics, resolver, AI editor on GraphEdit, live attach), the project template and assistants, Run orchestration, the export plugin that calls the Cooker | Most modules, Cooker (libgodot editor build and godot-cpp private) | never shipped | GDT-1 to GDT-16 |
-| Tools | Runic::Cooker | Cooking orchestration and Runic format writers: Jolt cooking, Recast, meshoptimizer for collision, Zstandard; reads geometry from the scenes Godot imported; runs inside the RunicEditor and headless on build machines | Core, Content, Assets, World, Physics, Navigation, Water (each runtime module owns its cooked format; the Cooker links its writer) | tool | COOK-1 to COOK-8 |
+| Tools | Runic::GodotTools | RunicEditor plugins: marker nodes, schema inspectors and Runic file formats in the editor, world and region tools, docks (world, ECS, physics, resolver, AI editor on GraphEdit, live attach), the project template and assistants, Run orchestration, the export plugin that calls the Cooker, script resources and their parameters | Most modules, Cooker (libgodot editor build and godot-cpp private) | never shipped | GDT-1 to GDT-17 |
+| Tools | Runic::Cooker | Cooking orchestration and Runic format writers: Jolt cooking, Recast, meshoptimizer for collision, Zstandard; reads geometry from the scenes Godot imported; runs inside the RunicEditor and headless on build machines | Core, Content, Assets, World, Physics, Navigation, Water, Scripting (each runtime module owns its cooked format; the Cooker links its writer) | tool | COOK-1 to COOK-8 |
 
 Runic::GameplayAPI is the umbrella target of the GameplayAPI group: it links Gameplay, Combat, GameplayFlow and Quest so the Game links one name, while each module keeps its own boundary and tests.
 

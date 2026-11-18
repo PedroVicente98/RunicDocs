@@ -3,7 +3,7 @@ title: "Development overview"
 tags:
   - "development"
 created: "2026-11-03"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
 Every slice of [[RunicGame — Development]], shown in full in its own box, in roadmap order.
@@ -91,6 +91,8 @@ Every slice of [[RunicGame — Development]], shown in full in its own box, in r
 ![[Slice 36 · Multiple simulations]]
 
 ![[Slice 37 · Cross-border combat]]
+
+![[Slice 37a · Lua scripting]]
 
 ![[Slice 38 · Battle scale]]
 

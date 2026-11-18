@@ -197,7 +197,7 @@ Game code is always compiled before it runs, and Godot never executes it. The Ru
 | Services/ (Go) | Service binaries | Next to the server |
 | Data/ and Content/ | Nothing to compile: cooked, or reloaded live | Read by server and client |
 
-**External IDE and assistants.** C++ and Go are written in an external IDE. The editor generates what the IDE needs (compile\_commands.json for clangd, go.work, VS Code tasks and launch configurations), and a build error in the editor opens the file at its line. Assistants generate template files, register them in CMake or the right registry and open the result in the IDE: **New Flecs system**, **New behavior**, **New quest condition or action**, **New AI node**, **New data type** (a schema), **New marker node** and **New Go service**. Each costs days, the same flow as Unreal’s “New C++ class”.
+**External IDE and assistants.** C++ and Go are written in an external IDE. The editor generates what the IDE needs (compile\_commands.json for clangd, go.work, VS Code tasks and launch configurations), and a build error in the editor opens the file at its line. Assistants generate template files, register them in CMake or the right registry and open the result in the IDE: **New Flecs system**, **New behavior**, **New quest condition or action**, **New AI node**, **New data type** (a schema), **New marker node** and **New Go service**, and from slice 37a **New Lua action or condition**. Each costs days, the same flow as Unreal’s “New C++ class”.
 
 **What Run does:**
 
@@ -219,6 +219,7 @@ RunicGameClient \--project . \--connect 127.0.0.1:7777 \--dev-ticket Build/dev.t
 | Map or asset | Cooks the affected cells and reloads them | A few seconds |
 | One game .cpp | Recompiles, relinks and restarts the local server | 10 to 40 s, mostly linking |
 | One Go service | go build and a restart of that service only | 2 to 10 s |
+| One Lua script (from slice 37a) | Cooks to bytecode and swaps at the next safe tick, keeping simulation state | Under 1 s |
 | The editor library | Recompiles and reloads inside the open editor | 10 to 30 s |
 
 A server restart loses simulation state, but durable state stays in the services. A development checkpoint on stop returns you exactly where you were, with quests and inventory.
@@ -349,7 +350,7 @@ void RunicExportPlugin::_export_file(const String& path, const String& type,
 }
 ```
 
-If a studio ever wants designers to script quests and dialogue, the answer is a sandboxed language on the server (for example Luau), as many MMO servers do: a separate future Runic feature, never GDScript.
+Quests, sequences, events and one-of-a-kind interactables are scripted in Runic’s sandboxed Lua, which runs in the simulation (slice 37a; see [[Engine gameplay APIs (Engine)#Content scripting (Lua)|Content scripting (Lua)]]), never in GDScript.
 
 ### Godot plugins
 

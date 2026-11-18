@@ -109,6 +109,7 @@ Oct 14, 2026 · Pedro
   - [[Engine gameplay APIs (Engine)#Mechanism and policy|Mechanism and policy]]
   - [[Engine gameplay APIs (Engine)#Starter templates|Starter templates]]
   - [[Engine gameplay APIs (Engine)#Behavior registry contract|Behavior registry contract]]
+  - [[Engine gameplay APIs (Engine)#Content scripting (Lua)|Content scripting (Lua)]]
   - [[Engine gameplay APIs (Engine)#Light and perception|Light and perception]]
   - [[Engine gameplay APIs (Engine)#Scripted sequences (GameplayFlow) and restrictions|Scripted sequences (GameplayFlow) and restrictions]]
   - [[Engine gameplay APIs (Engine)#Quest runtime and the quest-creation API|Quest runtime and the quest-creation API]]
