@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10-30 (game vision version of 2026-10-30, rewritten in English). Every conflict of the earlier version was resolved in the game vision, so the Conflict subsections were removed, entries were updated to match it, and the notes that were in Portuguese were translated into English.
@@ -135,6 +135,7 @@ Last sync with [[RunicGame — Complete MMORPG Vision|the game vision]]: 2026-10
 - [[HOUSE-01 Houses and Home Functions|HOUSE-01 · Houses and Home Functions]]
   - [[HOUSE-02 Basements and Cellars|HOUSE-02 · Basements and Cellars]]
 - [[NODE-01 Enemy Activity Tied to Nodes|NODE-01 · Enemy Activity Tied to Nodes]]
+- [[GFX-02 Far Entity Tier|GFX-02 · Far Entity Tier]]
 
 **Lore**
 

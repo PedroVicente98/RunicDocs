@@ -55,6 +55,10 @@ jobs:
       - name: Build the slice map
         run: python3 tools/build_slice_map.py
 
+      # The update timeline is built from the git history (the checkout above fetches all of it).
+      - name: Build the update timeline
+        run: python3 tools/build_changelog.py
+
       - name: Add RunicDocs content and configuration
         run: |
           rm -rf .quartz/content

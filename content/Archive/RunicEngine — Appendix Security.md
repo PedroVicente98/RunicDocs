@@ -3,6 +3,7 @@ title: "RunicEngine — Appendix: Security"
 tags:
   - "archive"
   - "appendix"
+  - "appendix/security"
 source: "RunicEngine — Appendix: Security"
 source_url: "https://docs.google.com/document/d/1W9S-5tPLsfXRzNXKb9vazkhnFiolq1QhV1C1i_o2PbQ/edit"
 created: "2026-10-22"

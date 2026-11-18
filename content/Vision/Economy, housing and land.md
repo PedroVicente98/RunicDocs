@@ -2,10 +2,12 @@
 title: "Economy, housing and land"
 tags:
   - "vision"
+  - "appendix/nodes-economy-exploration"
+  - "appendix/design-compile"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 Land is limited per account, fitted to a grid and never lost: if the tax isn't paid, the plot freezes and returns to the owner as a Deed, with everything in it.

@@ -3,10 +3,12 @@ title: "Networking: replication, interest and handoff (Engine)"
 tags:
   - "architecture"
   - "repo/engine"
+  - "appendix/rendering-lighting-visibility"
+  - "appendix/ping-resolution"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-16"
 ---
 
 Each client receives a priority-ordered, bandwidth-capped delta of only what it may perceive, which keeps a 500-player battle near 50 KB/s per player.
@@ -32,21 +34,24 @@ Beyond the budget, degradation follows a fixed order: lower update rates for dis
 
 ### Interest and visibility tiers (decided)
 
-Candidates come from the 3D cells around the client inside its interest volume (plus a preload margin), filtered by category. Each candidate pair then gets a visibility tier — server-side fog of war. The tiers and what each one sends are data, and a function the Game registers picks the tier from distance, light, concealment and its own rules. RunicGame uses three (GSRV-10):
+Candidates come from the 3D cells around the client inside its interest volume (plus a preload margin), filtered by category. Each candidate pair then gets a visibility tier — server-side fog of war. The tiers and what each one sends are data, and a function the Game registers picks the tier from distance, light, concealment and its own rules. RunicGame uses two (GSRV-10):
 
 | Tier | Condition | Data sent |
 | :---- | :---- | :---- |
-| Full | Within visibility range, set by the target’s luminosity and concealment | Everything |
-| Silhouette | Within the minimum silhouette range in any light, or revealed by contact in the last few seconds | Coarse position and pose at a low rate; no name, gear or identity |
+| Full | Within the visibility range: class range × ambient light × target emission × weather, clamped between about 1 m and 1 km; an entity enters at range R and leaves only beyond R + 10% (hysteresis) | Everything |
 | Hidden | Otherwise | Nothing |
 
-* Contact reveals (RunicGame): hitting or being hit, a heal nearby, AoE contact.
+* The client knows only what the player knows (decided on 9 November): the server never sends an entity the player can't see, and height has no effect on the range. Ambient light comes from the time of day, weather, node, the Underground and the server darkness grid; lanterns, torches and fires lengthen the range; complete darkness and blindness bring it to about 1 m.
 
-* Projectiles and effects from an entity in a tier without identity are sent without the caster’s identity.
+* Contact events (RunicGame): every interaction with a hidden entity (it hits you, or you hit it) sends an anonymous event with position, facing and size class (about 12 bytes) and a handle scoped to the viewer, never the real ID. The client draws a generic silhouette, frozen where the attack came from and colored by relation. Damage over time and auras send at most one per direct hit, or one per attacker every few seconds.
+
+* Projectiles and effects are judged by their own position and light, never the caster’s, and are sent without the caster’s identity when the caster is hidden.
+
+* Cost: the range per observer is about 50 ns and membership about 3 ns per candidate pair. *Proposal: recheck membership at 5 to 10 Hz instead of every tick.* Details: [[Rendering, lighting and visibility (Engine, Game)#Entity visibility|Entity visibility]].
 
 * Cost: one multiplication per candidate pair inside an interest pass that already runs.
 
-* Combat never uses tiers; the server resolves every hit regardless of visibility.
+* Combat never uses tiers; the server resolves every hit regardless of visibility. Telegraph fast-forward, defender grace and predicted impacts apply only to entities the client knows (see [[Ping resolution (Engine, Game)]]).
 
 ### Detail levels and focus
 

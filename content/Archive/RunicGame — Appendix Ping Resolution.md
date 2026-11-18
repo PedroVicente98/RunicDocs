@@ -3,6 +3,7 @@ title: "RunicGame — Appendix: Ping Resolution"
 tags:
   - "archive"
   - "appendix"
+  - "appendix/ping-resolution"
 source: "RunicGame — Appendix: Ping Resolution"
 source_url: "https://docs.google.com/document/d/1iYe10T523upQnBfv91Pk3dL1FC6TuyF7hmdGg6ZG5Ys/edit"
 created: "2026-10-21"

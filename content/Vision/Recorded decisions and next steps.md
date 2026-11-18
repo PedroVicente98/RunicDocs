@@ -2,10 +2,14 @@
 title: "Recorded decisions and next steps"
 tags:
   - "vision"
+  - "appendix/combat-review"
+  - "appendix/design-compile"
+  - "appendix/rendering-lighting-visibility"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 ### Recorded decisions
@@ -102,14 +106,19 @@ modified: "2026-11-05"
 * A chapter needing some of its region's arcs; chapter replays as Altar memories.  
 * Four quest guidance levels.  
 * The pack overriding the back slot without unequipping the glider.  
-* Soul Runes as the name of the runes of living beings.
+* Soul Runes as the name of the runes of living beings.  
+* **Combat (Combat Systems Review, 11 Nov):** input resolution from the most specific match (Shift+key, direction+key, key), dodge and Guard always winning; auto-placement rows and default layouts per class, kept across an Altar reset; skill-granted Resolve blocking CC only, ending if the skill is cancelled, with a PvP uptime cap of about 20 to 25% checked at cook time; a grab against Resolve becoming Stagger build-up; big payoffs consuming the state; a combo hint near the crosshair; the Focus scale 0 to 10; mastery up to 50 with 5 passive slots, one per loadout and per character, no duplicate passives and a budget growing with the minimum level; mastery 50 winning about 60 to 65% of mirror duels; Inscriptions at about 3 h per level at a 0.1 rate; base stamina and mana numbers; the item budget as item level × slot weight × grade, with example point rates; reforge offering 3 distributions; an upgrade swapping the secondary Power, never adding a third.  
+* **Items (9 Nov):** four axes (tier, grade, quality, unique effect), with grade and quality multiplying to +15.5%; 8 tiers every 7 levels (×1.32 per tier); five quality steps up to Masterwork (+10%, needing the profession's mastery), with labor to push a craft one step like WoW's Concentration; grade materials at a fixed cost (127 units from Common to Mythic, the same on every tier); where items start at level 50 by source. Details in [[RunicGame — Design Compile, 5 to 9 November 2026]].  
+* **Number scale (6 Nov):** the scale as a data table that rejects content outside it; damage and healing stored in hundredths and shown as integers, with 1 as the visible floor; a top piece's recipe needing parts of the previous content step's gear.  
+* **Leveling run:** the run's inventory and gold joining the original on return; nothing mailed or traded into the run from the same Lineage; labor shared with the alts; home stations at the run's profession level; with free-to-play, a new account needing some play time (e.g. 10 h) before it triggers the teaching bonus.  
+* **Visuals (9 Nov):** a clear-day haze visibility around 15 km, with terrain beyond it at its coarsest level of detail; one silhouette per unseen entity with a viewer-scoped handle, removed when visible, when combat ends or above about 20, colored from the viewer's side, with a color-blind option.
 
 ### Being defined (Open)
 
 * The mount and aerial trees per class: balancing how easy it is to create new skills with the quality of aerial combat.  
 * The base business model (free-to-play or buy-to-play) and, with it, the launch plan.  
 * Defense's dodge shape and Vitality's exclusive; the Dual Axes' signature mechanic.  
-* Where the Undead start before choosing a faction, which race starts in which area, and the new race traits.  
+* The new race traits.  
 * The cooldown and requirements of switching between the PvE and PvP modes.  
 * The Infamy limit to become a pirate and the rate at which Infamy decays.  
 * Whether pirates can return to a continental faction.  
@@ -119,7 +128,12 @@ modified: "2026-11-05"
 * Whether climbing mounts use stamina.  
 * The name of the runes of living beings, the special resource from coin purses, quest points and the Market Isle.  
 * How story NPCs who die or turn traitor work in a shared world.  
-* How players reach the Sky Island, now that the island staircase is gone.
+* How players reach the Sky Island, now that the island staircase is gone.  
+* **Combat:** the Sword + Shield's signature; charged attacks with press-only input (dropped, or holding comes back); whether the natural Resolve chain stays viable; the weapon mastery format, scope and passive pool; the mastery XP curve; the cost per Inscription level; stamina and mana numbers; the Bow's Guard and alt and the Dual Axes' alt; extra key combinations (W+V, Shift+V); armor weight leanings; the recovery cap (after the recovery table); item slot weights and exchange rates; armor sets; which stats are flat or %; whether healing should come from Magical Power.  
+* **Progression:** where the top of the number scale sits above the launch best-in-slot; the level cap's value (50 is an example); the combined power budget of item level, grade, quality, stat budget, mastery and morphs.  
+* **PvP:** the PvP damage coefficient (×0.25 or ×0.4).  
+* **Leveling run:** crops and animals already on the plot when a run starts (proposed: they keep growing but can be harvested only after returning).  
+* **Items:** tier spacing (8 tiers every 7 levels or 10 every 5) and the material names after adamantite; leather, cloth and wood lines; whether grade on crafted items comes from graded materials or from grade materials added at the craft; whether grade costs grow with the tier; how many quality steps and their names; whether quality replaces the item level axis.
 * The basement's vertical limit. It has to be set before housing zones are cooked.  
 * Which professions get home stations, and whether those stations get the node's specialty return.  
 * What a chest placed in a house does.  
@@ -149,7 +163,7 @@ modified: "2026-11-05"
 | A castle in every region | Discarded; castles exist only on the neutral continent |
 | Altars that don't teleport; a cargo fee on teleports | Discarded |
 | Map discovery per character; three map types per region | Discarded; map discovery per Lineage and charts per node and layer |
-| A short main story | Discarded; the main story is long and non-intrusive |
+| A short main story | Discarded; later (5 Nov) the main story itself was dropped for a long faction series |
 | Gradual free-to-play as a decision | Reopened as part of the business model |
 
 ### Risks

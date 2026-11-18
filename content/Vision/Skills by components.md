@@ -2,10 +2,11 @@
 title: "Skills by components"
 tags:
   - "vision"
+  - "appendix/combat-review"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-13"
+modified: "2026-11-16"
 ---
 
 Every skill is built from data components: damage type, delivery, shape, timeline, effects, CC, conditions, world utility and interaction rules. The components are also the tags that the skill pools, the role passives and the unique effects read, so tuning one component tunes every skill that uses it at once.
@@ -59,11 +60,19 @@ Effects, CC and conditions are separate components that the skill declares. Most
 Each component has a global coefficient, separate for PvE and PvP, and a damage part inherits the product of its components' coefficients. If Area is too strong in wars, lower Area's PvP coefficient and every area skill adjusts together. Coefficients and the armor constant are set in development and playtests. Besides the coefficients, any value can declare its own PvE and PvP values (see [[Combat]]).
 
 ```text
-D_final = D_base × Π k_c × E_role × (1 − R_pool) × M_subtype
+D_final = W × c_skill × (1 + B_power) × Π k_c × E_role × (1 − R_pool) × M_subtype
+Healing = W × c_heal × (1 + B_healing)
+B_power = P ÷ (P + K_P)   (diminishing returns; e.g. K_P = 400: 100 → +20%, 400 → +50%, 1,200 → +75%)
 R_pool = A ÷ (A + K)   (proposal; never reaches 100%)
 ```
 
-D\_base \= the Balance Profile value (base, PvE or PvP); k\_c \= the coefficient of each component of the damage part (PvE or PvP); E\_role \= efficiency from the Roles table; A \= the target's armor in the pool of the hit's domain, blended per piece; M\_subtype \= the physical subtype multiplier against the armor weight, or the magic subtype rule. One curve per pool is easier to read and balance than multiplying layers of resistances.
+W \= the weapon's own damage value (e.g. 20); c\_skill \= the skill's coefficient, its Balance Profile value (base, PvE or PvP); P \= the Power of the damage part's domain: Physical Power, Magical Power or Healing Power, each read by its own part, so splitting points pays off for hybrid skills. Power is a modifier on the weapon's damage, never the damage itself; k\_c \= the coefficient of each component of the damage part (PvE or PvP); E\_role \= efficiency from the Roles table; A \= the target's armor in the pool of the hit's domain, blended per piece; M\_subtype \= the physical subtype multiplier against the armor weight, or the magic subtype rule. One curve per pool is easier to read and balance than multiplying layers of resistances.
+
+* **Direct stats:** no attributes (Strength, Intelligence…) and no stat points chosen by the player; stats come from gear, and changing gear is the respec. The sheet: Health, Stamina, Mana and their regenerations; Physical, Magical and Healing Power, critical chance and damage, Cast Time Reduction and Recovery Reduction; physical and magical armor and Guard; stamina and mana cost reduction; Focus (from mastery only).  
+* **No class is 100% one Power:** every class mixes (magical damage and healing, physical damage and healing…), and martial weapons always give some Physical Power. Healing Power is separate from Magical Power, so a melee healer doesn't need caster stats. *Open: whether healing should come from Magical Power instead.*  
+* **Caps:** every % stat has a hard cap in the base data, and no single accessory maxes a stat: reaching a cap means specializing. Critical damage: base 150%, cap 200% for all content, with no PvE/PvP split. Critical chance: base 5%, cap 40%.  
+* **Cast Time Reduction** shortens only the startup above a 0.5 s floor: new = 0.5 + (base − 0.5) × (1 − r), capped at 30% (a 3 s skill never drops below about 2.25 s; 0.5 s skills don't change). **Recovery Reduction** (attack speed) uses the same formula with a 150 ms floor and a provisional 40% cap, until the recovery table exists. Results round to 30 Hz ticks; a reduction under one tick has no effect.  
+* Stun duration, build-up, threat and similar values stay on skills and passives, never as character stats.
 
 ### Skill anatomy
 
@@ -71,15 +80,15 @@ Almost everything is a standard component; only truly unique behavior goes into 
 
 | Component family | What it describes | Examples | Visible to the player |
 | :---- | :---- | :---- | :---- |
-| Identity | Where it comes from and how it is classified | Weapon kit or Discipline pool, tags (Opener, Finisher) | Yes |
-| Activation | When it can be used and what it costs | Cost, cooldown, cast time, requirements | Yes |
-| Timeline | The rhythm of the strike | Startup, active, recovery, cancel window | No |
+| Identity | Where it comes from and how it is classified | Weapon kit or Discipline pools, medium (martial, infused, spell, innate), tier with per-loadout overrides, capstone flag, morph flag, tags (Opener, Finisher), a one-sentence fantasy line (design only) | Yes, except the fantasy line |
+| Activation | When it can be used and what it costs | Cost (stamina, mana or both), cooldown, cast time, requirements (weapon parts, minimum Focus) | Yes |
+| Timeline | The rhythm of the strike | Startup (shown as the cast bar), active, recovery | Cast time yes, the rest no |
 | Shape | Where the strike happens | Cone, circle, line, projectile; origin; range | Range yes, hitbox no |
 | Damage | How much and of what type | Damage parts with their components | Yes |
 | Effect | What stays after the strike | Concussion, Armor Break, Slow, buffs, with duration | Yes |
 | Condition | Build-up added per hit | Burn, Chill, Bleed… with the amount per hit | Yes |
 | Control | CC that goes through Resolve | Stun, Knockdown, Trip, Root, Stagger | Yes |
-| Movement | The caster's movement | Advance, leap, step back, rooted while casting | Yes |
+| Movement | The caster's movement | Advance, leap, step back; cast mobility: Rooted, Slowed (speed per skill) or Free | Yes |
 | Defense | The skill's own Guard and dodge | Frontal Guard during a dash, iframe | Yes |
 | Threat and protection | The skill's weight in PvE and PvP | Threat multiplier, Challenge | No |
 | World utility | What the skill does for exploration | Lighting (radius, duration, intensity), revealing a path | Yes |
@@ -92,8 +101,8 @@ Almost everything is a standard component; only truly unique behavior goes into 
 
 | Type | Attributes | Unit | Where it shows |
 | :---- | :---- | :---- | :---- |
-| Hidden | Startup (animation until the strike), active, recovery, cancel window | Ticks of the combat domain (30 Hz; 1 tick ≈ 33 ms) | In the feel of the strike and in debug tools |
-| Public | Damage, effects, effect, buff and area durations, cooldown, cost, cast time | Values and seconds, converted to ticks on the server | Tooltip and interface |
+| Hidden | Active and recovery | Ticks of the combat domain (30 Hz; 1 tick ≈ 33 ms) | In the feel of the strike and in debug tools |
+| Public | Damage, effects, effect, buff and area durations, cooldown, cost, cast time (the startup: one phase) | Values and seconds, converted to ticks on the server | Tooltip and interface |
 
 Each weapon has one timing profile (there are no versatile weapons, so no second grip profile): it sets the rhythm of the light and heavy attacks and scales the recovery of the weapon's skills. That way a sword strike recovers faster than a spear strike without every skill repeating it.
 
@@ -152,12 +161,15 @@ The states created by a hit (Stagger, Frozen, a Shock mark, condition build-up) 
 ```yaml
 # Rending Arrow — Bow, War pool (Ranger)
 id: game:rending_arrow
-loadout: bow
 pool: war                    # Discipline skill; costs skill points
+medium: martial              # needs the weapon part; costs stamina
+requires: { parts: [bow] }
+tier: 2
+mobility: rooted
 tags: [opener, projectile]
-activation: { cost: { mana: 20 }, cooldown_s: 8, cast_s: 0.4 }
-timing:                      # hidden, ticks at 30 Hz
-  startup: 10
+activation: { cost: { stamina: 20 }, cooldown_s: 8 }
+timing:                      # ticks at 30 Hz; the startup is the cast bar
+  startup: 12
   active: 2
   recovery: 14               # x the Bow's profile scale
 shape: { kind: projectile, origin: socket, range_m: 28, homing: false }
@@ -173,11 +185,12 @@ interactions:
     at: hit
     do: { add_component: armor_break }
 ---
-# Earth Grasp — Quarterstaff weapon kit
+# Earth Grasp — Quarterstaff, Arcane pool
 id: game:earth_grasp
-loadout: quarterstaff
-pool: weapon                 # basic kit; unlocked by level, no points
-activation: { cooldown_s: 14, cast_s: 1.0 }
+pool: arcane
+medium: infused              # weapon part plus half stamina and half mana
+requires: { parts: [haft] }
+activation: { cost: { stamina: 10, mana: 10 }, cooldown_s: 14, cast_s: 1.0 }
 shape: { kind: circle, origin: crosshair_point, radius_m: 4 }
 damage:
   - share: 1.0
@@ -189,11 +202,11 @@ interactions:
     at: activation
     do: { set: { cast_s: 0 } }
 ---
-# Arcane Torch — Wand weapon kit (world utility)
+# Arcane Torch — Arcane innate skill (world utility)
 id: game:arcane_torch
-loadout: [wand_shield, wand_focus]
-pool: weapon
-activation: { cooldown_s: 30, cast_s: 0.5 }
+pool: arcane
+medium: innate               # mana only; on every loadout of the Discipline
+activation: { cost: { mana: 15 }, cooldown_s: 30, cast_s: 0.5 }
 world_utility:
   light: { radius_m: 12, duration_s: 120, intensity: 0.8 }
 ```

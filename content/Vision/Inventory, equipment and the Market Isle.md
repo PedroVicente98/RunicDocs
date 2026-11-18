@@ -2,10 +2,13 @@
 title: "Inventory, equipment and the Market Isle"
 tags:
   - "vision"
+  - "appendix/combat-review"
+  - "appendix/nodes-economy-exploration"
+  - "appendix/design-compile"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-05"
+modified: "2026-11-16"
 ---
 
 ### Inventory
@@ -19,7 +22,7 @@ The inventory has no weight, only slots. Carrying a lot never slows the characte
 
 ### Equipment slots
 
-* **Combat (13):** main hand \+ off hand, or one 2H weapon; armor (head, chest, hands, legs, feet); jewelry (necklace, 2 rings, 2 earrings); cloak.  
+* **Combat (13):** main hand \+ off hand, or one 2H weapon; armor (head, chest, hands, legs, feet); jewelry (necklace, 2 rings, 2 earrings); cloak, which works as an accessory (bracers maybe later).  
 * **Back:** glider or wing. A trade pack takes it over while carried. *Proposal: the pack overrides the slot without unequipping the glider, which comes back when the pack is dropped, and the cloak is hidden while something is on the back.*  
 * **Profession (5):** head, hands, feet, body and tool, always active (see [[Real exploration#Professions|Professions]]).  
 * There is no ranged slot, no instrument slot and no tool belt. The boarding hook is a single-use item used from the hotbar. *Proposal: no costume or undergarment stat slots, since the account wardrobe covers looks.*

@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
 Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese version of 13 October 2026, with every conflict recorded in [[RunicGame — Ideias]] resolved.
@@ -20,6 +20,7 @@ Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese versi
   - [[Weapon Class System#Loadouts|Loadouts]]
   - [[Weapon Class System#Disciplines|Disciplines]]
   - [[Weapon Class System#Skills, trees and points|Skills, trees and points]]
+  - [[Weapon Class System#Weapon mastery|Weapon mastery]]
   - [[Weapon Class System#Roles|Roles]]
   - [[Weapon Class System#Context kit mount, glider and wing|Context kit: mount, glider and wing]]
   - [[Weapon Class System#Example Sword + Shield|Example: Sword + Shield]]
@@ -28,7 +29,16 @@ Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese versi
 - [[Races]]
 - [[Combat]]
   - [[Combat#Resolve hard and light CC|Resolve: hard and light CC]]
+  - [[Combat#Resources|Resources]]
   - [[Combat#Conditions, build-up and Tolerance|Conditions, build-up and Tolerance]]
+- [[Controls, targeting and skill delivery]]
+  - [[Controls, targeting and skill delivery#Controls and input|Controls and input]]
+  - [[Controls, targeting and skill delivery#Command board|Command board]]
+  - [[Controls, targeting and skill delivery#Timeline and cancelling|Timeline and cancelling]]
+  - [[Controls, targeting and skill delivery#Targeting|Targeting]]
+  - [[Controls, targeting and skill delivery#Skill delivery and casting|Skill delivery and casting]]
+  - [[Controls, targeting and skill delivery#Supports and combos|Supports and combos]]
+  - [[Controls, targeting and skill delivery#Configurability|Configurability]]
 - [[Defense Evasion, Guard and armor|Defense: Evasion, Guard and armor]]
   - [[Defense Evasion, Guard and armor#Evasion|Evasion]]
   - [[Defense Evasion, Guard and armor#Guard|Guard]]
@@ -56,7 +66,7 @@ Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese versi
   - [[Factions, PvP and crime#Outlaw and Infamy|Outlaw and Infamy]]
 - [[PvE]]
 - [[Quests and story]]
-  - [[Quests and story#Main story|Main story]]
+  - [[Quests and story#Series and story|Series and story]]
   - [[Quests and story#Quest design|Quest design]]
 - [[Item progression and infinite progression]]
   - [[Item progression and infinite progression#Anatomy of a weapon|Anatomy of a weapon]]
@@ -64,6 +74,7 @@ Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese versi
   - [[Item progression and infinite progression#Grades|Grades]]
   - [[Item progression and infinite progression#Where everything comes from|Where everything comes from]]
   - [[Item progression and infinite progression#Infinite progression|Infinite progression]]
+  - [[Item progression and infinite progression#The leveling run (New Game+)|The leveling run (New Game+)]]
 - [[Inventory, equipment and the Market Isle]]
   - [[Inventory, equipment and the Market Isle#Inventory|Inventory]]
   - [[Inventory, equipment and the Market Isle#Equipment slots|Equipment slots]]

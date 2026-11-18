@@ -6,16 +6,17 @@ tags:
   - "ideias"
   - "idea"
   - "status/in-game-vision"
+  - "appendix/design-compile"
 id: "QUEST-02"
 status: "In game vision"
-game_vision: "Quests and story › Main story"
+game_vision: "Quests and story › Series and story"
 source: "RunicGame — Ideias"
 source_url: "https://docs.google.com/document/d/17LDd3TGBar3XuFIUUvtsdGn95Op5B6Lsv7XYVe7Meow/edit"
 created: "2026-10-17"
-modified: "2026-11-03"
+modified: "2026-11-16"
 ---
 
-**ID:** QUEST-02 · **Status:** In game vision · **Game vision:** [[Quests and story#Main story|Quests and story › Main story]]
+**ID:** QUEST-02 · **Status:** In game vision · **Game vision:** [[Quests and story#Series and story|Quests and story › Series and story]]
 
 The main story is mandatory, long and non-intrusive, with branching choices ([[QUEST-01 Quests and Leveling Content|QUEST-01]]): it runs beside the rest of the leveling and never gets in the way. The player shapes the rest of the leveling by choosing side content, which also teaches the game's systems ([[LVL-01 Leveling|LVL-01]]).
 

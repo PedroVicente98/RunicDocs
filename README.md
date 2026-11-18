@@ -12,6 +12,7 @@ documents are edited and merged here, in Markdown, not in Google Docs.
 ```
 content/                                      ← the Obsidian vault (open this folder in Obsidian)
 ├── index.md                                  home page (the only index.md; Quartz needs it)
+├── Update timeline.md                        every change to the notes, newest first (generated, see below)
 ├── Vision/                                   RunicGame — Complete MMORPG Vision: the rules
 │   ├── RunicGame — Complete MMORPG Vision.md the document's note: introduction and sections in order
 │   ├── Combat.md                             one note per H2
@@ -26,7 +27,7 @@ content/                                      ← the Obsidian vault (open this 
 │   └── Archived and Discarded ideas.md
 ├── Development/                              the slices checklist and one note per slice (generated, see below)
 ├── Visualizations/                           interactive pages, each shown in a note (see below)
-├── Archive/                                  the original appendices, unchanged, even after they are merged
+├── Archive/                                  the original appendices and compiles, unchanged, even after they are merged
 ├── Lore/                                     one note linking to the RunicGame repository — never delete this folder
 ├── Quest Design/                             one note linking to the RunicGame repository — never delete this folder
 └── attachments/                              images
@@ -35,17 +36,17 @@ quartz-styles/custom.scss                     site styles (the scroll box for em
 quartz-plugins/runic-graph/                   the site's graph, with the settings panel
 .github/workflows/deploy.yml                  builds and publishes the site on every push to main
 scripts/preview.sh|.ps1                       build and serve the site on your machine
-tools/                                        the split script, the move tool, the vault checker and the visualization tools
+tools/                                        the split script, the move tool, the vault checker, the update timeline and the visualization tools
 ```
 
 | Folder | Notes |
 | :--- | ---: |
-| `Vision/` | 22 |
-| `Architecture/` | 29 |
-| `Ideias/` | 108 |
+| `Vision/` | 23 |
+| `Architecture/` | 35 |
+| `Ideias/` | 109 |
 | `Development/` | 54 |
 | `Visualizations/` | 5 |
-| `Archive/` | 5 |
+| `Archive/` | 8 |
 | `Lore/`, `Quest Design/` | 1 each |
 
 ## Rules
@@ -60,6 +61,11 @@ tools/                                        the split script, the move tool, t
 - **Ideias stay whole**, as history: archived and decided entries are never removed. Each idea's ID is its alias.
 - **The original appendices stay intact in `Archive/`**, also after they are merged. Merged notes get no "differences"
   or "conflicts" sections.
+- **Appendix tags.** Every note that holds content from an appendix carries the tag `appendix/<name>`, and so does the
+  appendix itself in `Archive/`, so the tag's page lists the notes that are part of it. Tags in use:
+  `appendix/nodes-economy-exploration`, `appendix/ping-resolution`, `appendix/security`, `appendix/database-layout`,
+  `appendix/content-pipeline`, `appendix/design-compile`, `appendix/rendering-lighting-visibility` and
+  `appendix/combat-review`. A note that later receives text from an appendix gets its tag too.
 - **English throughout.** Titles carry no version ("RunicEngine — Technical Architecture").
 - **Links.** "Section › Subsection" references, "(see X)" references, idea IDs and document names are wikilinks.
 
@@ -91,6 +97,27 @@ status from the GitHub issues of RunicEngine, RunicPlatform and RunicGame (throu
 repositories). A package is done when its issue is closed, and a slice when its issue is closed. To change a slice or a
 package, change the Architecture (and its issue), then run the script; it warns when a package has no issue or an
 issue has no package.
+
+## Update timeline
+
+`content/Update timeline.md` lists every change to the notes, newest first: the date, what the update was (the commit
+subject, linked to the commit) and the notes it added, changed, renamed or removed. `tools/build_changelog.py` writes it
+from the git history, so it is never edited by hand. Regenerated Development notes are counted, not listed, and a group
+of more than 40 notes is shown as counts per folder.
+
+- **On the site** the deploy workflow rebuilds it before building (the checkout fetches the whole history), so the site
+  is always current.
+- **In the vault** run it before committing, with the subject of the commit you are about to make, so the copy in the
+  repository includes that commit too:
+
+```bash
+git add -A
+python3 tools/build_changelog.py --staged "Subject of the commit"
+git add "content/Update timeline.md"
+git commit -m "Subject of the commit"
+```
+
+A clear commit subject is the changelog entry, so write it for a reader: what changed in the documentation, not how.
 
 ## Visualizations
 

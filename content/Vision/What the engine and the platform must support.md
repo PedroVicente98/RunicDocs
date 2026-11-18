@@ -2,10 +2,11 @@
 title: "What the engine and the platform must support"
 tags:
   - "vision"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-10-30"
+modified: "2026-11-16"
 ---
 
 A summary of the requirements this document creates for RunicEngine and the platform, grouped by area. The appendices add their own requirements per repository.

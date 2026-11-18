@@ -2,10 +2,11 @@
 title: "Weapon Class System"
 tags:
   - "vision"
+  - "appendix/combat-review"
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-04"
+modified: "2026-11-16"
 ---
 
 The class is a weapon loadout plus a Discipline. There are ten fixed loadouts and five Disciplines, which make 50 named classes, each with a single role: Damage, Tank or Support (heals and buffs). There is no separate role choice: the role comes from the class. E.g. Sword \+ Shield \+ Defense \= Guardian (Tank); Sword \+ Shield \+ Vitality \= Paladin (Support); Sword \+ Shield \+ War \= Legionnaire (Damage).
@@ -16,28 +17,28 @@ Vertentes no longer exist, and there are no versatile weapons: each weapon is ei
 
 | Layer | What it defines | How it is obtained | When it changes |
 | :---- | :---- | :---- | :---- |
-| Weapon loadout | Basic actions, the weapon's basic kit of skills, range and shape of the strikes, timing profile | Chosen at the Altar | Only at the Altar reset |
+| Weapon loadout | Basic actions, range and shape of the strikes (Reach), timing profile, base damage and base Focus | Chosen at the Altar | Only at the Altar reset |
+| Weapon mastery | The weapon's base kit, its cheap ranged strike, and passives that change the kit or add base damage, defense or Focus | Mastery XP on the equipped weapon type; never reset | Passive choices reset at the Altar |
 | Discipline | The main kit: a pool of skills with its own mechanic | Chosen at the Altar | Only at the Altar reset |
 | Named class | Name, single role (Damage, Tank or Support), role kit and passive, class signature, one merged skill tree | Derived from the loadout plus the Discipline | Changes with the loadout or the Discipline |
 | Skill points | Investment in the Discipline skills | Only by leveling | Redistributed at the Altar reset |
-| Level choices | Some levels offer a choice of weapon skill (e.g. level 35: flame, ice or lightning strike) | By level | Only at the Altar reset |
 
 There is no weapon swap in combat, and no change of weapon type outside the Altar reset. Replacing a weapon with a better one of the same type happens out of combat, as usual.
 
 ### Choosing and resetting the class
 
 * At an Altar the player picks the loadout and the Discipline, which locks the named class. Changing either needs the full reset at an Altar; every city has one.  
-* The reset redistributes the skill points and the level choices. It is paid with in-game gold, and the first one can be free.  
+* The reset redistributes the skill points and clears every mastery passive choice. It is paid with in-game gold, and the first one can be free.  
 * Why fixed loadouts: stronger identity, readability in PvP (the enemy knows what a class can do), a manageable number of classes and animations, and focus on the skill pools.
 
 ### Loadouts
 
 | Loadout | Hands | Delivery | Signature mechanic |
 | :---- | :---- | :---- | :---- |
-| Sword \+ Shield | 1H \+ off hand | Melee | Sword riposte: a short parry that opens a counterattack; the shield gives free, directional Guard and the shield bash |
+| Sword \+ Shield | 1H \+ off hand | Melee | *Open since Riposte became a Discipline skill*; the shield gives free, directional Guard and the shield bash |
 | Wand \+ Shield | 1H \+ off hand | Ranged magic | Fast projectiles and channeling; no bash of its own, so it uses the shield bash |
 | Wand \+ Focus | 1H \+ off hand | Ranged magic | The Focus amplifies spells and gives a personal barrier; more evasion instead of a bash |
-| Spear | 2H | Medium reach | A Stagger meter on the target; a sprint with frontal Guard as its own skill |
+| Spear | 2H | Medium reach | A Stagger meter on the target; a sprint with frontal Guard as its alt action (Shift+RMB) |
 | Quarterstaff | 2H | Monk: staff, punches and kicks; hybrid physical and magical | Flow: alternating staff and empty hand empowers the next spell |
 | Staff | 2H | Ranged magic | Area and long casts; a melee bash that stuns and pushes away |
 | Bow | 2H | Physical ranged (the only one) | Charged shots, with no homing |
@@ -49,8 +50,8 @@ There is no weapon swap in combat, and no change of weapon type outside the Alta
 * **Katana:** not added; its animation style is too different from the Greatsword's.  
 * **Expansion candidates:** a hand crossbow (pirates), a harpoon for naval combat and gauntlets.  
 * **No ranged slot.** The Bow is a loadout you choose, and every melee loadout also has a few cheap long-range skills at the root of its kit (flying slash, air ball, air pierce).  
-* **Basic attacks** use the left and right mouse buttons, have no cooldown and have a fixed damage type per weapon; the Quarterstaff is hybrid, physical and magical. Discipline passives can imbue basic attacks with an element: fire builds Burn, ice builds Chill and lightning builds Shock. Imbuing isn't exclusive to Arcane.  
-* **The bash** has no cooldown, only cost and recovery, but its stun has its own effect cooldown, spent when the skill is used, hit or miss; the effect's cost is paid only on a hit. Any skill can gate its effect the same way. *Proposal: holding the button uses the version with the effect, with a heavier animation, and a tap is the plain bash, so a filler bash never spends the stun by accident.*
+* **Basic attacks** are LMB (light) and Shift+LMB (heavy), with RMB for Guard and Shift+RMB for the alt action. They have no cooldown, cost stamina and have a fixed damage type per weapon; the Quarterstaff is hybrid, physical and magical. Discipline passives can imbue basic attacks with an element: fire builds Burn, ice builds Chill and lightning builds Shock. Imbuing isn't exclusive to Arcane.  
+* **The bash** has no cooldown, only cost and recovery, but its stun has its own effect cooldown, spent when the skill is used, hit or miss; the effect's cost is paid only on a hit. Any skill can gate its effect the same way. The bash is press only, with no hold version.
 
 ### Disciplines
 
@@ -62,7 +63,7 @@ Each Discipline exists because it creates a different play pattern, not just a d
 | Defense | Shields, Guard and protection of allies | Always Tank, except on the Bow, where it is Support | *Proposal: absorb barriers, restoring Guard and reflect* |
 | Vitality | Heals, buffs and cleanse, the largest support kit | Always Support | To define |
 | Arcane | Rune magic: raw arcane damage that ignores part of magical armor, plus elemental spells such as fireball and meteor | Damage or Tank by loadout | Arcane damage, with no build-up, and Acid |
-| Occultism | Skills paid with life, stealth and teleports | Damage, Tank or Support by loadout | Curse and Madness |
+| Occultism | Stealth and teleports (skills paid with life are out for now) | Damage, Tank or Support by loadout | Curse and Madness |
 
 * **Defense on the Bow** is Support: shield arrows damage the enemy and shield allies. The Vigilant (Defense) shields more and the Sacred Archer (Vitality) heals more. Mages tank with magic shields (Wand \+ Focus, Staff), and the Instrument with magic shields around it.  
 * **Elemental conditions** (Burn, Chill, Shock, Poison) are open to every Discipline, because elemental is too wide to lock into one; each Discipline also has something exclusive.  
@@ -71,16 +72,51 @@ Each Discipline exists because it creates a different play pattern, not just a d
 
 ### Skills, trees and points
 
-* **Weapon skills are the basic kit:** light, heavy, the off-hand action and the cheap ranged strike, always available. More unlock automatically by level, with no point cost. Some levels offer a choice (e.g. level 35: flame, ice or lightning strike), changed only at the Altar reset.  
-* **Discipline skills are the main kit.** They cost skill points and are tiered: a pick in one tier unlocks the next.  
-* **One merged tree per named class:** the merge of the weapon and Discipline skills whose requirements match the equipped weapons; a skill in several pools appears once. Discipline skills are filtered by the weapon, so a skill that needs a shield is shared by Sword \+ Shield and Wand \+ Shield.  
+* **The weapon kit comes from weapon mastery** (see below): light, heavy, Guard, the alt action and the cheap ranged strike, always available and outside the tree. The extra weapon skills of earlier versions (Thrust, Riposte, Charge…) are Discipline skills with a weapon requirement, and mastery passives can add effects to them.  
+* **Discipline skills are the main kit.** They cost skill points. Pools belong only to the Disciplines; the weapon kit is in no pool.  
+* **Skill library:** every skill is written once, with its pools, requirements (weapon parts such as blade, point, haft, shield or bow, and a minimum Focus) and a default tier, which a loadout can override (e.g. Vine Strike is tier 1 on the Quarterstaff and tier 2 on the Staff). Each class's tree is cooked from the library, with per-class pin, remove and move overrides for exceptions; a skill in several pools appears once.  
+* **Tiers:** a tier opens by character level and by a number of points spent in the tier below (a different number per tier); passives count as picks. Between 5 and 10 tiers; 28 skill points at level 50 for now (it can become 25, 30…). Ultimates (capstones) sit at level 50, and a build takes only one. One pick per tier and the fully free ArcheAge form were both dropped.  
+* **Skill types** (mediums): **martial** needs the weapon part; **infused** needs the weapon part and costs half stamina and half mana; a **spell** needs a minimum Focus and costs mana; an **innate** skill costs only mana and appears on every loadout of its Discipline. Focus comes only from weapon mastery (some loadouts have a base Focus and always cast spells; mastery passives raise it, so a Greatsword can reach a fireball). It is not an item stat. *Proposal: Focus 0 to 10 (Wand + Focus 10; Wand + Shield, Staff and Instrument 8; Quarterstaff 4; the rest 0), with spells needing 3, 6 or 9.* *To test: a spell from the Discipline pool appears in the skill list once the loadout's Focus reaches it.*  
+* **Builds:** the unlock choices depend on how skills are categorized (melee, area, projectile, projectile with area; buff, heal, damage; weapon or magic; cast, cost, cooldown; morph; kit or Discipline). The same class must allow different builds.  
+* **Discipline skills are filtered by the weapon,** so a skill that needs a shield is shared by Sword \+ Shield and Wand \+ Shield.  
 * **Discipline skills follow the weapon.** Most Discipline skills are written against what every weapon has (light and heavy attack, the off-hand action, Guard, dodge, and tags like Blunt or Finisher), so they work with any loadout. E.g. Bastion (your next Guard within 2 s reflects 30%) works as the shield block, the quarterstaff timed Guard or the spear's Guard while sprinting. Variants by weapon exist only where the form really changes, and Discipline skills reuse the weapon's animations by default.  
 * **Values per class:** the same skill can scale differently in different classes. *Proposal: requirement tags on each skill (e.g. needs an instrument); the named-class list is the allowlist; trees are generated at cook time, with nodes pinned, removed or moved by hand per class; the most specific value wins (class \+ PvP over class, over PvP, over base); per-class overrides stay exceptions.*  
 * Combat skill points come only from leveling, and everyone at max level has the same total. Balance is through the points and the skill cap below, and each skill's power is capped.  
-* **At most 28 combat skills.** A character's weapon skills and Discipline skills together add up to at most 28 skills usable in combat, close to ArcheAge's count. Auxiliary skills don't count: emotes, the context kit (mount, glider and wing) and other non-combat skills are separate categories. *Open: whether a skill added by an item's unique effect counts toward the 28.*  
+* **About 28 combat skill picks** at max level, close to ArcheAge's count. Auxiliary skills don't count: emotes, the context kit (mount, glider and wing) and other non-combat skills are separate categories. *Open: whether a skill added by an item's unique effect counts toward the 28.*  
 * Weapons and effects that grant extra skills make the class stronger, and that is accepted.  
 * **Tags as a contract.** Interactions are reusable conditions and modifiers, not hand-written pairs (see [[Skills by components]]).  
+* **Freedom to author:** any number of skills can be created and spread across the weapons, added later to specific weapons, or used to replace provisional ones. Some skills are weapon-focused and others purely magic (a protective aura not tied to the sword and shield; a magic shield charge tied to the shield).  
 * **Class signature.** Each named class has a small effect of its own: the per-class balance lever, used sparingly.
+
+### Weapon mastery
+
+Weapon mastery is separate from the character level and the Discipline. It is kept per weapon type (one per loadout) and never resets: moving from the Spear to the Instrument starts the Instrument at mastery 1, while level 50 and every Discipline point stay. Players who switch weapons at max level accept that cost.
+
+* **Milestones:** mastery 1 gives the base kit, mastery 5 the cheap ranged strike, mastery 10 the first passive, then one passive choice every 10 levels. *Open: the format (50 levels with a passive every 10, or about 10 levels with something at each), the scope and the passive pool.*  
+* **Passives:** one pool, filtered per weapon. Each passive has a minimum level, and a slot takes any passive at or below its own level (a level-10 passive fits the level-30 slot, not the reverse). A passive is a big stat with no effect, a big effect with no stat, or a smaller stat plus a lesser effect. Mastery gives mostly passives and base-kit changes, including base damage, defense or Focus.  
+* **XP:** only the equipped mastery levels, through a conversion of the base XP (see [[Item progression and infinite progression#Infinite progression|Infinite progression]]). No catch-up: higher-level monsters give more XP, and switching at max level already levels faster.  
+* **Impact:** mastery 1 against max mastery must be felt, neither too strong nor too weak; it can't be measured as a fixed % because it mixes stats and effects.  
+* The level-35 element strike of earlier versions becomes a wider effect milestone.  
+* The whole mastery framework can still change during development.
+
+**Basic kit per loadout** (decided as a direction; the Bow and Dual Axes entries are open):
+
+| Loadout | LMB light | Shift+LMB heavy | RMB Guard | Shift+RMB alt |
+| :---- | :---- | :---- | :---- | :---- |
+| Sword \+ Shield | Slash | Heavy slash | Shield block, free and directional | Shield bash |
+| Wand \+ Shield | Fast bolt | Charged bolt | Shield block | Shield bash |
+| Wand \+ Focus | Bolt | Heavy spell | Magic Guard | Focus personal barrier |
+| Spear | Thrust (builds Stagger) | Sweep | Frontal brace, limited | Sprint with frontal Guard |
+| Quarterstaff | Staff strike | Heavy staff | Timed Guard, then cooldown | Palm or kick (alternating builds Flow) |
+| Staff | Bolt | Area spell | Magic Guard | Bash (stun and push) |
+| Bow | Quick shot | Charged shot | Short deflect (open) | Kick-back (open) |
+| Instrument | Note | Chord (Resonance) | Magic Guard | Bash (stun and push) |
+| Greatsword | Slash | Charged strike (breaks Guard) | Parry Guard, limited | Side dash with frontal Guard |
+| Dual Axes | Flurry | Cleave | Cross guard, limited | Open |
+
+**Reach** is a fixed property of the weapon type: the hit shape (range, angle and width) and the projectile paths, the same for every weapon of that type and never an item stat. It changes only through passives and unique effects (possibly mastery). Range increases come only from outside sources such as ship stations, global to melee and ranged (melee possibly exempt). An effect around the weapon shows the real hit shape, even on basic attacks. A weapon's properties are its type, parts, timing profile, hit shapes, base damage and base Focus; an armor piece's are its weight (iframe share and condition resistance).
+
+*Idea, not decided: Dual Axes as a hybrid mid-range weapon in the style of the Blades of Chaos, mostly physical but also magical, with strikes, chain throws and chain skills.*
 
 ### Roles
 
@@ -104,14 +140,14 @@ Efficiency per role applies to everything the character produces, from the weapo
 
 **Being defined.** The open point is balancing how easy it is to create new skills with the quality of aerial combat.
 
-* Each named class has a mount tree and an aerial tree, with their own points earned by level and separate from the combat tree.  
+* Each named class has a mount tree and an aerial tree, with their own points earned by level and separate from the combat tree, and 5 to 10 skills at most each. *Open: combos in the air.*  
 * Mounted, on a glider or with a wing, the character uses only the context skills.  
 * The mount, glider or wing can modify the kit. E.g. Run becomes a Dash with the same buff and an animation before it; a mount brings its own elemental skill.  
 * The mount kit is the same on the ground and flying.
 
 ### Example: Sword + Shield
 
-* **Loadout:** Sword \+ Shield. Basic kit: light and heavy attack, block, shield bash and a flying slash; more weapon skills unlock by level (Thrust, Riposte, Charge…).  
+* **Loadout:** Sword \+ Shield. Basic kit from weapon mastery: light and heavy attack, block, shield bash and a flying slash. Thrust, Riposte and Charge are Discipline skills that need a sword or a shield.  
 * **With Defense** it is the Guardian, a Tank. The skill points go into Defense skills (Bastion, Wall…), and the Tank kit adds Taunt, Challenge and Unbreakable Guard; Blunt skills restore Guard.  
 * **With Vitality** it is the Paladin, a Support, with Radiant Heal, Blessing and Purify.  
 * **With War** it is the Legionnaire, a Damage class; with Arcane, the Rune Knight (Tank); with Occultism, the Blood Knight (Tank).  

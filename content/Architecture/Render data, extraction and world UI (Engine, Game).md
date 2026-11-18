@@ -4,10 +4,11 @@ tags:
   - "architecture"
   - "repo/engine"
   - "repo/game"
+  - "appendix/rendering-lighting-visibility"
 source: "RunicEngine — Technical Architecture"
 source_url: "https://docs.google.com/document/d/1GOCAfCfUjXrdDzDlcPFirDjGKZ6h20uFtqAEfqHy-dA/edit"
 created: "2026-10-14"
-modified: "2026-11-12"
+modified: "2026-11-16"
 ---
 
 Godot and the player UI never read Flecs, Jolt or the domain modules. Each frame the Client extracts what must be shown into plain RenderData structs that live in Core, and only GodotBridge consumes them: its presenter, debug layers and world UI turn them into Godot calls. The same RenderData feeds the debug layers, built first, and the production look (materials, shaders, lighting), built once the game slice justifies it.
@@ -162,7 +163,7 @@ binder.Bind(vm.skills,     hud, "SkillBar:slots");   // list → slots
 binder.Flush();   // each frame: only changed fields become set() calls on controls
 ```
 
-* **Visibility follows gameplay.** Anchors carry the visibility tier, so in RunicGame a Hidden player shows no nameplate and a Silhouette shows a reduced one.
+* **Visibility follows gameplay.** Anchors carry the visibility tier, so in RunicGame a Hidden entity never reaches the client and a contact silhouette shows no nameplate.
 
 * **Input reaches the UI first.** A click on a diegetic panel becomes a ray, the ray hits the panel’s quad, the hit becomes panel coordinates, and that panel’s SubViewport receives the event. Any action becomes a normal command that the server validates.
 

@@ -3,6 +3,7 @@ title: "RunicGame — Appendix: Content Pipeline and Art Direction"
 tags:
   - "archive"
   - "appendix"
+  - "appendix/content-pipeline"
 source: "RunicGame — Appendix: Content Pipeline and Art Direction"
 source_url: "https://docs.google.com/document/d/1SQ4d0oVU_sqVEO6JtGF4nym9JUYtIM7-3-52tHIbcYQ/edit"
 created: "2026-10-26"

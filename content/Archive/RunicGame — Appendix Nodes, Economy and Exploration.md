@@ -3,6 +3,7 @@ title: "RunicGame — Appendix: Nodes, Economy and Exploration"
 tags:
   - "archive"
   - "appendix"
+  - "appendix/nodes-economy-exploration"
 source: "RunicGame — Appendix: Nodes, Economy and Exploration"
 source_url: "https://docs.google.com/document/d/1HW3MV5eSJhU-cTdsMnc-3lC6XhBCCcP07pZzexqmjCA/edit"
 created: "2026-10-19"
