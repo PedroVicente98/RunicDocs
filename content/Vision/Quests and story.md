@@ -6,7 +6,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-16"
+modified: "2026-11-19"
 ---
 
 ### Series and story
@@ -34,8 +34,8 @@ Decided on 5 November 2026 (see [[RunicGame — Design Compile, 5 to 9 November 
 * **The quest helper** keeps only hints, the knowledge linked to the quest, the timeline and, in some cases, the area around an object.  
 * **Overhear:** a player who stays in an area for the zone's set time (e.g. 1 to 3 s) gets a knowledge entry or a lead, once per character, with optional requirements such as an active quest or a prior entry.  
 * **The Chronicle:** a timeline journal like Divinity: Original Sin 2's and Baldur's Gate 3's: what happened, in order, and what you chose. It points to specific NPCs by name and role, and the player has to find them. Entering a new expansion, chapter or region adds a lead automatically.  
-* **The Codex:** knowledge is collected automatically, like Crimson Desert's; players never take notes by hand. Knowledge earns points, and the reward system is designed later. There is no energy system.  
-* **Asking NPCs:** like EverQuest's keywords, but through knowledge instead of typed words. Every knowledge entry has tags with tiers, every NPC knows tags through their role, home and faction, and an NPC answers only what they would know; the more tags match, the fuller the answer.  
+* **The Codex:** knowledge is collected automatically, like Crimson Desert's; players never take notes by hand. Knowledge earns points, and the reward system is designed later. There is no energy system. The tab itself is in [[Knowledge tab and bestiary]].  
+* **Asking NPCs:** through choices and typed words on one knowledge query, and an NPC answers only what it would know. The rules are in [[Knowledge and dialogue overview|Knowledge and dialogue]].  
 * **Secrets** like World of Warcraft's and EverQuest's: the game never mentions them. A typical secret starts with an item whose description is a riddle, and whoever discovers it becomes a legend.  
 * **Quest points**, RuneScape style, with a regional part that counts toward that region's reputation. The name is open.  
 * **Quest items** never take normal inventory space, are never lost, stolen or dropped, and are never PvP targets (see [[Inventory, equipment and the Market Isle#Inventory|Inventory]]).  

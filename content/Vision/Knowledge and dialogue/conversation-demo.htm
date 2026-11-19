@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conversation demo</title>
+<style>
+:root{--surface-2:#ffffff;--surface-1:#faf9f5;--surface-0:#f0eee6;--bg-neutral:rgba(31,30,29,.06);--border:rgba(31,30,29,.15);--border-strong:rgba(31,30,29,.3);--border-stronger:rgba(31,30,29,.45);--text-primary:#1f1e1d;--text-secondary:#5e5d59;--text-muted:#8b8a85;--text-danger:#a32d2d;--radius:8px;--font-sans:system-ui,-apple-system,"Segoe UI",sans-serif;--font-voice:Georgia,"Times New Roman",serif;color-scheme:light}
+:root[data-theme="dark"]{--surface-2:#30302e;--surface-1:#262624;--surface-0:#1f1e1d;--bg-neutral:rgba(255,255,255,.07);--border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.28);--border-stronger:rgba(255,255,255,.45);--text-primary:#f5f4ef;--text-secondary:#b8b5a9;--text-muted:#8b8a85;--text-danger:#f09595;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--surface-2:#30302e;--surface-1:#262624;--surface-0:#1f1e1d;--bg-neutral:rgba(255,255,255,.07);--border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.28);--border-stronger:rgba(255,255,255,.45);--text-primary:#f5f4ef;--text-secondary:#b8b5a9;--text-muted:#8b8a85;--text-danger:#f09595;color-scheme:dark}}
+body{margin:0;padding:16px;font:16px/1.5 var(--font-sans);color:var(--text-primary);background:transparent}
+button{font:inherit;font-size:14px;padding:6px 12px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:transparent;color:var(--text-primary);cursor:pointer}
+button:hover{background:var(--surface-1)}
+input:not([type]),input[type=text]{font:inherit;font-size:14px;height:36px;padding:0 10px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-primary);box-sizing:border-box}
+input[type=checkbox]{accent-color:#1D9E75}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<style>
+.p{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+.l{font-size:12px;color:var(--text-secondary)}
+.ch{display:inline-block;font-size:12px;padding:2px 8px;border-radius:var(--radius);margin:2px 6px 2px 0}
+.C{background:#E6F1FB;color:#0C447C}.D{background:#FAEEDA;color:#633806}.E{background:#E1F5EE;color:#085041}.H{background:#EEEDFE;color:#3C3489}.N{background:var(--bg-neutral);color:var(--text-secondary)}
+.ob{display:block;width:100%;text-align:left;margin:6px 0;font-size:14px}
+.cd{display:flex;justify-content:space-between;align-items:center;gap:8px;border:0.5px solid var(--border);border-radius:var(--radius);padding:6px 10px;font-size:13px;margin:6px 0}
+.pip{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:4px;border:1px solid var(--text-secondary);vertical-align:-1px}
+:root{--unk:#444441;--unk-line:#444441}
+:root[data-theme="dark"]{--unk:#121211;--unk-line:rgba(255,255,255,.4)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--unk:#121211;--unk-line:rgba(255,255,255,.4)}}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+</style>
+<h2 class="sr-only">A demo conversation with a rune scholar: choices give knowledge, typing finds topics, offers raise standing, patience runs out, and her knowledge web updates.</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">
+<div class="p">
+  <div style="display:flex;gap:12px;align-items:center">
+    <div style="width:40px;height:40px;border-radius:50%;background:var(--bg-neutral);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;color:var(--text-secondary)">RS</div>
+    <div><div style="font-weight:500">Rune scholar</div><div class="l">Neutral cities</div></div>
+  </div>
+  <div id="bar" style="margin-top:10px"></div>
+  <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span id="pat"></span><span id="lang" class="l"></span></div>
+  <div id="line" style="font-family:var(--font-voice);font-size:16px;line-height:1.6;padding:10px 12px;background:var(--surface-1);border-radius:var(--radius);margin-top:10px;min-height:52px"></div>
+  <div id="res" style="min-height:24px;margin-top:6px"></div>
+  <div class="l" style="margin-top:6px">Choices</div>
+  <div id="opts"></div>
+  <div id="typing">
+    <div style="display:flex;gap:8px;margin-top:10px"><input id="kw" placeholder="Ask about a word, like history" style="flex:1" aria-label="Ask about a word"><button id="ask">Ask</button></div>
+    <div id="err" style="font-size:13px;color:var(--text-danger);min-height:18px"></div>
+  </div>
+  <div id="leads" class="l"></div>
+</div>
+<div class="p">
+  <div style="font-weight:500">What she knows</div>
+  <div id="cnt" class="l"></div>
+  <svg id="web" viewBox="0 0 350 245" width="100%" role="img" aria-label="Knowledge web of the rune scholar"></svg>
+  <div id="cap" style="font-size:13px;min-height:20px">Click a circle</div>
+  <div class="l" style="margin-top:8px;line-height:2">
+    <span class="dot" style="background:#9FE1CB;border:1px solid #0F6E56"></span>Known, colored by depth &nbsp;
+    <span class="dot" style="background:var(--unk);border:1px solid var(--unk-line)"></span>Not known yet &nbsp;
+    <span class="dot" style="background:var(--unk);box-shadow:0 0 0 2px #1D9E75"></span>Not known, depth shown &nbsp;
+    Hidden entries never show until learned.
+  </div>
+</div>
+</div>
+<div class="p" style="margin-top:12px">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px"><span style="font-weight:500">Exchange</span><span class="l">Interests: runes, history, the stars</span></div>
+  <div id="cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0 12px"></div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button id="wait">Skip the timer (demo only)</button><button id="reset">Reset</button></div>
+  <div class="l" style="margin-top:8px">Placeholder lore, not canon. The patience meter is shown for the demo; whether players see it is open.</div>
+</div>
+<script>
+const $=i=>document.getElementById(i);
+const DN={C:'Common',D:'Doctrine',E:'Expertise',H:'Hidden'};
+const COL={C:['#B5D4F4','#185FA5'],D:['#FAC775','#854F0B'],E:['#9FE1CB','#0F6E56'],H:['#CECBF6','#534AB7']};
+const N={R1:{c:'runes',d:'C',t:'Runes cannot lie',x:50,y:95},R2:{c:'runes',d:'E',t:'Rune vocabularies',x:100,y:65},R3:{c:'runes',d:'E',t:'The oldest runes',x:150,y:95},H1:{c:'history',d:'C',t:'The first war',x:205,y:95},H2:{c:'history',d:'E',t:'Ruin inscriptions are true history',x:255,y:65},H3:{c:'history',d:'H',t:'What the ancients knew',x:305,y:95},A1:{c:'altars',d:'C',t:'Altars give rest',x:50,y:215},A2:{c:'altars',d:'D',t:'The Altars were a gift of the gods',x:100,y:185},A3:{c:'altars',d:'H',t:'The Altar pact',x:150,y:215},C1:{c:'stars',d:'E',t:'Star runes',x:270,y:200}};
+const ED=[['R1','R2'],['R2','R3'],['H2','H3'],['A1','A2'],['A1','A3'],['R2','C1']];
+const PREV={R2:'R1',R3:'R2',A2:'A1',C1:'R2',H3:'H2',A3:'A1'};
+const CL={runes:['Runes',100,30],history:['History',255,30],altars:['Altars',100,152],stars:['Stars',270,162]};
+const KW={runes:['rune','magic','spell'],history:['history','war','ruin','ancient','inscription','script','empire'],altars:['altar','shrine'],stars:['star','sky','cosmos','constellation','heaven']};
+const HIT={history:"History? I've read my share of it.",stars:"The stars? Now that's a question.",runes:"Runes are my trade.",altars:"The Altars, yes."};
+const Q={R1:'What do you know about runes?',R2:'Tell me about rune vocabularies.',R3:'What are the oldest runes?',H1:'What happened in the first war?',H3:'What did the ancients know?',A2:'Where do the Altars come from?',A3:'Have you heard of the Altar pact?',C1:'Tell me about the stars.'};
+const AFTER={R2:'R1',R3:'R2',A2:'A1'},REQ={C1:'R2'},GATE={R3:5,H3:5,A3:5};
+const TELL={R1:"Runes are the letters of magic, and whatever is written in them is true.",R2:"Every school of runes is a vocabulary. A spell borrows words from several.",R3:"Some runes are older than any writing. I've seen one, once.",H1:"The peoples fought for longer than anyone remembers. That much everyone knows.",H2:"Old script, and old script never lies. Whoever carved this knew things we've lost.",H3:"They wrote with runes we can no longer read. Their ruins still remember.",A2:"The temple says the gods gave us the Altars as a gift.",A3:"Several gods wrote the Altars together, as a pact. Keep it quiet.",C1:"The sky is written too. Every star is a rune, if you can read it."};
+const DENY={R3:"That's not for a casual chat.",H3:"Some things I only tell people I trust.",A3:"That's not something I discuss with strangers."};
+const POOL=[w=>w.charAt(0).toUpperCase()+w.slice(1)+"? Couldn't tell you.",w=>"I don't know anything about "+w+".",w=>"No, "+w+" isn't my field."];
+const SERV=[['vendor','Browse her books','Vendor',"Have a look. Nothing on the top shelf is for sale.",'Vendor window opens'],['quest','About the errand you mentioned','Quest',"The errand? Bring me the rubbing when you have it.",'Quest dialogue continues']];
+const K=[{id:'fish',d:'C',t:'Fishing spot off Saltmarch',r:'no',say:"I'm a scholar, not a fisher."},{id:'kA1',d:'C',t:'Altars give rest',r:'known',say:"Everyone knows that."},{id:'ruins',d:'E',t:'Ruins under Saltmarch',r:'want',v:4,say:"You found them? Tell me everything."},{id:'bell',d:'H',t:'The drowned bell',r:'ok',v:2,say:"A Tide Temple secret. I won't ask how you know.",cost:'Tide Temple reputation lowered'}];
+const CAP=7,MAXP=4;let S;
+const ch=(c,t)=>'<span class="ch '+c+'">'+t+'</span>';
+function say(t,r){$('line').textContent=t;$('res').innerHTML=r||'';}
+const vis=id=>N[id].d!=='H'||S.known.has(id);
+const depthShown=id=>!PREV[id]||S.known.has(PREV[id]);
+function learn(id){S.known.add(id);S.leads.delete(id);S.open.add(N[id].c);}
+function spend(){S.pat=Math.max(0,S.pat-1);return S.pat===0;}
+function init(){S={known:new Set(['A1']),leads:new Set(['A3']),open:new Set(['runes','altars']),s:1,pat:MAXP,xp:0,shown:false,offered:new Set(),note:{},reframed:false,want:true,miss:0};say("Another traveller. Unless you know what lies under Saltmarch, keep it short.",ch('N','Lead: she wants to know what lies under Saltmarch'));$('cap').textContent='Click a circle';all();}
+function all(){bar();opts();web();cards();leads();$('typing').style.display=S.pat>0?'':'none';}
+function mk(p){return '<div style="position:absolute;left:'+p+'%;top:-3px;width:1px;height:14px;background:var(--border-stronger)"></div>';}
+function lb(p,t){return '<span style="position:absolute;top:2px;left:'+p+'%;transform:translateX('+(p===100?'-100%':'-50%')+');white-space:nowrap">'+t+'</span>';}
+function bar(){const s=S.s;$('bar').innerHTML='<div class="l" style="display:flex;justify-content:space-between"><span>Standing: '+(s>=5?'Trusted':'Acquaintance')+'</span><span>'+s+' / 10</span></div><div style="position:relative;height:8px;background:var(--bg-neutral);border-radius:4px;margin-top:4px"><div style="height:8px;width:'+(s*10)+'%;background:#1D9E75;border-radius:4px"></div>'+mk(50)+mk(70)+'</div><div class="l" style="position:relative;height:18px">'+lb(50,'Trusted')+lb(70,'Trade cap')+lb(100,'Confidant')+'</div>';
+ let p='<span class="l">Patience (demo view)</span>';for(let i=0;i<MAXP;i++)p+='<span class="pip" style="background:'+(i<S.pat?'var(--text-primary)':'transparent')+'"></span>';$('pat').innerHTML=p;$('lang').textContent='Language 12 · '+S.xp+' xp';}
+function opts(){const o=[];
+ if(S.pat>0){if(!S.shown)o.push(['show','Show the sunken gate rubbing','Show']);
+  for(const id in Q){const n=N[id];if(!S.open.has(n.c)||S.known.has(id))continue;if(AFTER[id]&&!S.known.has(AFTER[id]))continue;if(n.d==='H'&&!S.leads.has(id))continue;o.push([id,Q[id],n.d==='H'?'Lead':AFTER[id]?'Follow-up':'Topic']);}}
+ SERV.forEach(s=>o.push([s[0],s[1],s[2]]));
+ const el=$('opts');el.innerHTML='';o.forEach(([id,t,k])=>{const b=document.createElement('button');b.className='ob';b.innerHTML=ch('N',k)+t;b.onclick=()=>ask(id);el.appendChild(b);});}
+function ln(a,b,col,da){const A=N[a],B=N[b];return '<line x1="'+A.x+'" y1="'+A.y+'" x2="'+B.x+'" y2="'+B.y+'" style="stroke:'+col+'" stroke-width="1"'+(da?' stroke-dasharray="'+da+'"':'')+'/>';}
+function web(){let h='';for(const k in CL){const [nm,x,y]=CL[k];h+='<text x="'+x+'" y="'+y+'" text-anchor="middle" style="fill:var(--text-secondary);font-size:12px">'+(S.open.has(k)?nm:'?')+'</text>';}
+ ED.forEach(([a,b])=>{if(vis(a)&&vis(b))h+=ln(a,b,'var(--border-strong)','');});
+ if(S.reframed)h+=ln('A3','A2','#BA7517','4 3');
+ for(const id in N){if(!vis(id))continue;const n=N[id];let f,s,w=1.5;
+  if(S.known.has(id)){[f,s]=COL[n.d];}else if(depthShown(id)){f='var(--unk)';s=COL[n.d][1];w=3;}else{f='var(--unk)';s='var(--unk-line)';}
+  if(id==='A2'&&S.reframed&&S.known.has('A2'))h+='<circle cx="'+n.x+'" cy="'+n.y+'" r="16" fill="none" stroke="#BA7517" stroke-width="1"/>';
+  h+='<circle data-id="'+id+'" cx="'+n.x+'" cy="'+n.y+'" r="11" style="fill:'+f+';stroke:'+s+';cursor:pointer" stroke-width="'+w+'"/>';}
+ $('web').innerHTML=h;$('web').querySelectorAll('circle[data-id]').forEach(c=>c.addEventListener('click',()=>cap(c.dataset.id)));
+ const cde=Object.keys(N).filter(i=>N[i].d!=='H'),k=cde.filter(i=>S.known.has(i)).length,f=Object.keys(N).filter(i=>N[i].d==='H'&&S.known.has(i)).length;
+ $('cnt').textContent='Common, doctrine, expertise: '+k+' of '+cde.length+' · hidden: '+f+' found';}
+function cap(id){const n=N[id];$('cap').textContent=S.known.has(id)?n.t+' · '+DN[n.d]+(id==='A2'&&S.reframed?' · reframed by the Altar pact':''):'Not known yet'+(depthShown(id)?' · '+DN[n.d]:'')+(S.open.has(n.c)?' · '+CL[n.c][0]:'');}
+function leads(){const l=[];if(S.leads.has('A3'))l.push('the Altar pact (from the altar keeper)');if(S.leads.has('H3'))l.push('what the ancients knew');if(S.want)l.push('she wants to know what lies under Saltmarch');$('leads').textContent='Leads: '+(l.length?l.join(' · '):'none');}
+function ask(id){
+ const sv=SERV.find(s=>s[0]===id);if(sv){say(sv[3],ch('N',sv[4]));return;}
+ if(id==='show'){S.shown=true;learn('H2');S.leads.add('H3');say(TELL.H2,ch('E','New: ruin inscriptions are true history')+ch('H','Lead: what the ancients knew'));all();return;}
+ if(REQ[id]&&!S.known.has(REQ[id])){say("You'd need to understand rune vocabularies first.",ch('N','Needs groundwork: rune vocabularies'));return;}
+ if(GATE[id]&&S.s<GATE[id]){say(DENY[id],ch('H','Needs more trust: Trusted'));return;}
+ learn(id);let r=ch(N[id].d,'New: '+N[id].t);
+ if(id==='A3'&&S.known.has('A2')){S.reframed=true;r+=ch('D','Reframed: the gift was a misreading of the pact');}
+ if(id==='A2'&&S.known.has('A3')){S.reframed=true;r+=ch('D','Shown in context: the temple misreads the pact');}
+ say(TELL[id],r);all();}
+function out(prev){say("That's enough questions for today.",prev+ch('N','Only quest dialogue and services remain until her patience refills'));}
+function typed(){const w=$('kw').value.trim().toLowerCase();if(!w){$('err').textContent='Type a word first';return;}$('err').textContent='';
+ let cl=null;for(const k in KW)if(KW[k].some(x=>w.includes(x)))cl=k;if(w.includes('pact')&&S.leads.has('A3'))cl='altars';
+ if(cl){if(S.open.has(cl))say("We're already on that. Pick a choice.",ch('N','Topic already open'));else{S.open.add(cl);S.xp+=15;say(HIT[cl],ch('E','Topic found: '+CL[cl][0])+ch('N','New choices')+ch('N','Language +15 xp'));}$('kw').value='';all();return;}
+ const line=POOL[S.miss++%3](w);if(spend())out(ch('N',"Doesn't know"));else say(line,ch('N',"Doesn't know"));$('kw').value='';all();}
+function cards(){if(S.pat<=0){$('cards').innerHTML='<div class="l" style="margin:8px 0">She won\'t hear offers until her patience refills.</div>';return;}
+ $('cards').innerHTML=K.map(c=>'<div class="cd"><span>'+ch(c.d,c.d)+c.t+'</span>'+(S.offered.has(c.id)?'<span class="l">'+S.note[c.id]+'</span>':'<button data-k="'+c.id+'">Offer</button>')+'</div>').join('');
+ $('cards').querySelectorAll('button[data-k]').forEach(b=>b.addEventListener('click',()=>offer(b.dataset.k)));}
+function offer(id){const c=K.find(x=>x.id===id);S.offered.add(id);
+ if(c.r==='no'||c.r==='known'){S.note[id]=c.r==='no'?'Not her interest':'She knew it';if(spend())out(ch('N',S.note[id]));else say(c.say,ch('N',S.note[id]));}
+ else{const b=S.s,g=Math.max(0,Math.min(c.v,CAP-S.s));S.s+=g;S.note[id]='Standing +'+g;let r=ch('E','Standing +'+g);if(c.r==='want'){r+=ch('E','She wanted this');S.want=false;}if(c.cost)r+=ch('D',c.cost);if(g<c.v)r+=ch('N','Trade cap reached');if(b<5&&S.s>=5)r+=ch('E','Now Trusted');say(c.say,r);}
+ all();}
+$('ask').addEventListener('click',typed);$('kw').addEventListener('keydown',e=>{if(e.key==='Enter')typed();});$('kw').addEventListener('input',()=>$('err').textContent='');
+$('wait').addEventListener('click',()=>{S.pat=MAXP;say("You're back. Go on.",'');all();});$('reset').addEventListener('click',init);
+init();
+</script>
+
+<script>
+/* RunicDocs embed helper, added by tools/add_visualization.py and tools/build_slice_map.py.
+   Inside a RunicDocs note the page sits in an iframe on the same site, so it can follow the site's
+   light/dark toggle (Quartz keeps it in the saved-theme attribute). Opened on its own, or from another
+   origin such as Obsidian, the page keeps the system theme. */
+(function () {
+  try {
+    if (window.parent === window) return;
+    var site = window.parent.document.documentElement;
+    var apply = function () {
+      var t = site.getAttribute("saved-theme");
+      if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+    };
+    apply();
+    new MutationObserver(apply).observe(site, { attributes: true, attributeFilter: ["saved-theme"] });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

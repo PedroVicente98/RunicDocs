@@ -9,7 +9,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-16"
+modified: "2026-11-19"
 ---
 
 ### Recorded decisions
@@ -86,6 +86,14 @@ modified: "2026-11-16"
 | Housing | Open-world plots only, no instanced housing; two-floor designs with balconies; farming and husbandry on the plot; recall with a cost and a cooldown; home crafting stations need the profession's mastery; any house can have a packing bench and a resource-pack processing station; buffs only from rare-reward furniture, never combat; no bank, commerce, workers or expeditions at the house |
 | Basements | An extra added after the house: an entrance (trapdoor or staircase), then one cell per expansion, horizontally up to the plot's area or vertically; each expansion needs a new Market Isle design and resource packs; a room like any other, with a cellar by default |
 | Crops and climate | Every crop grows anywhere; the node's climate sets growth efficiency; only neutral-continent crops are exclusive |
+| Knowledge | Server-only, never public; depths Common, Doctrine, Expertise, Hidden and Lost; every entry is true, and only Doctrine can be a misreading, marked with `clarifies` (see [[Knowledge entries]]) |
+| Use of knowledge | Secrets, collections and some storylines; never gear, vendors or services; the main storylines are easy to find |
+| Asking NPCs | Choices and typed words use one query; typing finds topics and adds choices, never knowledge; Hidden and Lost words need a lead (see [[Conversations]]) |
+| Patience | Unknown typed words and unwanted offers cost an NPC's patience; it refills on a hard real-time timer that nothing bypasses; at 0, every knowledge option disappears and only quest dialogue and services remain |
+| Knowledge exchange | The main conversation mechanic, per character; good offers raise standing with that NPC, each piece once, with wants, a trade cap and a reputation cost for secrets (see [[Knowledge exchange]]) |
+| NPC knowledge web | Known entries lit by depth, wherever they were learned; unknown Common, Doctrine and Expertise as dark circles that show their depth once the entry before is known; Hidden and Lost never shown until learned (see [[NPC knowledge web]]) |
+| Bestiary | Basics from inspecting, dealing or taking damage; more at kill thresholds; each drop and then its true rate at its own threshold; secret drops only once dropped; conditional drops such as an active questline; "used in" from known recipes (see [[Knowledge tab and bestiary]]) |
+| Confronting | Dropped, together with the contradicts relation |
 
 ### Still proposed
 
@@ -113,6 +121,8 @@ modified: "2026-11-16"
 * **Leveling run:** the run's inventory and gold joining the original on return; nothing mailed or traded into the run from the same Lineage; labor shared with the alts; home stations at the run's profession level; with free-to-play, a new account needing some play time (e.g. 10 h) before it triggers the teaching bonus.  
 * **Visuals (9 Nov):** a clear-day haze visibility around 15 km, with terrain beyond it at its coarsest level of detail; one silhouette per unseen entity with a viewer-scoped handle, removed when visible, when combat ends or above about 20, colored from the viewer's side, with a color-blind option.
 
+* **Knowledge (19 Nov):** Language XP from typing hits, with the Language level raising maximum patience; the knowledge tab's tabs; plants revealed like creatures; standing with NPCs never decaying.  
+
 ### Being defined (Open)
 
 * The mount and aerial trees per class: balancing how easy it is to create new skills with the quality of aerial combat.  
@@ -137,7 +147,8 @@ modified: "2026-11-16"
 * The basement's vertical limit. It has to be set before housing zones are cooked.  
 * Which professions get home stations, and whether those stations get the node's specialty return.  
 * What a chest placed in a house does.  
-* Which profession owns aging (Cooking is the likely one).
+* Which profession owns aging (Cooking is the likely one).  
+* **Knowledge:** whether players see the patience meter; patience amounts and refill time; topics that collapse in large NPC webs.
 
 ### Archived and discarded
 

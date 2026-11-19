@@ -5,7 +5,7 @@ tags:
 source: "RunicGame — Complete MMORPG Vision"
 source_url: "https://docs.google.com/document/d/1BgyjnLHmloU-AswLXJO2lkD7R-jxIFSedYrKTsCNnqk/edit"
 created: "2026-10-13"
-modified: "2026-11-16"
+modified: "2026-11-19"
 ---
 
 Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese version of 13 October 2026, with every conflict recorded in [[RunicGame — Ideias]] resolved.
@@ -68,6 +68,14 @@ Updated 30 October 2026 · Pedro. Rewritten in English from the Portuguese versi
 - [[Quests and story]]
   - [[Quests and story#Series and story|Series and story]]
   - [[Quests and story#Quest design|Quest design]]
+- [[Knowledge and dialogue overview|Knowledge and dialogue]]
+  - [[Knowledge entries]]
+  - [[NPC knowledge and trust]]
+  - [[Conversations]]
+  - [[Knowledge exchange]]
+  - [[NPC knowledge web]]
+  - [[Knowledge tab and bestiary]]
+  - [[Conversation demo]] and [[Bestiary demo]]
 - [[Item progression and infinite progression]]
   - [[Item progression and infinite progression#Anatomy of a weapon|Anatomy of a weapon]]
   - [[Item progression and infinite progression#Power budget|Power budget]]

@@ -16,6 +16,7 @@ content/                                      ← the Obsidian vault (open this 
 ├── Vision/                                   RunicGame — Complete MMORPG Vision: the rules
 │   ├── RunicGame — Complete MMORPG Vision.md the document's note: introduction and sections in order
 │   ├── Combat.md                             one note per H2
+│   ├── Knowledge and dialogue/               how players learn: knowledge, NPCs, conversations, exchange, bestiary, demos
 │   └── …
 ├── Architecture/                             RunicEngine — Technical Architecture: how they are built
 │   ├── RunicEngine — Technical Architecture.md
@@ -41,7 +42,7 @@ tools/                                        the split script, the move tool, t
 
 | Folder | Notes |
 | :--- | ---: |
-| `Vision/` | 23 |
+| `Vision/` | 32 |
 | `Architecture/` | 35 |
 | `Ideias/` | 109 |
 | `Development/` | 55 |
@@ -131,6 +132,7 @@ embed helper in `tools/templates/embed-helper.html`. In Obsidian the frames may 
 | :--- | :--- |
 | `slice-map.htm` (note: Slice map) | `python3 tools/build_slice_map.py`, from the roadmap, the package tables and the Development notes |
 | `latency-feel-lab.htm`, `runic-database-map.htm`, `targeting-lab.htm`, `knowledge-workbench.htm` | pages made in Claude chats, added with `tools/add_visualization.py` |
+| `Vision/Knowledge and dialogue/conversation-demo.htm`, `bestiary-demo.htm` | pages made in Claude chats, added with `tools/add_visualization.py --folder` |
 
 **The slice map is generated; don't edit it by hand.** Its page comes from `tools/templates/slice-map.html`; the script
 fills in the slices, the packages' needs and, from the Development notes, which packages are done and their issues.
@@ -144,7 +146,8 @@ python3 tools/add_visualization.py SAVED.html page-name --title "Note title" --d
 ```
 
 It writes `content/Visualizations/page-name.htm` (with a document around it if the chat saved only the body, Mermaid
-from jsDelivr instead of the claude.ai runtime, and the embed helper) and creates the note unless it exists. Add the
+from jsDelivr instead of the claude.ai runtime, and the embed helper) and creates the note unless it exists. A page
+that belongs to one section of a document goes in that section's folder instead, with `--folder "Vision/Section"`. Add the
 note to the list in **RunicGame — Visualizations**, then run `tools/check_vault.py`.
 
 ## Graph settings

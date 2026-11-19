@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bestiary demo</title>
+<style>
+:root{--surface-2:#ffffff;--surface-1:#faf9f5;--surface-0:#f0eee6;--bg-neutral:rgba(31,30,29,.06);--border:rgba(31,30,29,.15);--border-strong:rgba(31,30,29,.3);--border-stronger:rgba(31,30,29,.45);--text-primary:#1f1e1d;--text-secondary:#5e5d59;--text-muted:#8b8a85;--text-danger:#a32d2d;--radius:8px;--font-sans:system-ui,-apple-system,"Segoe UI",sans-serif;--font-voice:Georgia,"Times New Roman",serif;color-scheme:light}
+:root[data-theme="dark"]{--surface-2:#30302e;--surface-1:#262624;--surface-0:#1f1e1d;--bg-neutral:rgba(255,255,255,.07);--border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.28);--border-stronger:rgba(255,255,255,.45);--text-primary:#f5f4ef;--text-secondary:#b8b5a9;--text-muted:#8b8a85;--text-danger:#f09595;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--surface-2:#30302e;--surface-1:#262624;--surface-0:#1f1e1d;--bg-neutral:rgba(255,255,255,.07);--border:rgba(255,255,255,.14);--border-strong:rgba(255,255,255,.28);--border-stronger:rgba(255,255,255,.45);--text-primary:#f5f4ef;--text-secondary:#b8b5a9;--text-muted:#8b8a85;--text-danger:#f09595;color-scheme:dark}}
+body{margin:0;padding:16px;font:16px/1.5 var(--font-sans);color:var(--text-primary);background:transparent}
+button{font:inherit;font-size:14px;padding:6px 12px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:transparent;color:var(--text-primary);cursor:pointer}
+button:hover{background:var(--surface-1)}
+input:not([type]),input[type=text]{font:inherit;font-size:14px;height:36px;padding:0 10px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--surface-2);color:var(--text-primary);box-sizing:border-box}
+input[type=checkbox]{accent-color:#1D9E75}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<style>
+.p{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+.l{font-size:12px;color:var(--text-secondary)}
+.ch{display:inline-block;font-size:12px;padding:2px 8px;border-radius:var(--radius);margin:2px 6px 2px 0}
+.D{background:#FAEEDA;color:#633806}.H{background:#EEEDFE;color:#3C3489}
+.sec{border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:13px}
+.lock{color:var(--text-secondary)}
+.row{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:0.5px solid var(--border)}
+</style>
+<h2 class="sr-only">A demo bestiary entry for a tide lurker whose sections, drops, drop rates and recipes unlock through inspecting, fighting, kill counts, questlines and learned recipes.</h2>
+<div class="p">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">
+    <div style="font-weight:500">Bestiary · Tide lurker</div>
+    <div class="l" id="cnt"></div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
+    <button data-a="i">Inspect (R)</button><button data-a="h">Deal damage</button><button data-a="t">Take damage</button>
+    <button data-k="1">Kill 1</button><button data-k="10">Kill 10</button><button data-k="50">Kill 50</button><button id="reset">Reset</button>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-bottom:10px">
+    <label><input type="checkbox" id="q"> Questline active: the drowned bell</label>
+    <label><input type="checkbox" id="r1"> Know recipe: scale armor</label>
+    <label><input type="checkbox" id="r2"> Know recipe: brine tonic</label>
+  </div>
+  <div id="log" style="min-height:24px;font-size:13px"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:6px">
+    <div class="sec"><div class="l">Basics</div><div id="s1"></div></div>
+    <div class="sec"><div class="l">Behavior</div><div id="s2"></div></div>
+    <div class="sec"><div class="l">Weaknesses</div><div id="s3"></div></div>
+    <div class="sec"><div class="l">Lore <span class="ch D">D</span></div><div id="s5"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;margin-top:8px">
+    <div class="sec"><div class="l">Drops</div><div id="s4"></div></div>
+    <div class="sec"><div class="l">Used in · from recipes you know</div><div id="s6"></div></div>
+  </div>
+  <div class="l" style="margin-top:10px">Placeholder creature, drops and numbers, not canon. The secret coin drops 20% of the time per kill while its questline is active.</div>
+</div>
+<script>
+const $=i=>document.getElementById(i);
+const L=[{n:'Lurker scale',see:1,rate:25,p:'31%'},{n:'Brine sac',see:10,rate:50,p:'8%'},{n:'Tidal pearl',see:25,rate:100,p:'1.5%'}];
+let B;
+function init(){B={i:0,h:0,t:0,k:0,coin:false,log:''};$('q').checked=false;$('r1').checked=false;$('r2').checked=false;render();}
+function kill(n){for(let j=0;j<n;j++){B.k++;if($('q').checked&&!B.coin&&Math.random()<0.2){B.coin=true;B.log='<span class="ch H">Secret drop found: drowned coin</span>';}}render();}
+function lk(t){return '<span class="lock">'+t+'</span>';}
+function render(){const k=B.k,basic=B.i||B.h||B.t;
+ $('s1').innerHTML=basic?'Level 18. Lives in the tidal caves of Saltmarch.':lk('Inspect it (R), hit it or get hit');
+ $('s2').innerHTML=k>=1?'Drags prey into the water. Flees below half health.':lk('Kill one');
+ $('s3').innerHTML=k>=10?'Weak to fire. Resists frost.':lk('Kills: '+Math.min(k,10)+' of 10');
+ $('s5').innerHTML=lk('Learned by talking, not fighting. Sailors at the docks have a story.');
+ let d='';L.forEach(x=>{d+='<div class="row">'+(k>=x.see?'<span>'+x.n+'</span><span class="'+(k>=x.rate?'':'lock')+'">'+(k>=x.rate?x.p:'rate at '+x.rate+' kills')+'</span>':'<span class="lock">Unknown drop</span><span class="lock">at '+x.see+' kills</span>')+'</div>';});
+ if(B.coin)d+='<div class="row"><span>Drowned coin <span class="ch H">Secret</span></span><span class="lock">only during its questline</span></div>';
+ $('s4').innerHTML=d;
+ const u=[];if($('r1').checked)u.push('Scale armor · Leatherwork · uses lurker scale');if($('r2').checked)u.push('Brine tonic · Alchemy · uses brine sac');
+ $('s6').innerHTML=u.length?u.map(x=>'<div class="row"><span>'+x+'</span></div>').join(''):lk('No recipe you know uses its drops');
+ const secs=[basic,k>=1,k>=10,k>=1,false].filter(Boolean).length,drops=L.filter(x=>k>=x.see).length;
+ $('cnt').textContent='Kills '+k+' · sections '+secs+' of 5 · drops '+drops+' of 3 · secrets '+(B.coin?1:0)+' found';
+ $('log').innerHTML=B.log;}
+document.querySelectorAll('button[data-a]').forEach(b=>b.addEventListener('click',()=>{B[b.dataset.a]=1;render();}));
+document.querySelectorAll('button[data-k]').forEach(b=>b.addEventListener('click',()=>kill(Number(b.dataset.k))));
+['q','r1','r2'].forEach(i=>$(i).addEventListener('change',render));
+$('reset').addEventListener('click',init);
+init();
+</script>
+
+<script>
+/* RunicDocs embed helper, added by tools/add_visualization.py and tools/build_slice_map.py.
+   Inside a RunicDocs note the page sits in an iframe on the same site, so it can follow the site's
+   light/dark toggle (Quartz keeps it in the saved-theme attribute). Opened on its own, or from another
+   origin such as Obsidian, the page keeps the system theme. */
+(function () {
+  try {
+    if (window.parent === window) return;
+    var site = window.parent.document.documentElement;
+    var apply = function () {
+      var t = site.getAttribute("saved-theme");
+      if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+    };
+    apply();
+    new MutationObserver(apply).observe(site, { attributes: true, attributeFilter: ["saved-theme"] });
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

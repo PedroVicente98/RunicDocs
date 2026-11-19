@@ -2,10 +2,11 @@
 """
 Add an interactive page (for example one made in a Claude chat) to content/Visualizations/.
 
-    python3 tools/add_visualization.py SOURCE.html NAME [--title "Note title" --description "One line."]
+    python3 tools/add_visualization.py SOURCE.html NAME [--title "Note title" --description "One line."] [--folder "Vision/Section"]
 
 NAME is the page's file name without its extension, in lowercase words joined by hyphens (latency-feel-lab). The page
-is written to content/Visualizations/NAME.htm, ready to be served on its own by the site. The extension is .htm because
+is written to content/Visualizations/NAME.htm, or to the folder given with --folder (relative to content/) when the page
+belongs to a section of a document, ready to be served on its own by the site. The extension is .htm because
 Quartz drops .html from the files it copies, and the site would then send the page as a download. On the way:
 
 - a page saved without its <!doctype html><head> (as Claude writes an artifact) gets a minimal document around it;
@@ -14,7 +15,7 @@ Quartz drops .html from the files it copies, and the site would then send the pa
 - the RunicDocs embed helper (tools/templates/embed-helper.html) is added, so inside a note the page follows the
   site's light/dark toggle.
 
-With --title, the script also creates the note content/Visualizations/TITLE.md that shows the page in a frame and
+With --title, the script also creates the note TITLE.md, next to the page, that shows the page in a frame and
 links to it, unless that note exists. Add the new note to the list in "RunicGame — Visualizations" yourself.
 
 Running it again on the same source rewrites the page; the note is never overwritten.
@@ -26,7 +27,6 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "content" / "Visualizations"
 HELPER = ROOT / "tools" / "templates" / "embed-helper.html"
 HELPER_MARK = "RunicDocs embed helper"
 MERMAID = "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"
@@ -89,15 +89,17 @@ def main() -> int:
     ap.add_argument("name", help="file name without extension, e.g. latency-feel-lab")
     ap.add_argument("--title", help="also create the note with this title")
     ap.add_argument("--description", default="", help="the note's opening line")
+    ap.add_argument("--folder", default="Visualizations", help="folder under content/ for the page and its note")
     args = ap.parse_args()
     if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", args.name):
         sys.exit("NAME must be lowercase words joined by hyphens, e.g. latency-feel-lab")
-    OUT.mkdir(parents=True, exist_ok=True)
-    page = OUT / f"{args.name}.htm"
+    out = ROOT / "content" / args.folder
+    out.mkdir(parents=True, exist_ok=True)
+    page = out / f"{args.name}.htm"
     page.write_text(standalone(args.source.read_text(encoding="utf-8")), encoding="utf-8")
     print(f"Wrote {page.relative_to(ROOT)}")
     if args.title:
-        note = OUT / (re.sub(r'[*"\\/<>:|?#^\[\]]', "", args.title) + ".md")
+        note = out / (re.sub(r'[*"\\/<>:|?#^\[\]]', "", args.title) + ".md")
         if note.exists():
             print(f"{note.relative_to(ROOT)} exists; left as it is")
         else:
