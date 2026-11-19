@@ -128,15 +128,15 @@ plugins:
       folderClickBehavior: link
       folderDefaultState: collapsed
       useSavedState: true
-      # Folders first; in each folder the document's own note ("RunicGame — …" / "RunicEngine — …"), then its
-      # overview, then the other notes by name. The explorer runs this string as a JavaScript function in the page.
+      # In each folder the document's own note ("RunicGame — …" / "RunicEngine — …") first, then its overview, then
+      # subfolders, then the other notes by name. The explorer runs this string as a JavaScript function in the page.
       sortFn: |
         (a, b) => {
           const rank = (n) => {
-            if (n.isFolder) return 0;
             const t = (n.data && n.data.title) || "";
-            if (/^Runic(Game|Engine) \u2014 /.test(t)) return 1;
-            if (/overview$/i.test(t)) return 2;
+            if (!n.isFolder && /^Runic(Game|Engine) \u2014 /.test(t)) return 0;
+            if (!n.isFolder && /overview$/i.test(t)) return 1;
+            if (n.isFolder) return 2;
             return 3;
           };
           const d = rank(a) - rank(b);

@@ -167,8 +167,8 @@ search lasts until the page is reloaded. **Reset** goes back to the site's defau
 
 ## Site navigation
 
-- **Sidebar order:** in each folder the document's own note comes first, then its overview, then the other notes by
-  name (the explorer's `sortFn` in `quartz.config.yaml`).
+- **Sidebar order:** in each folder the document's own note comes first, then its overview, then its subfolders (such as
+  `Vision/Knowledge and dialogue/`), then the other notes by name (the explorer's `sortFn` in `quartz.config.yaml`).
 - **Home page:** `content/index.md` has `cssclasses: home-dashboard`, so its callouts show as a grid of cards, on the site
   (`quartz-styles/custom.scss`) and in Obsidian's reading view (the same `runicdocs-embeds` snippet).
 

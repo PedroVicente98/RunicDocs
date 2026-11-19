@@ -12,7 +12,7 @@ Every change to the notes, newest first: what each update was and which notes it
 
 ### 19 November 2026
 
-- **Knowledge and dialogue: the rules for knowledge, NPC conversations, exchange and the bestiary, with two demos**
+- **Knowledge and dialogue: the rules for knowledge, NPC conversations, exchange and the bestiary, with two demos** · [0a46979](https://github.com/PedroVicente98/RunicDocs/commit/0a469795e97e6723f04303db7f92dd7f9e3f4239)
     - Added: [[Bestiary demo]], [[Conversation demo]], [[Conversations]], [[Knowledge and dialogue overview]], [[Knowledge entries]], [[Knowledge exchange]], [[Knowledge tab and bestiary]], [[NPC knowledge and trust]], [[NPC knowledge web]]
     - Changed: [[Quests and story]], [[Recorded decisions and next steps]], [[RunicGame — Complete MMORPG Vision]], [[Knowledge Workbench]], [[RunicGame — Visualizations]]
 
